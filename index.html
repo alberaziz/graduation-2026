@@ -2,43 +2,80 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Class of 2026 - Graduation Booth</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-black text-white min-h-screen flex flex-col items-center justify-center p-3 font-sans">
+<body class="bg-black text-white min-h-screen flex flex-col items-center justify-between p-3 font-sans select-none overflow-hidden">
 
-  <!-- صندوق تنبيه الكاميرا -->
-  <div id="errorBox" class="hidden max-w-sm w-full bg-red-900/80 border border-red-500 p-3 rounded-xl mb-3 text-center text-xs text-red-200"></div>
-
-  <!-- الشاشة الأولى: الكاميرا والفريم الحي -->
-  <div id="cameraView" class="w-full max-w-sm flex flex-col items-center">
-    <div class="relative w-full aspect-square bg-neutral-900 rounded-2xl overflow-hidden shadow-2xl border border-amber-500/20">
-      <video id="video" autoplay playsinline muted class="w-full h-full object-cover transform -scale-x-100"></video>
-      <canvas id="overlayCanvas" class="absolute inset-0 w-full h-full pointer-events-none z-10"></canvas>
-    </div>
-
-    <!-- زرار الالتقاط -->
-    <button id="snapBtn" class="mt-6 w-20 h-20 rounded-full border-4 border-amber-400 flex items-center justify-center bg-black hover:bg-neutral-900 active:scale-95 transition-all shadow-lg shadow-amber-500/20">
-      <div class="w-14 h-14 rounded-full bg-amber-400"></div>
-    </button>
+  <!-- شريط علوي أنيق -->
+  <div class="w-full max-w-sm flex items-center justify-between py-2 px-1 text-xs text-amber-300/80 tracking-widest font-mono">
+    <span>CLASS OF 2026</span>
+    <span id="uploadStatus" class="text-emerald-400 opacity-0 transition-opacity">● تم الحفظ سحابياً</span>
   </div>
 
-  <!-- الشاشة الثانية: المعاينة المؤقتة (بدون أي أزرار) -->
-  <div id="resultView" class="hidden w-full max-w-sm flex flex-col items-center">
-    <div id="statusBadge" class="mb-3 px-4 py-1.5 rounded-full text-xs font-semibold bg-amber-500/20 text-amber-300 border border-amber-400/30 flex items-center gap-2">
-      <span class="animate-spin inline-block w-3 h-3 border-2 border-current border-t-transparent rounded-full"></span>
-      جاري حفظ صورتك في ألبوم التخرج...
+  <!-- صندوق تنبيه للكاميرا -->
+  <div id="errorBox" class="hidden max-w-sm w-full bg-red-900/80 border border-red-500 p-2.5 rounded-xl text-center text-xs text-red-200 mb-2"></div>
+
+  <!-- كادر الكاميرا والفريم -->
+  <div class="relative w-full max-w-sm aspect-square bg-neutral-900 rounded-3xl overflow-hidden shadow-2xl border border-amber-500/20">
+    <video id="video" autoplay playsinline muted class="w-full h-full object-cover transform -scale-x-100"></video>
+    <canvas id="overlayCanvas" class="absolute inset-0 w-full h-full pointer-events-none z-10"></canvas>
+    <!-- تأثير الفلاش اللحظي عند الالتقاط -->
+    <div id="flashEffect" class="absolute inset-0 bg-white pointer-events-none opacity-0 transition-opacity duration-150 z-20"></div>
+  </div>
+
+  <!-- شريط التحكم السفلي (مثل كاميرا الآيفون والأندرويد) -->
+  <div class="w-full max-w-sm flex items-center justify-between px-6 py-5">
+    
+    <!-- زرار المعرض الشخصي (المصغرة) -->
+    <div class="relative w-14 h-14 flex items-center justify-center">
+      <button id="galleryThumbBtn" class="w-13 h-13 rounded-2xl border-2 border-white/40 overflow-hidden bg-neutral-900 focus:outline-none active:scale-90 transition-transform">
+        <img id="thumbImg" src="" class="hidden w-full h-full object-cover" alt="Thumb">
+        <div id="emptyThumbIcon" class="text-xl text-neutral-500 flex items-center justify-center h-full">🖼️</div>
+      </button>
+      <span id="photoBadge" class="hidden absolute -top-1 -right-1 bg-amber-500 text-black text-[10px] font-black px-1.5 py-0.5 rounded-full shadow">0</span>
     </div>
 
-    <!-- عرض النتيجة النهائية -->
-    <div class="w-full aspect-square rounded-2xl overflow-hidden shadow-2xl border border-amber-500/30">
-      <img id="finalPreview" class="w-full h-full object-cover" alt="Graduation Photo">
+    <!-- زرار الالتقاط في المنتصف -->
+    <button id="snapBtn" class="w-20 h-20 rounded-full border-4 border-amber-400 flex items-center justify-center bg-black active:scale-95 transition-all shadow-lg shadow-amber-500/20">
+      <div class="w-14 h-14 rounded-full bg-amber-400 active:bg-amber-300"></div>
+    </button>
+
+    <!-- مساحة متوازنة (مكان زر التبديل) -->
+    <div class="w-14 h-14 flex items-center justify-center text-xs text-neutral-500 font-bold">
+      LIVE
+    </div>
+  </div>
+
+  <!-- المعرض الكامل للصور الشخصية (Full-Screen Gallery Viewer) -->
+  <div id="galleryModal" class="hidden fixed inset-0 bg-black z-50 flex flex-col justify-between p-4">
+    <!-- هيدر المعرض -->
+    <div class="w-full flex items-center justify-between pt-2 pb-4 border-b border-neutral-800">
+      <button id="closeGalleryBtn" class="px-4 py-1.5 bg-neutral-900 rounded-full text-xs text-amber-300 font-bold border border-neutral-700 active:scale-95">
+        ✕ رجوع للكاميرا
+      </button>
+      <span id="galleryCounter" class="text-xs text-neutral-400 font-mono">1 / 1</span>
+      <a id="downloadPhotoBtn" download="grad-photo.jpg" class="px-3 py-1.5 bg-amber-500 text-black rounded-full text-xs font-bold active:scale-95">
+        ⬇️ تنزيل
+      </a>
     </div>
 
-    <p id="timerNotice" class="mt-4 text-xs text-neutral-400 text-center flex items-center justify-center gap-1.5">
-      <span>ألف مبروك! جاري الرجوع للكاميرا خلال لحظات...</span>
-    </p>
+    <!-- عرض الصورة الحالية -->
+    <div class="relative flex-1 flex items-center justify-center p-2">
+      <img id="galleryMainImg" class="max-w-full max-h-[72vh] object-contain rounded-2xl shadow-2xl border border-neutral-800" alt="Graduation View">
+    </div>
+
+    <!-- أسهم التقليب بين صوره -->
+    <div class="w-full flex items-center justify-between px-6 pb-4">
+      <button id="prevPhotoBtn" class="w-12 h-12 rounded-full bg-neutral-900 border border-neutral-700 text-lg flex items-center justify-center active:scale-90 transition-transform">
+        ❮
+      </button>
+      <span class="text-[11px] text-neutral-500">اسحب أو استخدم الأسهم</span>
+      <button id="nextPhotoBtn" class="w-12 h-12 rounded-full bg-neutral-900 border border-neutral-700 text-lg flex items-center justify-center active:scale-90 transition-transform">
+        ❯
+      </button>
+    </div>
   </div>
 
   <canvas id="compositeCanvas" class="hidden"></canvas>
@@ -48,20 +85,32 @@
 
     const video = document.getElementById('video');
     const snapBtn = document.getElementById('snapBtn');
-    const cameraView = document.getElementById('cameraView');
-    const resultView = document.getElementById('resultView');
-    const finalPreview = document.getElementById('finalPreview');
-    const statusBadge = document.getElementById('statusBadge');
     const overlayCanvas = document.getElementById('overlayCanvas');
     const overlayCtx = overlayCanvas.getContext('2d');
     const canvas = document.getElementById('compositeCanvas');
     const ctx = canvas.getContext('2d');
     const errorBox = document.getElementById('errorBox');
+    const flashEffect = document.getElementById('flashEffect');
+    const uploadStatus = document.getElementById('uploadStatus');
 
+    // عناصر الجاليري
+    const galleryThumbBtn = document.getElementById('galleryThumbBtn');
+    const thumbImg = document.getElementById('thumbImg');
+    const emptyThumbIcon = document.getElementById('emptyThumbIcon');
+    const photoBadge = document.getElementById('photoBadge');
+    const galleryModal = document.getElementById('galleryModal');
+    const closeGalleryBtn = document.getElementById('closeGalleryBtn');
+    const galleryMainImg = document.getElementById('galleryMainImg');
+    const galleryCounter = document.getElementById('galleryCounter');
+    const downloadPhotoBtn = document.getElementById('downloadPhotoBtn');
+    const prevPhotoBtn = document.getElementById('prevPhotoBtn');
+    const nextPhotoBtn = document.getElementById('nextPhotoBtn');
+
+    let userPhotos = []; // يحفظ صور المستخدم الحالي فقط
+    let currentPhotoIndex = 0;
     let processedFrameCanvas = null;
-    let autoResetTimer = null;
 
-    // 1. تفريغ الفريم تلقائياً
+    // 1. تفريغ الفريم المباشر
     function processFrame(img) {
       const c = document.createElement('canvas');
       const size = 900;
@@ -81,11 +130,7 @@
       for (let y = Math.floor(minY); y < maxY; y++) {
         for (let x = Math.floor(minX); x < maxX; x++) {
           const idx = (y * size + x) * 4;
-          const r = data[idx];
-          const g = data[idx + 1];
-          const b = data[idx + 2];
-
-          if (r < 50 && g < 50 && b < 50) {
+          if (data[idx] < 50 && data[idx + 1] < 50 && data[idx + 2] < 50) {
             data[idx + 3] = 0;
           }
         }
@@ -105,7 +150,7 @@
     frameImg.src = 'frame.jpg';
     if (frameImg.complete) processFrame(frameImg);
 
-    // 2. تشغيل الكاميرا الأمامية
+    // 2. تشغيل الكاميرا
     async function startCamera() {
       try {
         const stream = await navigator.mediaDevices.getUserMedia({
@@ -116,53 +161,21 @@
         await video.play();
       } catch (err) {
         errorBox.classList.remove('hidden');
-        errorBox.innerHTML = '⚠️ يرجى السماح بصلاحية الكاميرا من إعدادات المتصفح.';
+        errorBox.innerHTML = '⚠️ يرجى السماح بالوصول للكاميرا من إعدادات المتصفح.';
       }
     }
     startCamera();
 
-    // 3. دالة الرجوع للكاميرا وإعادة التهيئة
-    async function resetToCamera() {
-      if (autoResetTimer) clearTimeout(autoResetTimer);
-      
-      resultView.classList.add('hidden');
-      cameraView.classList.remove('hidden');
-      snapBtn.disabled = false;
-
-      // إعادة ضبط رسالة التحميل
-      statusBadge.innerHTML = '<span class="animate-spin inline-block w-3 h-3 border-2 border-current border-t-transparent rounded-full"></span> جاري حفظ صورتك في ألبوم التخرج...';
-      statusBadge.className = 'mb-3 px-4 py-1.5 rounded-full text-xs font-semibold bg-amber-500/20 text-amber-300 border border-amber-400/30 flex items-center gap-2';
-
-      try {
-        if (video.srcObject && video.srcObject.active) {
-          await video.play();
-        } else {
-          await startCamera();
-        }
-      } catch (e) {
-        await startCamera();
-      }
-    }
-
-    // الاستجابة لزر Back في التليفون
-    window.addEventListener('popstate', (e) => {
-      if (!resultView.classList.contains('hidden')) {
-        resetToCamera();
-      }
-    });
-
-    // 4. التقاط ودمج ورفع الصورة
+    // 3. التقاط الصورة وإضافتها لألبوم المستخدم
     snapBtn.addEventListener('click', async () => {
-      snapBtn.disabled = true;
-
-      // إضافة حالة في تاريخ المتصفح عشان زر الـ Back يشتغل محلياً
-      history.pushState({ view: 'result' }, '');
+      // وميض الفلاش السريع
+      flashEffect.style.opacity = '0.85';
+      setTimeout(() => { flashEffect.style.opacity = '0'; }, 120);
 
       const size = 1080;
       canvas.width = size;
       canvas.height = size;
 
-      // قص مربع من منتصف الفيديو لمنع المط
       const vw = video.videoWidth || 1080;
       const vh = video.videoHeight || 1080;
       const minDim = Math.min(vw, vh);
@@ -175,48 +188,79 @@
       ctx.drawImage(video, sx, sy, minDim, minDim, 0, 0, size, size);
       ctx.restore();
 
-      // رسم الفريم فوق الصورة
       if (processedFrameCanvas) {
         ctx.drawImage(processedFrameCanvas, 0, 0, size, size);
       } else {
         ctx.drawImage(frameImg, 0, 0, size, size);
       }
 
-      // إظهار الصورة فوراً
       const base64Image = canvas.toDataURL('image/jpeg', 0.88);
-      finalPreview.src = base64Image;
-      cameraView.classList.add('hidden');
-      resultView.classList.remove('hidden');
 
-      // إيقاف مؤقت لحركة الفيديو
-      video.pause();
+      // إضافة الصورة لقائمة صوره وتحديث المصغرة فوراً
+      userPhotos.unshift(base64Image); // الأحدث أولاً
+      updateThumbnail();
 
-      // الرفع لجوجل درايف في الخلفية
-      try {
-        const filename = `Grad_2026_${Date.now()}.jpg`;
-        await fetch(GOOGLE_SCRIPT_URL, {
-          method: 'POST',
-          mode: 'no-cors',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ image: base64Image, filename: filename })
-        });
+      // إشعار بالحفظ السحابي
+      uploadStatus.style.opacity = '1';
+      setTimeout(() => { uploadStatus.style.opacity = '0'; }, 2500);
 
-        statusBadge.innerHTML = '✅ تم الحفظ في ألبوم الدفعة بنجاح!';
-        statusBadge.className = 'mb-3 px-4 py-1.5 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 flex items-center gap-2';
-      } catch (err) {
-        statusBadge.innerHTML = '⚠️ حدث خطأ أثناء الحفظ بالسيرفر';
+      // الرفع التلقائي في الخلفية بدون تعطيل الكاميرا
+      fetch(GOOGLE_SCRIPT_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ image: base64Image, filename: `Grad_${Date.now()}.jpg` })
+      }).catch(err => console.error(err));
+    });
+
+    // تحديث أيقونة المعرض بجانب زرار التصوير
+    function updateThumbnail() {
+      if (userPhotos.length > 0) {
+        thumbImg.src = userPhotos[0];
+        thumbImg.classList.remove('hidden');
+        emptyThumbIcon.classList.add('hidden');
+        photoBadge.textContent = userPhotos.length;
+        photoBadge.classList.remove('hidden');
       }
+    }
 
-      // الرجوع للكاميرا تلقائياً بعد 4 ثوانٍ
-      autoResetTimer = setTimeout(() => {
-        if (!resultView.classList.contains('hidden')) {
-          if (history.state && history.state.view === 'result') {
-            history.back(); // يستدعي popstate ويرجع للكاميرا بنظافة
-          } else {
-            resetToCamera();
-          }
-        }
-      }, 4000);
+    // 4. فتح وإدارة المعرض الشخصي
+    galleryThumbBtn.addEventListener('click', () => {
+      if (userPhotos.length === 0) return;
+      currentPhotoIndex = 0;
+      showGalleryPhoto(currentPhotoIndex);
+      galleryModal.classList.remove('hidden');
+      history.pushState({ gallery: true }, '');
+    });
+
+    function showGalleryPhoto(index) {
+      if (index < 0 || index >= userPhotos.length) return;
+      currentPhotoIndex = index;
+      galleryMainImg.src = userPhotos[currentPhotoIndex];
+      downloadPhotoBtn.href = userPhotos[currentPhotoIndex];
+      galleryCounter.textContent = `${currentPhotoIndex + 1} / ${userPhotos.length}`;
+    }
+
+    prevPhotoBtn.addEventListener('click', () => {
+      if (currentPhotoIndex > 0) showGalleryPhoto(currentPhotoIndex - 1);
+    });
+
+    nextPhotoBtn.addEventListener('click', () => {
+      if (currentPhotoIndex < userPhotos.length - 1) showGalleryPhoto(currentPhotoIndex + 1);
+    });
+
+    // إغلاق المعرض بالزرار
+    closeGalleryBtn.addEventListener('click', () => {
+      if (history.state && history.state.gallery) {
+        history.back();
+      } else {
+        galleryModal.classList.add('hidden');
+      }
+    });
+
+    // زرار Back في الموبايل يغلق المعرض فوراً
+    window.addEventListener('popstate', () => {
+      galleryModal.classList.add('hidden');
     });
   </script>
 </body>
