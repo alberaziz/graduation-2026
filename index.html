@@ -8,16 +8,13 @@
 </head>
 <body class="bg-black text-white min-h-screen flex flex-col items-center justify-center p-3 font-sans">
 
-  <!-- صندوق تنبيه لو تم رفض إذن الكاميرا -->
+  <!-- صندوق تنبيه الكاميرا -->
   <div id="errorBox" class="hidden max-w-sm w-full bg-red-900/80 border border-red-500 p-3 rounded-xl mb-3 text-center text-xs text-red-200"></div>
 
-  <!-- الشاشة الأولى: الكاميرا مع الفريم المباشر -->
+  <!-- الشاشة الأولى: الكاميرا والفريم الحي -->
   <div id="cameraView" class="w-full max-w-sm flex flex-col items-center">
     <div class="relative w-full aspect-square bg-neutral-900 rounded-2xl overflow-hidden shadow-2xl border border-amber-500/20">
-      <!-- بث الكاميرا المباشر -->
       <video id="video" autoplay playsinline muted class="w-full h-full object-cover transform -scale-x-100"></video>
-      
-      <!-- الفريم المفرغ لايف فوق الكاميرا -->
       <canvas id="overlayCanvas" class="absolute inset-0 w-full h-full pointer-events-none z-10"></canvas>
     </div>
 
@@ -27,19 +24,21 @@
     </button>
   </div>
 
-  <!-- الشاشة الثانية: النتيجة والرفع التلقائي -->
+  <!-- الشاشة الثانية: المعاينة المؤقتة (بدون أي أزرار) -->
   <div id="resultView" class="hidden w-full max-w-sm flex flex-col items-center">
     <div id="statusBadge" class="mb-3 px-4 py-1.5 rounded-full text-xs font-semibold bg-amber-500/20 text-amber-300 border border-amber-400/30 flex items-center gap-2">
       <span class="animate-spin inline-block w-3 h-3 border-2 border-current border-t-transparent rounded-full"></span>
       جاري حفظ صورتك في ألبوم التخرج...
     </div>
 
-    <!-- عرض النتيجة المدمجة -->
+    <!-- عرض النتيجة النهائية -->
     <div class="w-full aspect-square rounded-2xl overflow-hidden shadow-2xl border border-amber-500/30">
       <img id="finalPreview" class="w-full h-full object-cover" alt="Graduation Photo">
     </div>
 
-    <p class="mt-4 text-xs text-neutral-400 text-center">ألف مبروك التخرج! 🎉 صورتك اتحفظت تلقائياً في درايف الدفعة.</p>
+    <p id="timerNotice" class="mt-4 text-xs text-neutral-400 text-center flex items-center justify-center gap-1.5">
+      <span>ألف مبروك! جاري الرجوع للكاميرا خلال لحظات...</span>
+    </p>
   </div>
 
   <canvas id="compositeCanvas" class="hidden"></canvas>
@@ -60,8 +59,9 @@
     const errorBox = document.getElementById('errorBox');
 
     let processedFrameCanvas = null;
+    let autoResetTimer = null;
 
-    // 1. تفريغ قلب الفريم الأسود أوتوماتيكياً
+    // 1. تفريغ الفريم تلقائياً
     function processFrame(img) {
       const c = document.createElement('canvas');
       const size = 900;
@@ -105,7 +105,7 @@
     frameImg.src = 'frame.jpg';
     if (frameImg.complete) processFrame(frameImg);
 
-    // 2. تشغيل الكاميرا
+    // 2. تشغيل الكاميرا الأمامية
     async function startCamera() {
       try {
         const stream = await navigator.mediaDevices.getUserMedia({
@@ -121,22 +121,54 @@
     }
     startCamera();
 
-    // 3. التقاط الصورة مع الحفاظ على الأبعاد الطبيعية (بدون مط)
+    // 3. دالة الرجوع للكاميرا وإعادة التهيئة
+    async function resetToCamera() {
+      if (autoResetTimer) clearTimeout(autoResetTimer);
+      
+      resultView.classList.add('hidden');
+      cameraView.classList.remove('hidden');
+      snapBtn.disabled = false;
+
+      // إعادة ضبط رسالة التحميل
+      statusBadge.innerHTML = '<span class="animate-spin inline-block w-3 h-3 border-2 border-current border-t-transparent rounded-full"></span> جاري حفظ صورتك في ألبوم التخرج...';
+      statusBadge.className = 'mb-3 px-4 py-1.5 rounded-full text-xs font-semibold bg-amber-500/20 text-amber-300 border border-amber-400/30 flex items-center gap-2';
+
+      try {
+        if (video.srcObject && video.srcObject.active) {
+          await video.play();
+        } else {
+          await startCamera();
+        }
+      } catch (e) {
+        await startCamera();
+      }
+    }
+
+    // الاستجابة لزر Back في التليفون
+    window.addEventListener('popstate', (e) => {
+      if (!resultView.classList.contains('hidden')) {
+        resetToCamera();
+      }
+    });
+
+    // 4. التقاط ودمج ورفع الصورة
     snapBtn.addEventListener('click', async () => {
       snapBtn.disabled = true;
+
+      // إضافة حالة في تاريخ المتصفح عشان زر الـ Back يشتغل محلياً
+      history.pushState({ view: 'result' }, '');
 
       const size = 1080;
       canvas.width = size;
       canvas.height = size;
 
-      // حساب مقاس القص المربع من منتصف الكادر
+      // قص مربع من منتصف الفيديو لمنع المط
       const vw = video.videoWidth || 1080;
       const vh = video.videoHeight || 1080;
       const minDim = Math.min(vw, vh);
       const sx = (vw - minDim) / 2;
       const sy = (vh - minDim) / 2;
 
-      // رسم الكاميرا في مربع متناسق بدون أي تشويه أبعادي
       ctx.save();
       ctx.translate(size, 0);
       ctx.scale(-1, 1);
@@ -150,16 +182,16 @@
         ctx.drawImage(frameImg, 0, 0, size, size);
       }
 
-      // عرض النتيجة
+      // إظهار الصورة فوراً
       const base64Image = canvas.toDataURL('image/jpeg', 0.88);
       finalPreview.src = base64Image;
       cameraView.classList.add('hidden');
       resultView.classList.remove('hidden');
 
-      const stream = video.srcObject;
-      if (stream) stream.getTracks().forEach(track => track.stop());
+      // إيقاف مؤقت لحركة الفيديو
+      video.pause();
 
-      // الرفع إلى Google Drive
+      // الرفع لجوجل درايف في الخلفية
       try {
         const filename = `Grad_2026_${Date.now()}.jpg`;
         await fetch(GOOGLE_SCRIPT_URL, {
@@ -174,6 +206,17 @@
       } catch (err) {
         statusBadge.innerHTML = '⚠️ حدث خطأ أثناء الحفظ بالسيرفر';
       }
+
+      // الرجوع للكاميرا تلقائياً بعد 4 ثوانٍ
+      autoResetTimer = setTimeout(() => {
+        if (!resultView.classList.contains('hidden')) {
+          if (history.state && history.state.view === 'result') {
+            history.back(); // يستدعي popstate ويرجع للكاميرا بنظافة
+          } else {
+            resetToCamera();
+          }
+        }
+      }, 4000);
     });
   </script>
 </body>
