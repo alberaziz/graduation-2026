@@ -45,7 +45,6 @@
   <canvas id="compositeCanvas" class="hidden"></canvas>
 
   <script>
-    // رابط تطبيق الويب الخاص بـ Google Apps Script
     const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyJqgbbH2UBN-KzefwQspwHAU-iIx-W0gbcBGafuoFNNdzqT5lTlV3-C1lp8KCjuIhH/exec";
 
     const video = document.getElementById('video');
@@ -62,7 +61,7 @@
 
     let processedFrameCanvas = null;
 
-    // 1. تفريغ الجزء الداخلي من الفريم برمجياً
+    // 1. تفريغ قلب الفريم الأسود أوتوماتيكياً
     function processFrame(img) {
       const c = document.createElement('canvas');
       const size = 900;
@@ -74,7 +73,6 @@
       const imgData = fCtx.getImageData(0, 0, size, size);
       const data = imgData.data;
 
-      // حدود المربع الداخلي للفريم
       const minX = size * 0.15;
       const maxX = size * 0.85;
       const minY = size * 0.08;
@@ -87,7 +85,6 @@
           const g = data[idx + 1];
           const b = data[idx + 2];
 
-          // تفريغ درجات الأسود في المنتصف
           if (r < 50 && g < 50 && b < 50) {
             data[idx + 3] = 0;
           }
@@ -97,7 +94,6 @@
       fCtx.putImageData(imgData, 0, 0);
       processedFrameCanvas = c;
 
-      // رسم الفريم على الشاشة فوق الكاميرا فوراً
       overlayCanvas.width = overlayCanvas.clientWidth || 360;
       overlayCanvas.height = overlayCanvas.clientHeight || 360;
       overlayCtx.drawImage(processedFrameCanvas, 0, 0, overlayCanvas.width, overlayCanvas.height);
@@ -109,14 +105,13 @@
     frameImg.src = 'frame.jpg';
     if (frameImg.complete) processFrame(frameImg);
 
-    // 2. تشغيل الكاميرا الأمامية بسلاسة على متصفحات الموبايل
+    // 2. تشغيل الكاميرا
     async function startCamera() {
       try {
-        const constraints = {
+        const stream = await navigator.mediaDevices.getUserMedia({
           video: { facingMode: 'user' },
           audio: false
-        };
-        const stream = await navigator.mediaDevices.getUserMedia(constraints);
+        });
         video.srcObject = stream;
         await video.play();
       } catch (err) {
@@ -126,7 +121,7 @@
     }
     startCamera();
 
-    // 3. التقاط ودمج ورفع الصورة تلقائياً
+    // 3. التقاط الصورة مع الحفاظ على الأبعاد الطبيعية (بدون مط)
     snapBtn.addEventListener('click', async () => {
       snapBtn.disabled = true;
 
@@ -134,31 +129,37 @@
       canvas.width = size;
       canvas.height = size;
 
-      // رسم لقطة الكاميرا معكوسة كمرآة طبيعية
+      // حساب مقاس القص المربع من منتصف الكادر
+      const vw = video.videoWidth || 1080;
+      const vh = video.videoHeight || 1080;
+      const minDim = Math.min(vw, vh);
+      const sx = (vw - minDim) / 2;
+      const sy = (vh - minDim) / 2;
+
+      // رسم الكاميرا في مربع متناسق بدون أي تشويه أبعادي
       ctx.save();
       ctx.translate(size, 0);
       ctx.scale(-1, 1);
-      ctx.drawImage(video, 0, 0, size, size);
+      ctx.drawImage(video, sx, sy, minDim, minDim, 0, 0, size, size);
       ctx.restore();
 
-      // رسم الفريم المفرغ فوق صورة الشخص
+      // رسم الفريم فوق الصورة
       if (processedFrameCanvas) {
         ctx.drawImage(processedFrameCanvas, 0, 0, size, size);
       } else {
         ctx.drawImage(frameImg, 0, 0, size, size);
       }
 
-      // عرض النتيجة للمستخدم فوراً
+      // عرض النتيجة
       const base64Image = canvas.toDataURL('image/jpeg', 0.88);
       finalPreview.src = base64Image;
       cameraView.classList.add('hidden');
       resultView.classList.remove('hidden');
 
-      // إيقاف الكاميرا
       const stream = video.srcObject;
       if (stream) stream.getTracks().forEach(track => track.stop());
 
-      // 4. إرسال الصورة لـ Google Drive بدون أي تدخل
+      // الرفع إلى Google Drive
       try {
         const filename = `Grad_2026_${Date.now()}.jpg`;
         await fetch(GOOGLE_SCRIPT_URL, {
