@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>كاميرا التخرج التذكارية</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-950 text-white min-h-screen flex flex-col items-center justify-center p-4 font-sans">
+
+  <!-- الشاشة الأولى: الكاميرا والفريم الحي -->
+  <div id="cameraView" class="w-full max-w-sm flex flex-col items-center">
+    <h2 class="text-lg font-bold mb-3 text-amber-300">ابتسم لكاميرا التخرج 🎓</h2>
+    
+    <div class="relative w-full aspect-[3/4] bg-black rounded-2xl overflow-hidden border-2 border-amber-400/40 shadow-2xl">
+      <video id="video" autoplay playsinline muted class="w-full h-full object-cover transform -scale-x-100"></video>
+      
+      <!-- الفريم المباشر فوق الكاميرا -->
+      <div class="absolute inset-0 pointer-events-none flex flex-col justify-between p-4 border-4 border-amber-400/30 rounded-2xl">
+        <div class="flex justify-center text-4xl pt-2">🎓</div>
+        <div class="text-center text-xs tracking-widest text-amber-200/80 bg-black/40 py-1 rounded-full">
+          GRADUATION CELEBRATION
+        </div>
+      </div>
+    </div>
+
+    <!-- زرار الالتقاط -->
+    <button id="snapBtn" class="mt-6 w-20 h-20 rounded-full border-4 border-white flex items-center justify-center bg-amber-500 hover:bg-amber-400 active:scale-95 transition-all shadow-lg shadow-amber-500/30">
+      <div class="w-14 h-14 rounded-full bg-white"></div>
+    </button>
+  </div>
+
+  <!-- الشاشة الثانية: النتيجة والرفع التلقائي -->
+  <div id="resultView" class="hidden w-full max-w-sm flex flex-col items-center">
+    <div id="statusBadge" class="mb-3 px-4 py-1.5 rounded-full text-xs font-semibold bg-amber-500/20 text-amber-300 border border-amber-400/30 flex items-center gap-2">
+      <span class="animate-spin inline-block w-3 h-3 border-2 border-current border-t-transparent rounded-full"></span>
+      جاري حفظ صورتك في ألبوم التخرج...
+    </div>
+
+    <!-- البوستر النهائي المدمج -->
+    <div class="w-full aspect-[3/4] rounded-2xl overflow-hidden shadow-2xl border-2 border-amber-400/40">
+      <img id="finalPreview" class="w-full h-full object-cover" alt="Graduation Poster">
+    </div>
+
+    <p class="mt-4 text-xs text-slate-400 text-center">ألف مبروك التخرج! صورتك اتحفظت تلقائياً في درايف الدفعة.</p>
+  </div>
+
+  <canvas id="compositeCanvas" class="hidden"></canvas>
+
+  <script>
+    // ⚠️ ضع هنا رابط تطبيق الويب الذي نسخته (الذي ينتهي بـ /exec)
+    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyJqgbbH2UBN-KzefwQspwHAU-iIx-W0gbcBGafuoFNNdzqT5lTlV3-C1lp8KCjuIhH/exec";
+
+    const video = document.getElementById('video');
+    const snapBtn = document.getElementById('snapBtn');
+    const cameraView = document.getElementById('cameraView');
+    const resultView = document.getElementById('resultView');
+    const finalPreview = document.getElementById('finalPreview');
+    const statusBadge = document.getElementById('statusBadge');
+    const canvas = document.getElementById('compositeCanvas');
+    const ctx = canvas.getContext('2d');
+
+    // تشغيل الكاميرا الأمامية
+    async function startCamera() {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: 'user', width: { ideal: 1080 }, height: { ideal: 1440 } },
+          audio: false
+        });
+        video.srcObject = stream;
+      } catch (err) {
+        alert("يرجى إعطاء صلاحية الكاميرا للتصوير.");
+      }
+    }
+    startCamera();
+
+    // التقاط ودمج ورفع أوتوماتيكي
+    snapBtn.addEventListener('click', async () => {
+      snapBtn.disabled = true;
+
+      // أبعاد البوستر التذكاري
+      const posterWidth = 1080;
+      const posterHeight = 1440;
+      canvas.width = posterWidth;
+      canvas.height = posterHeight;
+
+      // 1. الخلفية المتدرجة للبوستر الخارجي
+      const bgGrad = ctx.createLinearGradient(0, 0, posterWidth, posterHeight);
+      bgGrad.addColorStop(0, '#090d16');
+      bgGrad.addColorStop(0.5, '#111827');
+      bgGrad.addColorStop(1, '#05070a');
+      ctx.fillStyle = bgGrad;
+      ctx.fillRect(0, 0, posterWidth, posterHeight);
+
+      // إطار ذهبي خارجي
+      ctx.lineWidth = 14;
+      ctx.strokeStyle = '#d4af37';
+      ctx.strokeRect(30, 30, posterWidth - 60, posterHeight - 60);
+
+      // النصوص العلوية
+      ctx.fillStyle = '#fef08a';
+      ctx.font = 'bold 54px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('أَلْف مَبْرُوك التَّخَرُّج', posterWidth / 2, 130);
+
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = '28px sans-serif';
+      ctx.fillText('CLASS OF 2026', posterWidth / 2, 180);
+
+      // 2. كارت الصورة في المنتصف
+      const photoWidth = 820;
+      const photoHeight = 940;
+      const photoX = (posterWidth - photoWidth) / 2;
+      const photoY = 220;
+
+      // خلفية بيضاء للكارت
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(photoX - 15, photoY - 15, photoWidth + 30, photoHeight + 30);
+
+      // رسم صورة الشخص معكوسة كمرآة طبيعية
+      ctx.save();
+      ctx.translate(photoX + photoWidth, photoY);
+      ctx.scale(-1, 1);
+      ctx.drawImage(video, 0, 0, photoWidth, photoHeight);
+      ctx.restore();
+
+      // الفريم والتهنئة الداخلية فوق الصورة
+      ctx.font = '90px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('🎓', posterWidth / 2, photoY + 95);
+
+      ctx.fillStyle = '#1e293b';
+      ctx.fillRect(photoX, photoY + photoHeight - 70, photoWidth, 70);
+      ctx.fillStyle = '#facc15';
+      ctx.font = 'bold 30px sans-serif';
+      ctx.fillText('ذكريات لا تُنسى ✨', posterWidth / 2, photoY + photoHeight - 24);
+
+      // نص سفلي
+      ctx.fillStyle = '#cbd5e1';
+      ctx.font = '26px sans-serif';
+      ctx.fillText('حفلة التخرج الرسمية', posterWidth / 2, posterHeight - 100);
+
+      // عرض النتيجة فوراً للمستخدم
+      const base64Image = canvas.toDataURL('image/jpeg', 0.85);
+      finalPreview.src = base64Image;
+      cameraView.classList.add('hidden');
+      resultView.classList.remove('hidden');
+
+      // إيقاف بث الكاميرا
+      const stream = video.srcObject;
+      if (stream) stream.getTracks().forEach(track => track.stop());
+
+      // 3. إرسال الصورة لجوجل درايف تلقائياً
+      try {
+        const filename = `Grad_${Date.now()}.jpg`;
+        await fetch(GOOGLE_SCRIPT_URL, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ image: base64Image, filename: filename })
+        });
+
+        statusBadge.innerHTML = '✅ تم الحفظ في ألبوم الدفعة بنجاح!';
+        statusBadge.className = 'mb-3 px-4 py-1.5 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 flex items-center gap-2';
+      } catch (err) {
+        console.error(err);
+        statusBadge.innerHTML = '⚠️ حدث خطأ أثناء الحفظ';
+      }
+    });
+  </script>
+</body>
+</html>
