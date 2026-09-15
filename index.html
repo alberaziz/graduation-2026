@@ -1,77 +1,78 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="en" dir="ltr">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Class of 2026 - Graduation Booth</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-black text-white min-h-screen flex flex-col items-center justify-between p-3 font-sans select-none overflow-hidden">
+<body class="bg-black text-white h-[100dvh] w-full overflow-hidden select-none font-sans relative">
 
-  <!-- شريط علوي أنيق -->
-  <div class="w-full max-w-sm flex items-center justify-between py-2 px-1 text-xs text-amber-300/80 tracking-widest font-mono">
-    <span>CLASS OF 2026</span>
-    <span id="uploadStatus" class="text-emerald-400 opacity-0 transition-opacity">● تم الحفظ سحابياً</span>
+  <!-- Top Status Bar -->
+  <div class="absolute top-0 inset-x-0 z-30 flex items-center justify-between px-5 pt-4 pb-8 bg-gradient-to-b from-black/80 to-transparent text-xs tracking-widest font-mono">
+    <span class="text-amber-300/90 font-bold">CLASS OF 2026</span>
+    <span id="uploadStatus" class="text-emerald-400 opacity-0 transition-opacity duration-300 flex items-center gap-1.5">
+      <span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+      Saved to Drive
+    </span>
   </div>
 
-  <!-- صندوق تنبيه للكاميرا -->
-  <div id="errorBox" class="hidden max-w-sm w-full bg-red-900/80 border border-red-500 p-2.5 rounded-xl text-center text-xs text-red-200 mb-2"></div>
+  <!-- Camera Permission Error -->
+  <div id="errorBox" class="hidden absolute top-16 inset-x-4 z-40 bg-red-900/90 border border-red-500 p-3 rounded-2xl text-center text-xs text-red-200"></div>
 
-  <!-- كادر الكاميرا والفريم -->
-  <div class="relative w-full max-w-sm aspect-square bg-neutral-900 rounded-3xl overflow-hidden shadow-2xl border border-amber-500/20">
+  <!-- Full-Screen Camera & Frame Viewport -->
+  <div class="relative w-full h-full overflow-hidden bg-neutral-950 flex items-center justify-center">
     <video id="video" autoplay playsinline muted class="w-full h-full object-cover transform -scale-x-100"></video>
     <canvas id="overlayCanvas" class="absolute inset-0 w-full h-full pointer-events-none z-10"></canvas>
-    <!-- تأثير الفلاش اللحظي عند الالتقاط -->
     <div id="flashEffect" class="absolute inset-0 bg-white pointer-events-none opacity-0 transition-opacity duration-150 z-20"></div>
   </div>
 
-  <!-- شريط التحكم السفلي (مثل كاميرا الآيفون والأندرويد) -->
-  <div class="w-full max-w-sm flex items-center justify-between px-6 py-5">
+  <!-- Bottom Camera Controls -->
+  <div class="absolute bottom-0 inset-x-0 z-30 flex items-center justify-around px-6 pt-10 pb-8 bg-gradient-to-t from-black/90 via-black/40 to-transparent">
     
-    <!-- زرار المعرض الشخصي (المصغرة) -->
+    <!-- Gallery Thumbnail -->
     <div class="relative w-14 h-14 flex items-center justify-center">
       <button id="galleryThumbBtn" class="w-13 h-13 rounded-2xl border-2 border-white/40 overflow-hidden bg-neutral-900 focus:outline-none active:scale-90 transition-transform">
-        <img id="thumbImg" src="" class="hidden w-full h-full object-cover" alt="Thumb">
+        <img id="thumbImg" src="" class="hidden w-full h-full object-cover" alt="Gallery">
         <div id="emptyThumbIcon" class="text-xl text-neutral-500 flex items-center justify-center h-full">🖼️</div>
       </button>
       <span id="photoBadge" class="hidden absolute -top-1 -right-1 bg-amber-500 text-black text-[10px] font-black px-1.5 py-0.5 rounded-full shadow">0</span>
     </div>
 
-    <!-- زرار الالتقاط في المنتصف -->
+    <!-- Shutter Capture Button -->
     <button id="snapBtn" class="w-20 h-20 rounded-full border-4 border-amber-400 flex items-center justify-center bg-black active:scale-95 transition-all shadow-lg shadow-amber-500/20">
       <div class="w-14 h-14 rounded-full bg-amber-400 active:bg-amber-300"></div>
     </button>
 
-    <!-- مساحة متوازنة (مكان زر التبديل) -->
-    <div class="w-14 h-14 flex items-center justify-center text-xs text-neutral-500 font-bold">
-      LIVE
-    </div>
+    <!-- Flip Camera Button -->
+    <button id="flipBtn" class="w-14 h-14 rounded-2xl bg-neutral-900/80 border border-white/20 flex items-center justify-center active:scale-90 transition-transform text-white">
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+      </svg>
+    </button>
   </div>
 
-  <!-- المعرض الكامل للصور الشخصية (Full-Screen Gallery Viewer) -->
+  <!-- Full-Screen Gallery Viewer -->
   <div id="galleryModal" class="hidden fixed inset-0 bg-black z-50 flex flex-col justify-between p-4">
-    <!-- هيدر المعرض -->
     <div class="w-full flex items-center justify-between pt-2 pb-4 border-b border-neutral-800">
       <button id="closeGalleryBtn" class="px-4 py-1.5 bg-neutral-900 rounded-full text-xs text-amber-300 font-bold border border-neutral-700 active:scale-95">
-        ✕ رجوع للكاميرا
+        Back to Camera
       </button>
       <span id="galleryCounter" class="text-xs text-neutral-400 font-mono">1 / 1</span>
-      <a id="downloadPhotoBtn" download="grad-photo.jpg" class="px-3 py-1.5 bg-amber-500 text-black rounded-full text-xs font-bold active:scale-95">
-        ⬇️ تنزيل
+      <a id="downloadPhotoBtn" download="graduation-2026.jpg" class="px-5 py-1.5 bg-amber-500 hover:bg-amber-400 text-black rounded-full text-xs font-bold active:scale-95 transition-all">
+        Download
       </a>
     </div>
 
-    <!-- عرض الصورة الحالية -->
     <div class="relative flex-1 flex items-center justify-center p-2">
-      <img id="galleryMainImg" class="max-w-full max-h-[72vh] object-contain rounded-2xl shadow-2xl border border-neutral-800" alt="Graduation View">
+      <img id="galleryMainImg" class="max-w-full max-h-[72vh] object-contain rounded-2xl shadow-2xl border border-neutral-800" alt="Captured Photo">
     </div>
 
-    <!-- أسهم التقليب بين صوره -->
     <div class="w-full flex items-center justify-between px-6 pb-4">
       <button id="prevPhotoBtn" class="w-12 h-12 rounded-full bg-neutral-900 border border-neutral-700 text-lg flex items-center justify-center active:scale-90 transition-transform">
         ❮
       </button>
-      <span class="text-[11px] text-neutral-500">اسحب أو استخدم الأسهم</span>
+      <span class="text-[11px] text-neutral-500">Browse Photos</span>
       <button id="nextPhotoBtn" class="w-12 h-12 rounded-full bg-neutral-900 border border-neutral-700 text-lg flex items-center justify-center active:scale-90 transition-transform">
         ❯
       </button>
@@ -85,6 +86,7 @@
 
     const video = document.getElementById('video');
     const snapBtn = document.getElementById('snapBtn');
+    const flipBtn = document.getElementById('flipBtn');
     const overlayCanvas = document.getElementById('overlayCanvas');
     const overlayCtx = overlayCanvas.getContext('2d');
     const canvas = document.getElementById('compositeCanvas');
@@ -93,7 +95,6 @@
     const flashEffect = document.getElementById('flashEffect');
     const uploadStatus = document.getElementById('uploadStatus');
 
-    // عناصر الجاليري
     const galleryThumbBtn = document.getElementById('galleryThumbBtn');
     const thumbImg = document.getElementById('thumbImg');
     const emptyThumbIcon = document.getElementById('emptyThumbIcon');
@@ -106,30 +107,33 @@
     const prevPhotoBtn = document.getElementById('prevPhotoBtn');
     const nextPhotoBtn = document.getElementById('nextPhotoBtn');
 
-    let userPhotos = []; // يحفظ صور المستخدم الحالي فقط
+    let currentFacingMode = 'user';
+    let userPhotos = [];
     let currentPhotoIndex = 0;
     let processedFrameCanvas = null;
 
-    // 1. تفريغ الفريم المباشر
+    // 1. Process Frame to 9:16 Portrait Canvas
     function processFrame(img) {
       const c = document.createElement('canvas');
-      const size = 900;
-      c.width = size;
-      c.height = size;
+      const w = 1080;
+      const h = 1920;
+      c.width = w;
+      c.height = h;
       const fCtx = c.getContext('2d');
-      fCtx.drawImage(img, 0, 0, size, size);
+      fCtx.drawImage(img, 0, 0, w, h);
 
-      const imgData = fCtx.getImageData(0, 0, size, size);
+      const imgData = fCtx.getImageData(0, 0, w, h);
       const data = imgData.data;
 
-      const minX = size * 0.15;
-      const maxX = size * 0.85;
-      const minY = size * 0.08;
-      const maxY = size * 0.81;
+      // Transparent inner bounds
+      const minX = w * 0.12;
+      const maxX = w * 0.88;
+      const minY = h * 0.08;
+      const maxY = h * 0.82;
 
       for (let y = Math.floor(minY); y < maxY; y++) {
         for (let x = Math.floor(minX); x < maxX; x++) {
-          const idx = (y * size + x) * 4;
+          const idx = (y * w + x) * 4;
           if (data[idx] < 50 && data[idx + 1] < 50 && data[idx + 2] < 50) {
             data[idx + 3] = 0;
           }
@@ -138,11 +142,18 @@
 
       fCtx.putImageData(imgData, 0, 0);
       processedFrameCanvas = c;
+      drawLiveOverlay();
+    }
 
-      overlayCanvas.width = overlayCanvas.clientWidth || 360;
-      overlayCanvas.height = overlayCanvas.clientHeight || 360;
+    function drawLiveOverlay() {
+      if (!processedFrameCanvas) return;
+      overlayCanvas.width = overlayCanvas.clientWidth;
+      overlayCanvas.height = overlayCanvas.clientHeight;
+      overlayCtx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
       overlayCtx.drawImage(processedFrameCanvas, 0, 0, overlayCanvas.width, overlayCanvas.height);
     }
+
+    window.addEventListener('resize', drawLiveOverlay);
 
     const frameImg = new Image();
     frameImg.crossOrigin = "anonymous";
@@ -150,61 +161,96 @@
     frameImg.src = 'frame.jpg';
     if (frameImg.complete) processFrame(frameImg);
 
-    // 2. تشغيل الكاميرا
+    // 2. Camera Management (Switch Front / Rear)
     async function startCamera() {
+      if (video.srcObject) {
+        video.srcObject.getTracks().forEach(t => t.stop());
+      }
+
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: 'user' },
+        const constraints = {
+          video: {
+            facingMode: currentFacingMode,
+            width: { ideal: 1920 },
+            height: { ideal: 1080 }
+          },
           audio: false
-        });
+        };
+        const stream = await navigator.mediaDevices.getUserMedia(constraints);
         video.srcObject = stream;
         await video.play();
+
+        // Mirror selfie only
+        if (currentFacingMode === 'user') {
+          video.classList.add('-scale-x-100');
+        } else {
+          video.classList.remove('-scale-x-100');
+        }
       } catch (err) {
         errorBox.classList.remove('hidden');
-        errorBox.innerHTML = '⚠️ يرجى السماح بالوصول للكاميرا من إعدادات المتصفح.';
+        errorBox.textContent = 'Please allow camera permissions in your browser settings.';
       }
     }
     startCamera();
 
-    // 3. التقاط الصورة وإضافتها لألبوم المستخدم
+    flipBtn.addEventListener('click', async () => {
+      currentFacingMode = (currentFacingMode === 'user') ? 'environment' : 'user';
+      await startCamera();
+    });
+
+    // 3. Shutter Capture (Full Portrait 1080 x 1920)
     snapBtn.addEventListener('click', async () => {
-      // وميض الفلاش السريع
       flashEffect.style.opacity = '0.85';
       setTimeout(() => { flashEffect.style.opacity = '0'; }, 120);
 
-      const size = 1080;
-      canvas.width = size;
-      canvas.height = size;
+      const targetW = 1080;
+      const targetH = 1920;
+      canvas.width = targetW;
+      canvas.height = targetH;
 
       const vw = video.videoWidth || 1080;
-      const vh = video.videoHeight || 1080;
-      const minDim = Math.min(vw, vh);
-      const sx = (vw - minDim) / 2;
-      const sy = (vh - minDim) / 2;
+      const vh = video.videoHeight || 1920;
+      const targetRatio = targetW / targetH;
+      const videoRatio = vw / vh;
 
-      ctx.save();
-      ctx.translate(size, 0);
-      ctx.scale(-1, 1);
-      ctx.drawImage(video, sx, sy, minDim, minDim, 0, 0, size, size);
-      ctx.restore();
-
-      if (processedFrameCanvas) {
-        ctx.drawImage(processedFrameCanvas, 0, 0, size, size);
+      let sW, sH, sX, sY;
+      if (videoRatio > targetRatio) {
+        sH = vh;
+        sW = vh * targetRatio;
+        sX = (vw - sW) / 2;
+        sY = 0;
       } else {
-        ctx.drawImage(frameImg, 0, 0, size, size);
+        sW = vw;
+        sH = vw / targetRatio;
+        sX = 0;
+        sY = (vh - sH) / 2;
       }
 
-      const base64Image = canvas.toDataURL('image/jpeg', 0.88);
+      // Draw camera
+      ctx.save();
+      if (currentFacingMode === 'user') {
+        ctx.translate(targetW, 0);
+        ctx.scale(-1, 1);
+      }
+      ctx.drawImage(video, sX, sY, sW, sH, 0, 0, targetW, targetH);
+      ctx.restore();
 
-      // إضافة الصورة لقائمة صوره وتحديث المصغرة فوراً
-      userPhotos.unshift(base64Image); // الأحدث أولاً
+      // Draw frame on top
+      if (processedFrameCanvas) {
+        ctx.drawImage(processedFrameCanvas, 0, 0, targetW, targetH);
+      } else {
+        ctx.drawImage(frameImg, 0, 0, targetW, targetH);
+      }
+
+      const base64Image = canvas.toDataURL('image/jpeg', 0.9);
+
+      userPhotos.unshift(base64Image);
       updateThumbnail();
 
-      // إشعار بالحفظ السحابي
       uploadStatus.style.opacity = '1';
       setTimeout(() => { uploadStatus.style.opacity = '0'; }, 2500);
 
-      // الرفع التلقائي في الخلفية بدون تعطيل الكاميرا
+      // Silent Auto-Upload to Drive
       fetch(GOOGLE_SCRIPT_URL, {
         method: 'POST',
         mode: 'no-cors',
@@ -213,7 +259,6 @@
       }).catch(err => console.error(err));
     });
 
-    // تحديث أيقونة المعرض بجانب زرار التصوير
     function updateThumbnail() {
       if (userPhotos.length > 0) {
         thumbImg.src = userPhotos[0];
@@ -224,7 +269,7 @@
       }
     }
 
-    // 4. فتح وإدارة المعرض الشخصي
+    // 4. Gallery Logic
     galleryThumbBtn.addEventListener('click', () => {
       if (userPhotos.length === 0) return;
       currentPhotoIndex = 0;
@@ -249,7 +294,6 @@
       if (currentPhotoIndex < userPhotos.length - 1) showGalleryPhoto(currentPhotoIndex + 1);
     });
 
-    // إغلاق المعرض بالزرار
     closeGalleryBtn.addEventListener('click', () => {
       if (history.state && history.state.gallery) {
         history.back();
@@ -258,7 +302,6 @@
       }
     });
 
-    // زرار Back في الموبايل يغلق المعرض فوراً
     window.addEventListener('popstate', () => {
       galleryModal.classList.add('hidden');
     });
