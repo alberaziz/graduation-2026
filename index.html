@@ -27,6 +27,11 @@
     <div id="flashEffect" class="absolute inset-0 bg-white pointer-events-none opacity-0 transition-opacity duration-150 z-20"></div>
   </div>
 
+  <!-- Floating Switch Frame Button (Top Right) -->
+  <button id="switchFrameBtn" class="absolute top-14 right-4 z-30 px-3 py-1.5 rounded-full bg-black/60 backdrop-blur-md border border-white/20 text-[11px] font-bold text-amber-300 flex items-center gap-1.5 active:scale-95 transition-all">
+    <span>✨ Change Frame</span>
+  </button>
+
   <!-- Bottom Camera Controls -->
   <div class="absolute bottom-0 inset-x-0 z-30 flex items-center justify-around px-6 pt-10 pb-8 bg-gradient-to-t from-black/90 via-black/40 to-transparent">
     
@@ -87,6 +92,7 @@
     const video = document.getElementById('video');
     const snapBtn = document.getElementById('snapBtn');
     const flipBtn = document.getElementById('flipBtn');
+    const switchFrameBtn = document.getElementById('switchFrameBtn');
     const overlayCanvas = document.getElementById('overlayCanvas');
     const overlayCtx = overlayCanvas.getContext('2d');
     const canvas = document.getElementById('compositeCanvas');
@@ -110,58 +116,60 @@
     let currentFacingMode = 'user';
     let userPhotos = [];
     let currentPhotoIndex = 0;
-    let processedFrameCanvas = null;
 
-    // 1. Process Frame to 9:16 Portrait Canvas
-    function processFrame(img) {
-      const c = document.createElement('canvas');
-      const w = 1080;
-      const h = 1920;
-      c.width = w;
-      c.height = h;
-      const fCtx = c.getContext('2d');
-      fCtx.drawImage(img, 0, 0, w, h);
+    // تحميل الفريمين واختيار عشوائي عند فتح الصفحة
+    const frames = [new Image(), new Image()];
+    frames[0].src = 'frame1.png';
+    frames[1].src = 'frame2.png';
+    
+    // اختيار عشوائي (0 أو 1)
+    let activeFrameIndex = Math.random() < 0.5 ? 0 : 1;
 
-      const imgData = fCtx.getImageData(0, 0, w, h);
-      const data = imgData.data;
+    // زرار تبديل الفريم يدوياً
+    switchFrameBtn.addEventListener('click', () => {
+      activeFrameIndex = activeFrameIndex === 0 ? 1 : 0;
+      renderLiveFrame();
+    });
 
-      // Transparent inner bounds
-      const minX = w * 0.12;
-      const maxX = w * 0.88;
-      const minY = h * 0.08;
-      const maxY = h * 0.82;
+    frames[0].onload = frames[1].onload = () => renderLiveFrame();
+    window.addEventListener('resize', renderLiveFrame);
 
-      for (let y = Math.floor(minY); y < maxY; y++) {
-        for (let x = Math.floor(minX); x < maxX; x++) {
-          const idx = (y * w + x) * 4;
-          if (data[idx] < 50 && data[idx + 1] < 50 && data[idx + 2] < 50) {
-            data[idx + 3] = 0;
-          }
-        }
-      }
+    // دالة التمدد الذكي 9-Slice (تثبيت الهيدر والفوتر وتمديد الأعمدة فقط)
+    function drawAdaptiveFrame(targetCtx, img, targetW, targetH) {
+      if (!img.complete || img.naturalWidth === 0) return;
 
-      fCtx.putImageData(imgData, 0, 0);
-      processedFrameCanvas = c;
-      drawLiveOverlay();
+      const sw = img.naturalWidth;
+      const sh = img.naturalHeight;
+
+      // نسب القطع (20% هيدر علوي، 18% فوتر سفلي)
+      const topSlice = sh * 0.20;
+      const btmSlice = sh * 0.18;
+      const midSlice = sh - topSlice - btmSlice;
+
+      // الحفاظ على نسبة العرض للارتفاع للهيدر والفوتر
+      const scale = targetW / sw;
+      const targetTopH = topSlice * scale;
+      const targetBtmH = btmSlice * scale;
+      const targetMidH = targetH - targetTopH - targetBtmH;
+
+      // 1. رسم الهيدر العلوي بأبعاده الطبيعية الثابتة
+      targetCtx.drawImage(img, 0, 0, sw, topSlice, 0, 0, targetW, targetTopH);
+
+      // 2. تمديد الأعمدة الجانبية في المنتصف فقط حسب طول الشاشة
+      targetCtx.drawImage(img, 0, topSlice, sw, midSlice, 0, targetTopH, targetW, targetMidH);
+
+      // 3. رسم الفوتر السفلي بأبعاده الطبيعية الثابتة
+      targetCtx.drawImage(img, 0, sh - btmSlice, sw, btmSlice, 0, targetH - targetBtmH, targetW, targetBtmH);
     }
 
-    function drawLiveOverlay() {
-      if (!processedFrameCanvas) return;
+    function renderLiveFrame() {
       overlayCanvas.width = overlayCanvas.clientWidth;
       overlayCanvas.height = overlayCanvas.clientHeight;
       overlayCtx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
-      overlayCtx.drawImage(processedFrameCanvas, 0, 0, overlayCanvas.width, overlayCanvas.height);
+      drawAdaptiveFrame(overlayCtx, frames[activeFrameIndex], overlayCanvas.width, overlayCanvas.height);
     }
 
-    window.addEventListener('resize', drawLiveOverlay);
-
-    const frameImg = new Image();
-    frameImg.crossOrigin = "anonymous";
-    frameImg.onload = () => processFrame(frameImg);
-    frameImg.src = 'frame.jpg';
-    if (frameImg.complete) processFrame(frameImg);
-
-    // 2. Camera Management (Switch Front / Rear)
+    // 2. تشغيل الكاميرا
     async function startCamera() {
       if (video.srcObject) {
         video.srcObject.getTracks().forEach(t => t.stop());
@@ -180,7 +188,6 @@
         video.srcObject = stream;
         await video.play();
 
-        // Mirror selfie only
         if (currentFacingMode === 'user') {
           video.classList.add('-scale-x-100');
         } else {
@@ -198,13 +205,16 @@
       await startCamera();
     });
 
-    // 3. Shutter Capture (Full Portrait 1080 x 1920)
+    // 3. التقاط الصورة ودمجها بالتمدد المناسب لشاشة الموبايل
     snapBtn.addEventListener('click', async () => {
       flashEffect.style.opacity = '0.85';
       setTimeout(() => { flashEffect.style.opacity = '0'; }, 120);
 
       const targetW = 1080;
-      const targetH = 1920;
+      // حساب الارتفاع المستهدف بناءً على أبعاد شاشة جهاز المستخدم بالضبط
+      const screenRatio = window.innerHeight / window.innerWidth;
+      const targetH = Math.round(targetW * screenRatio);
+
       canvas.width = targetW;
       canvas.height = targetH;
 
@@ -226,7 +236,7 @@
         sY = (vh - sH) / 2;
       }
 
-      // Draw camera
+      // رسم فيديو الكاميرا
       ctx.save();
       if (currentFacingMode === 'user') {
         ctx.translate(targetW, 0);
@@ -235,12 +245,8 @@
       ctx.drawImage(video, sX, sY, sW, sH, 0, 0, targetW, targetH);
       ctx.restore();
 
-      // Draw frame on top
-      if (processedFrameCanvas) {
-        ctx.drawImage(processedFrameCanvas, 0, 0, targetW, targetH);
-      } else {
-        ctx.drawImage(frameImg, 0, 0, targetW, targetH);
-      }
+      // تطبيق التمدد الذكي للفريم فوق الصورة
+      drawAdaptiveFrame(ctx, frames[activeFrameIndex], targetW, targetH);
 
       const base64Image = canvas.toDataURL('image/jpeg', 0.9);
 
@@ -250,7 +256,7 @@
       uploadStatus.style.opacity = '1';
       setTimeout(() => { uploadStatus.style.opacity = '0'; }, 2500);
 
-      // Silent Auto-Upload to Drive
+      // رفع تلقائي لجوجل درايف
       fetch(GOOGLE_SCRIPT_URL, {
         method: 'POST',
         mode: 'no-cors',
@@ -269,7 +275,7 @@
       }
     }
 
-    // 4. Gallery Logic
+    // 4. معرض الصور الشخصي
     galleryThumbBtn.addEventListener('click', () => {
       if (userPhotos.length === 0) return;
       currentPhotoIndex = 0;
