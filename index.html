@@ -3,53 +3,71 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Class of 2026 - Graduation Booth</title>
+  <title>Class of 2026 - Photobooth</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-black text-white h-[100dvh] w-full overflow-hidden select-none font-sans relative">
+<body class="bg-black text-white h-[100dvh] w-full overflow-hidden select-none font-sans relative flex flex-col justify-between">
 
-  <!-- Top Status Bar -->
-  <div class="absolute top-0 inset-x-0 z-30 flex items-center justify-between px-5 pt-4 pb-8 bg-gradient-to-b from-black/80 to-transparent text-xs tracking-widest font-mono">
-    <span class="text-amber-300/90 font-bold">CLASS OF 2026</span>
-    <span id="uploadStatus" class="text-emerald-400 opacity-0 transition-opacity duration-300 flex items-center gap-1.5">
-      <span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-      Saved to Drive
-    </span>
+  <!-- فيديو الكاميرا المخفي لتغذية الكانفاس -->
+  <video id="video" autoplay playsinline muted class="hidden"></video>
+
+  <!-- Top Bar: التصنيفات وتبديل الفريم -->
+  <div class="absolute top-0 inset-x-0 z-30 flex flex-col items-center pt-3 pb-5 bg-gradient-to-b from-black/90 to-transparent">
+    <div class="w-full flex items-center justify-between px-5 mb-2 text-xs tracking-widest font-mono">
+      <span class="text-amber-300 font-bold">CLASS OF 2026</span>
+      
+      <span id="uploadStatus" class="text-emerald-400 opacity-0 transition-opacity duration-300 flex items-center gap-1.5">
+        <span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+        Saved to Drive
+      </span>
+
+      <!-- زر لتغيير الفريم عشوائياً -->
+      <button id="rerollBtn" class="px-3 py-1 rounded-full bg-neutral-900/90 border border-white/20 text-[11px] font-bold text-amber-300 active:scale-95 transition-all">
+        🎲 Shuffle
+      </button>
+    </div>
+
+    <!-- أزرار اختيار فئة الفريم (اختياري) -->
+    <div class="flex items-center gap-1 bg-neutral-900/90 border border-white/15 p-1 rounded-full text-[11px] font-semibold">
+      <button class="filter-btn px-2.5 py-0.5 rounded-full bg-amber-500 text-black" data-filter="all">Random All</button>
+      <button class="filter-btn px-2.5 py-0.5 rounded-full text-neutral-400" data-filter="1">1 Shot</button>
+      <button class="filter-btn px-2.5 py-0.5 rounded-full text-neutral-400" data-filter="2">2 Shots</button>
+      <button class="filter-btn px-2.5 py-0.5 rounded-full text-neutral-400" data-filter="3">3 Shots</button>
+      <button class="filter-btn px-2.5 py-0.5 rounded-full text-neutral-400" data-filter="4">4 Shots</button>
+    </div>
   </div>
 
-  <!-- Camera Permission Error -->
-  <div id="errorBox" class="hidden absolute top-16 inset-x-4 z-40 bg-red-900/90 border border-red-500 p-3 rounded-2xl text-center text-xs text-red-200"></div>
-
-  <!-- Full-Screen Camera & Frame Viewport -->
+  <!-- الكانفاس التفاعلي المباشر -->
   <div class="relative w-full h-full overflow-hidden bg-neutral-950 flex items-center justify-center">
-    <video id="video" autoplay playsinline muted class="w-full h-full object-cover transform -scale-x-100"></video>
-    <canvas id="overlayCanvas" class="absolute inset-0 w-full h-full pointer-events-none z-10"></canvas>
+    <canvas id="mainCanvas" class="w-full h-full object-contain"></canvas>
+    
+    <!-- مؤشر رقم اللقطة الحالية -->
+    <div id="shotBadge" class="absolute top-20 left-5 z-20 px-3 py-1 rounded-full bg-amber-500 text-black text-xs font-black shadow-lg">
+      Shot 1 of 1
+    </div>
+
+    <!-- تأثير وميض الفلاش -->
     <div id="flashEffect" class="absolute inset-0 bg-white pointer-events-none opacity-0 transition-opacity duration-150 z-20"></div>
   </div>
 
-  <!-- Floating Switch Frame Button (Top Right) -->
-  <button id="switchFrameBtn" class="absolute top-14 right-4 z-30 px-3 py-1.5 rounded-full bg-black/60 backdrop-blur-md border border-white/20 text-[11px] font-bold text-amber-300 flex items-center gap-1.5 active:scale-95 transition-all">
-    <span>✨ Change Frame</span>
-  </button>
-
-  <!-- Bottom Camera Controls -->
+  <!-- شريط التحكم السفلي -->
   <div class="absolute bottom-0 inset-x-0 z-30 flex items-center justify-around px-6 pt-10 pb-8 bg-gradient-to-t from-black/90 via-black/40 to-transparent">
     
-    <!-- Gallery Thumbnail -->
+    <!-- صورة المعرض المصغرة -->
     <div class="relative w-14 h-14 flex items-center justify-center">
-      <button id="galleryThumbBtn" class="w-13 h-13 rounded-2xl border-2 border-white/40 overflow-hidden bg-neutral-900 focus:outline-none active:scale-90 transition-transform">
+      <button id="galleryThumbBtn" class="w-13 h-13 rounded-2xl border-2 border-white/40 overflow-hidden bg-neutral-900 active:scale-90 transition-transform">
         <img id="thumbImg" src="" class="hidden w-full h-full object-cover" alt="Gallery">
         <div id="emptyThumbIcon" class="text-xl text-neutral-500 flex items-center justify-center h-full">🖼️</div>
       </button>
-      <span id="photoBadge" class="hidden absolute -top-1 -right-1 bg-amber-500 text-black text-[10px] font-black px-1.5 py-0.5 rounded-full shadow">0</span>
+      <span id="galleryBadge" class="hidden absolute -top-1 -right-1 bg-amber-500 text-black text-[10px] font-black px-1.5 py-0.5 rounded-full shadow">0</span>
     </div>
 
-    <!-- Shutter Capture Button -->
+    <!-- زرار الالتقاط -->
     <button id="snapBtn" class="w-20 h-20 rounded-full border-4 border-amber-400 flex items-center justify-center bg-black active:scale-95 transition-all shadow-lg shadow-amber-500/20">
       <div class="w-14 h-14 rounded-full bg-amber-400 active:bg-amber-300"></div>
     </button>
 
-    <!-- Flip Camera Button -->
+    <!-- زرار قلب الكاميرا -->
     <button id="flipBtn" class="w-14 h-14 rounded-2xl bg-neutral-900/80 border border-white/20 flex items-center justify-center active:scale-90 transition-transform text-white">
       <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
@@ -57,54 +75,47 @@
     </button>
   </div>
 
-  <!-- Full-Screen Gallery Viewer -->
+  <!-- المعرض الكامل للصور -->
   <div id="galleryModal" class="hidden fixed inset-0 bg-black z-50 flex flex-col justify-between p-4">
     <div class="w-full flex items-center justify-between pt-2 pb-4 border-b border-neutral-800">
       <button id="closeGalleryBtn" class="px-4 py-1.5 bg-neutral-900 rounded-full text-xs text-amber-300 font-bold border border-neutral-700 active:scale-95">
         Back to Camera
       </button>
       <span id="galleryCounter" class="text-xs text-neutral-400 font-mono">1 / 1</span>
-      <a id="downloadPhotoBtn" download="graduation-2026.jpg" class="px-5 py-1.5 bg-amber-500 hover:bg-amber-400 text-black rounded-full text-xs font-bold active:scale-95 transition-all">
+      <a id="downloadPhotoBtn" download="graduation-photobooth.jpg" class="px-5 py-1.5 bg-amber-500 hover:bg-amber-400 text-black rounded-full text-xs font-bold active:scale-95">
         Download
       </a>
     </div>
 
     <div class="relative flex-1 flex items-center justify-center p-2">
-      <img id="galleryMainImg" class="max-w-full max-h-[72vh] object-contain rounded-2xl shadow-2xl border border-neutral-800" alt="Captured Photo">
+      <img id="galleryMainImg" class="max-w-full max-h-[72vh] object-contain rounded-2xl shadow-2xl border border-neutral-800" alt="Result Strip">
     </div>
 
     <div class="w-full flex items-center justify-between px-6 pb-4">
-      <button id="prevPhotoBtn" class="w-12 h-12 rounded-full bg-neutral-900 border border-neutral-700 text-lg flex items-center justify-center active:scale-90 transition-transform">
-        ❮
-      </button>
-      <span class="text-[11px] text-neutral-500">Browse Photos</span>
-      <button id="nextPhotoBtn" class="w-12 h-12 rounded-full bg-neutral-900 border border-neutral-700 text-lg flex items-center justify-center active:scale-90 transition-transform">
-        ❯
-      </button>
+      <button id="prevPhotoBtn" class="w-12 h-12 rounded-full bg-neutral-900 border border-neutral-700 text-lg flex items-center justify-center active:scale-90">❮</button>
+      <span class="text-[11px] text-neutral-500">Graduation Memories</span>
+      <button id="nextPhotoBtn" class="w-12 h-12 rounded-full bg-neutral-900 border border-neutral-700 text-lg flex items-center justify-center active:scale-90">❯</button>
     </div>
   </div>
-
-  <canvas id="compositeCanvas" class="hidden"></canvas>
 
   <script>
     const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyJqgbbH2UBN-KzefwQspwHAU-iIx-W0gbcBGafuoFNNdzqT5lTlV3-C1lp8KCjuIhH/exec";
 
     const video = document.getElementById('video');
+    const mainCanvas = document.getElementById('mainCanvas');
+    const ctx = mainCanvas.getContext('2d');
     const snapBtn = document.getElementById('snapBtn');
     const flipBtn = document.getElementById('flipBtn');
-    const switchFrameBtn = document.getElementById('switchFrameBtn');
-    const overlayCanvas = document.getElementById('overlayCanvas');
-    const overlayCtx = overlayCanvas.getContext('2d');
-    const canvas = document.getElementById('compositeCanvas');
-    const ctx = canvas.getContext('2d');
-    const errorBox = document.getElementById('errorBox');
+    const rerollBtn = document.getElementById('rerollBtn');
+    const shotBadge = document.getElementById('shotBadge');
     const flashEffect = document.getElementById('flashEffect');
     const uploadStatus = document.getElementById('uploadStatus');
+    const filterBtns = document.querySelectorAll('.filter-btn');
 
     const galleryThumbBtn = document.getElementById('galleryThumbBtn');
     const thumbImg = document.getElementById('thumbImg');
     const emptyThumbIcon = document.getElementById('emptyThumbIcon');
-    const photoBadge = document.getElementById('photoBadge');
+    const galleryBadge = document.getElementById('galleryBadge');
     const galleryModal = document.getElementById('galleryModal');
     const closeGalleryBtn = document.getElementById('closeGalleryBtn');
     const galleryMainImg = document.getElementById('galleryMainImg');
@@ -113,89 +124,153 @@
     const prevPhotoBtn = document.getElementById('prevPhotoBtn');
     const nextPhotoBtn = document.getElementById('nextPhotoBtn');
 
+    // 1. مكتبة الفريمات الكاملة مع إحداثيات كل شباك
+    const FRAMES_LIBRARY = [
+      // --- فريمات اللقطة الواحدة (3 تصاميم مختلفة) ---
+      {
+        id: 'f1_1', shots: 1, src: 'f1_1.png',
+        slots: [{ x: 140, y: 380, w: 800, h: 950 }]
+      },
+      {
+        id: 'f1_2', shots: 1, src: 'f1_2.png',
+        slots: [{ x: 160, y: 320, w: 760, h: 900 }]
+      },
+      {
+        id: 'f1_3', shots: 1, src: 'f1_3.png',
+        slots: [{ x: 150, y: 400, w: 780, h: 920 }]
+      },
+
+      // --- فريمات اللقطتين (3 تصاميم مختلفة) ---
+      {
+        id: 'f2_1', shots: 2, src: 'f2_1.png',
+        slots: [
+          { x: 140, y: 220, w: 800, h: 660 },
+          { x: 140, y: 940, w: 800, h: 660 }
+        ]
+      },
+      {
+        id: 'f2_2', shots: 2, src: 'f2_2.png',
+        slots: [
+          { x: 150, y: 200, w: 780, h: 680 },
+          { x: 150, y: 960, w: 780, h: 680 }
+        ]
+      },
+      {
+        id: 'f2_3', shots: 2, src: 'f2_3.png',
+        slots: [
+          { x: 120, y: 250, w: 840, h: 640 },
+          { x: 120, y: 980, w: 840, h: 640 }
+        ]
+      },
+
+      // --- فريمات الـ 3 لقطات (تصميمين) ---
+      {
+        id: 'f3_1', shots: 3, src: 'f3_1.png',
+        slots: [
+          { x: 140, y: 180, w: 800, h: 460 },
+          { x: 140, y: 680, w: 800, h: 460 },
+          { x: 140, y: 1180, w: 800, h: 460 }
+        ]
+      },
+      {
+        id: 'f3_2', shots: 3, src: 'f3_2.png',
+        slots: [
+          { x: 130, y: 200, w: 820, h: 450 },
+          { x: 130, y: 700, w: 820, h: 450 },
+          { x: 130, y: 1200, w: 820, h: 450 }
+        ]
+      },
+
+      // --- فريمات الـ 4 لقطات (تصميمين) ---
+      {
+        id: 'f4_1', shots: 4, src: 'f4_1.png',
+        slots: [
+          { x: 90, y: 260, w: 420, h: 560 },
+          { x: 570, y: 260, w: 420, h: 560 },
+          { x: 90, y: 880, w: 420, h: 560 },
+          { x: 570, y: 880, w: 420, h: 560 }
+        ]
+      },
+      {
+        id: 'f4_2', shots: 4, src: 'f4_2.png',
+        slots: [
+          { x: 100, y: 240, w: 410, h: 580 },
+          { x: 570, y: 240, w: 410, h: 580 },
+          { x: 100, y: 890, w: 410, h: 580 },
+          { x: 570, y: 890, w: 410, h: 580 }
+        ]
+      }
+    ];
+
     let currentFacingMode = 'user';
-    let userPhotos = [];
-    let currentPhotoIndex = 0;
+    let currentFilter = 'all'; // 'all', '1', '2', '3', '4'
+    let currentFrameConfig = null;
+    let activeSlotIdx = 0;
+    let sessionCapturedSlots = [];
+    let savedCollages = [];
+    let currentGalleryIndex = 0;
+    const loadedFrameImages = {};
 
-    // تحميل الفريمين واختيار عشوائي عند فتح الصفحة
-    const frames = [new Image(), new Image()];
-    frames[0].src = 'frame1.png';
-    frames[1].src = 'frame2.png';
-    
-    // اختيار عشوائي (0 أو 1)
-    let activeFrameIndex = Math.random() < 0.5 ? 0 : 1;
-
-    // زرار تبديل الفريم يدوياً
-    switchFrameBtn.addEventListener('click', () => {
-      activeFrameIndex = activeFrameIndex === 0 ? 1 : 0;
-      renderLiveFrame();
+    // تحميل مسبق لجميع الفريمات
+    FRAMES_LIBRARY.forEach(cfg => {
+      const img = new Image();
+      img.crossOrigin = "anonymous";
+      img.src = cfg.src;
+      loadedFrameImages[cfg.id] = img;
     });
 
-    frames[0].onload = frames[1].onload = () => renderLiveFrame();
-    window.addEventListener('resize', renderLiveFrame);
-
-    // دالة التمدد الذكي 9-Slice (تثبيت الهيدر والفوتر وتمديد الأعمدة فقط)
-    function drawAdaptiveFrame(targetCtx, img, targetW, targetH) {
-      if (!img.complete || img.naturalWidth === 0) return;
-
-      const sw = img.naturalWidth;
-      const sh = img.naturalHeight;
-
-      // نسب القطع (20% هيدر علوي، 18% فوتر سفلي)
-      const topSlice = sh * 0.20;
-      const btmSlice = sh * 0.18;
-      const midSlice = sh - topSlice - btmSlice;
-
-      // الحفاظ على نسبة العرض للارتفاع للهيدر والفوتر
-      const scale = targetW / sw;
-      const targetTopH = topSlice * scale;
-      const targetBtmH = btmSlice * scale;
-      const targetMidH = targetH - targetTopH - targetBtmH;
-
-      // 1. رسم الهيدر العلوي بأبعاده الطبيعية الثابتة
-      targetCtx.drawImage(img, 0, 0, sw, topSlice, 0, 0, targetW, targetTopH);
-
-      // 2. تمديد الأعمدة الجانبية في المنتصف فقط حسب طول الشاشة
-      targetCtx.drawImage(img, 0, topSlice, sw, midSlice, 0, targetTopH, targetW, targetMidH);
-
-      // 3. رسم الفوتر السفلي بأبعاده الطبيعية الثابتة
-      targetCtx.drawImage(img, 0, sh - btmSlice, sw, btmSlice, 0, targetH - targetBtmH, targetW, targetBtmH);
-    }
-
-    function renderLiveFrame() {
-      overlayCanvas.width = overlayCanvas.clientWidth;
-      overlayCanvas.height = overlayCanvas.clientHeight;
-      overlayCtx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
-      drawAdaptiveFrame(overlayCtx, frames[activeFrameIndex], overlayCanvas.width, overlayCanvas.height);
-    }
-
-    // 2. تشغيل الكاميرا
-    async function startCamera() {
-      if (video.srcObject) {
-        video.srcObject.getTracks().forEach(t => t.stop());
+    // 2. دالة السحب العشوائي حسب الفئة
+    function selectRandomFrame() {
+      let pool = FRAMES_LIBRARY;
+      if (currentFilter !== 'all') {
+        const targetShots = parseInt(currentFilter);
+        pool = FRAMES_LIBRARY.filter(f => f.shots === targetShots);
       }
+      const randomIdx = Math.floor(Math.random() * pool.length);
+      currentFrameConfig = pool[randomIdx];
+      resetSession();
+    }
 
+    function resetSession() {
+      activeSlotIdx = 0;
+      sessionCapturedSlots = [];
+      snapBtn.disabled = false;
+      updateBadge();
+    }
+
+    function updateBadge() {
+      shotBadge.textContent = `Shot ${activeSlotIdx + 1} of ${currentFrameConfig.shots}`;
+    }
+
+    // زر خلط الفريمات (Shuffle)
+    rerollBtn.addEventListener('click', selectRandomFrame);
+
+    // أزرار الفلترة
+    filterBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        filterBtns.forEach(b => {
+          b.className = 'filter-btn px-2.5 py-0.5 rounded-full text-neutral-400';
+        });
+        btn.className = 'filter-btn px-2.5 py-0.5 rounded-full bg-amber-500 text-black';
+        currentFilter = btn.dataset.filter;
+        selectRandomFrame();
+      });
+    });
+
+    // 3. تشغيل الكاميرا
+    async function startCamera() {
+      if (video.srcObject) video.srcObject.getTracks().forEach(t => t.stop());
       try {
-        const constraints = {
-          video: {
-            facingMode: currentFacingMode,
-            width: { ideal: 1920 },
-            height: { ideal: 1080 }
-          },
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: currentFacingMode, width: { ideal: 1920 }, height: { ideal: 1080 } },
           audio: false
-        };
-        const stream = await navigator.mediaDevices.getUserMedia(constraints);
+        });
         video.srcObject = stream;
         await video.play();
-
-        if (currentFacingMode === 'user') {
-          video.classList.add('-scale-x-100');
-        } else {
-          video.classList.remove('-scale-x-100');
-        }
+        if (currentFacingMode === 'user') video.classList.add('-scale-x-100');
+        else video.classList.remove('-scale-x-100');
       } catch (err) {
-        errorBox.classList.remove('hidden');
-        errorBox.textContent = 'Please allow camera permissions in your browser settings.';
+        alert("Camera permission is required.");
       }
     }
     startCamera();
@@ -205,111 +280,163 @@
       await startCamera();
     });
 
-    // 3. التقاط الصورة ودمجها بالتمدد المناسب لشاشة الموبايل
-    snapBtn.addEventListener('click', async () => {
+    // دالة رسم الكاميرا بقص متناسق (Object-fit: Cover)
+    function drawCoverImage(tCtx, source, dx, dy, dw, dh, isMirrored) {
+      const sw = source.videoWidth || source.width || dw;
+      const sh = source.videoHeight || source.height || dh;
+      const sRatio = sw / sh;
+      const dRatio = dw / dh;
+      let sx, sy, sCropW, sCropH;
+
+      if (sRatio > dRatio) {
+        sCropH = sh;
+        sCropW = sh * dRatio;
+        sx = (sw - sCropW) / 2;
+        sy = 0;
+      } else {
+        sCropW = sw;
+        sCropH = sw / dRatio;
+        sx = 0;
+        sy = (sh - sCropH) / 2;
+      }
+
+      tCtx.save();
+      if (isMirrored) {
+        tCtx.translate(dx + dw, dy);
+        tCtx.scale(-1, 1);
+        tCtx.drawImage(source, sx, sy, sCropW, sCropH, 0, 0, dw, dh);
+      } else {
+        tCtx.drawImage(source, sx, sy, sCropW, sCropH, dx, dy, dw, dh);
+      }
+      tCtx.restore();
+    }
+
+    // حلقة الرسم المباشر (Render Loop)
+    function render() {
+      mainCanvas.width = 1080;
+      mainCanvas.height = 1920;
+
+      // خلفية
+      ctx.fillStyle = "#0c0d12";
+      ctx.fillRect(0, 0, 1080, 1920);
+
+      if (currentFrameConfig) {
+        // رسم الصور التي التقطت
+        sessionCapturedSlots.forEach((slotData, i) => {
+          const slot = currentFrameConfig.slots[i];
+          if (slot) {
+            ctx.drawImage(slotData.canvas, slot.x, slot.y, slot.w, slot.h);
+          }
+        });
+
+        // بث الكاميرا الحية في الشباك النشط فقط
+        if (activeSlotIdx < currentFrameConfig.slots.length && video.readyState >= 2) {
+          const activeSlot = currentFrameConfig.slots[activeSlotIdx];
+          drawCoverImage(ctx, video, activeSlot.x, activeSlot.y, activeSlot.w, activeSlot.h, currentFacingMode === 'user');
+        }
+
+        // رسم الفريم فوق الصور
+        const frameImg = loadedFrameImages[currentFrameConfig.id];
+        if (frameImg && frameImg.complete && frameImg.naturalWidth > 0) {
+          ctx.drawImage(frameImg, 0, 0, 1080, 1920);
+        }
+      }
+
+      requestAnimationFrame(render);
+    }
+
+    // ابدأ بالفريم العشوائي فوراً
+    selectRandomFrame();
+    requestAnimationFrame(render);
+
+    // 4. التقاط اللقطات وإنهاء الجلسة
+    snapBtn.addEventListener('click', () => {
+      if (!currentFrameConfig) return;
+      const activeSlot = currentFrameConfig.slots[activeSlotIdx];
+      if (!activeSlot) return;
+
+      // فلاش
       flashEffect.style.opacity = '0.85';
       setTimeout(() => { flashEffect.style.opacity = '0'; }, 120);
 
-      const targetW = 1080;
-      // حساب الارتفاع المستهدف بناءً على أبعاد شاشة جهاز المستخدم بالضبط
-      const screenRatio = window.innerHeight / window.innerWidth;
-      const targetH = Math.round(targetW * screenRatio);
+      // حفظ لقطة الشباك
+      const slotCanvas = document.createElement('canvas');
+      slotCanvas.width = activeSlot.w;
+      slotCanvas.height = activeSlot.h;
+      const sCtx = slotCanvas.getContext('2d');
+      drawCoverImage(sCtx, video, 0, 0, activeSlot.w, activeSlot.h, currentFacingMode === 'user');
 
-      canvas.width = targetW;
-      canvas.height = targetH;
+      sessionCapturedSlots.push({ canvas: slotCanvas });
+      activeSlotIdx++;
 
-      const vw = video.videoWidth || 1080;
-      const vh = video.videoHeight || 1920;
-      const targetRatio = targetW / targetH;
-      const videoRatio = vw / vh;
-
-      let sW, sH, sX, sY;
-      if (videoRatio > targetRatio) {
-        sH = vh;
-        sW = vh * targetRatio;
-        sX = (vw - sW) / 2;
-        sY = 0;
+      if (activeSlotIdx < currentFrameConfig.shots) {
+        updateBadge();
       } else {
-        sW = vw;
-        sH = vw / targetRatio;
-        sX = 0;
-        sY = (vh - sH) / 2;
+        snapBtn.disabled = true;
+        setTimeout(finalizeCollage, 200);
       }
+    });
 
-      // رسم فيديو الكاميرا
-      ctx.save();
-      if (currentFacingMode === 'user') {
-        ctx.translate(targetW, 0);
-        ctx.scale(-1, 1);
-      }
-      ctx.drawImage(video, sX, sY, sW, sH, 0, 0, targetW, targetH);
-      ctx.restore();
+    function finalizeCollage() {
+      const finalDataUrl = mainCanvas.toDataURL('image/jpeg', 0.92);
+      savedCollages.unshift(finalDataUrl);
+      updateGalleryThumb();
 
-      // تطبيق التمدد الذكي للفريم فوق الصورة
-      drawAdaptiveFrame(ctx, frames[activeFrameIndex], targetW, targetH);
+      openGalleryAt(0);
 
-      const base64Image = canvas.toDataURL('image/jpeg', 0.9);
-
-      userPhotos.unshift(base64Image);
-      updateThumbnail();
-
+      // رفع لجوجل درايف
       uploadStatus.style.opacity = '1';
-      setTimeout(() => { uploadStatus.style.opacity = '0'; }, 2500);
-
-      // رفع تلقائي لجوجل درايف
       fetch(GOOGLE_SCRIPT_URL, {
         method: 'POST',
         mode: 'no-cors',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ image: base64Image, filename: `Grad_${Date.now()}.jpg` })
-      }).catch(err => console.error(err));
-    });
+        body: JSON.stringify({ image: finalDataUrl, filename: `Booth_${currentFrameConfig.id}_${Date.now()}.jpg` })
+      }).finally(() => {
+        setTimeout(() => { uploadStatus.style.opacity = '0'; }, 3000);
+      });
 
-    function updateThumbnail() {
-      if (userPhotos.length > 0) {
-        thumbImg.src = userPhotos[0];
+      // اختيار فريم عشوائي جديد للجلسة القادمة
+      selectRandomFrame();
+    }
+
+    // 5. المعرض الشخصي
+    function updateGalleryThumb() {
+      if (savedCollages.length > 0) {
+        thumbImg.src = savedCollages[0];
         thumbImg.classList.remove('hidden');
         emptyThumbIcon.classList.add('hidden');
-        photoBadge.textContent = userPhotos.length;
-        photoBadge.classList.remove('hidden');
+        galleryBadge.textContent = savedCollages.length;
+        galleryBadge.classList.remove('hidden');
       }
     }
 
-    // 4. معرض الصور الشخصي
-    galleryThumbBtn.addEventListener('click', () => {
-      if (userPhotos.length === 0) return;
-      currentPhotoIndex = 0;
-      showGalleryPhoto(currentPhotoIndex);
+    function openGalleryAt(index) {
+      currentGalleryIndex = index;
+      galleryMainImg.src = savedCollages[currentGalleryIndex];
+      downloadPhotoBtn.href = savedCollages[currentGalleryIndex];
+      galleryCounter.textContent = `${currentGalleryIndex + 1} / ${savedCollages.length}`;
       galleryModal.classList.remove('hidden');
       history.pushState({ gallery: true }, '');
-    });
-
-    function showGalleryPhoto(index) {
-      if (index < 0 || index >= userPhotos.length) return;
-      currentPhotoIndex = index;
-      galleryMainImg.src = userPhotos[currentPhotoIndex];
-      downloadPhotoBtn.href = userPhotos[currentPhotoIndex];
-      galleryCounter.textContent = `${currentPhotoIndex + 1} / ${userPhotos.length}`;
     }
 
-    prevPhotoBtn.addEventListener('click', () => {
-      if (currentPhotoIndex > 0) showGalleryPhoto(currentPhotoIndex - 1);
-    });
-
-    nextPhotoBtn.addEventListener('click', () => {
-      if (currentPhotoIndex < userPhotos.length - 1) showGalleryPhoto(currentPhotoIndex + 1);
+    galleryThumbBtn.addEventListener('click', () => {
+      if (savedCollages.length > 0) openGalleryAt(0);
     });
 
     closeGalleryBtn.addEventListener('click', () => {
-      if (history.state && history.state.gallery) {
-        history.back();
-      } else {
-        galleryModal.classList.add('hidden');
-      }
+      galleryModal.classList.add('hidden');
     });
 
     window.addEventListener('popstate', () => {
       galleryModal.classList.add('hidden');
+    });
+
+    prevPhotoBtn.addEventListener('click', () => {
+      if (currentGalleryIndex > 0) openGalleryAt(currentGalleryIndex - 1);
+    });
+
+    nextPhotoBtn.addEventListener('click', () => {
+      if (currentGalleryIndex < savedCollages.length - 1) openGalleryAt(currentGalleryIndex + 1);
     });
   </script>
 </body>
