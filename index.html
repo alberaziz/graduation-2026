@@ -8,7 +8,7 @@
 </head>
 <body class="bg-black text-white h-[100dvh] w-full overflow-hidden select-none font-sans relative flex flex-col justify-between">
 
-  <!-- Top Status Bar -->
+  <!-- شريط المعلومات العلوي -->
   <div class="absolute top-0 inset-x-0 z-30 flex items-center justify-between px-5 pt-4 pb-6 bg-gradient-to-b from-black/80 to-transparent text-xs tracking-widest font-mono">
     <span class="text-amber-300 font-bold">CLASS OF 2026</span>
     
@@ -17,26 +17,30 @@
       Saved to Drive
     </span>
 
-    <!-- Switch Live Sticker Button -->
-    <button id="switchLogoBtn" class="px-3.5 py-1.5 rounded-full bg-neutral-900/80 border border-white/20 text-[11px] font-bold text-amber-300 active:scale-95 transition-all">
+    <!-- زر تبديل الاستيكر لايف -->
+    <button id="switchLogoBtn" class="px-3.5 py-1.5 rounded-full bg-black/70 border border-white/20 text-[11px] font-bold text-amber-300 active:scale-95 transition-all shadow-lg backdrop-blur-sm">
       ✨ Change Sticker
     </button>
   </div>
 
-  <!-- Camera Permission Error Box -->
+  <!-- تنبيه الكاميرا -->
   <div id="errorBox" class="hidden absolute top-16 inset-x-4 z-40 bg-red-900/90 border border-red-500 p-3 rounded-2xl text-center text-xs text-red-200"></div>
 
-  <!-- Full Screen Live Camera with Stickers -->
+  <!-- مساحة الكاميرا الحية مع الاستيكر المباشر -->
   <div class="relative w-full h-full overflow-hidden bg-neutral-950 flex items-center justify-center">
     <video id="video" autoplay playsinline muted class="w-full h-full object-cover transform -scale-x-100"></video>
-    <canvas id="overlayCanvas" class="absolute inset-0 w-full h-full pointer-events-none z-10"></canvas>
+    
+    <!-- الاستيكر الحي التفاعلي فوق الكاميرا -->
+    <img id="liveSticker" src="logo1.png" alt="Live Sticker" class="absolute pointer-events-none z-20 transition-all duration-200 object-contain">
+    
+    <!-- وميض الفلاش -->
     <div id="flashEffect" class="absolute inset-0 bg-white pointer-events-none opacity-0 transition-opacity duration-150 z-20"></div>
   </div>
 
-  <!-- Bottom Camera Controls -->
+  <!-- شريط التحكم السفلي -->
   <div class="absolute bottom-0 inset-x-0 z-30 flex items-center justify-around px-5 pt-10 pb-8 bg-gradient-to-t from-black/95 via-black/50 to-transparent">
     
-    <!-- Gallery Thumb -->
+    <!-- مصغرة المعرض -->
     <div class="relative w-14 h-14 flex items-center justify-center">
       <button id="galleryThumbBtn" class="w-13 h-13 rounded-2xl border-2 border-white/40 overflow-hidden bg-neutral-900 active:scale-90 transition-transform">
         <img id="thumbImg" src="" class="hidden w-full h-full object-cover" alt="Gallery">
@@ -45,7 +49,7 @@
       <span id="galleryBadge" class="hidden absolute -top-1 -right-1 bg-amber-500 text-black text-[10px] font-black px-1.5 py-0.5 rounded-full shadow">0</span>
     </div>
 
-    <!-- Shutter Button Area -->
+    <!-- زر الالتقاط مع عداد الصور للجلسة -->
     <div class="relative flex items-center justify-center">
       <button id="snapBtn" class="w-20 h-20 rounded-full border-4 border-amber-400 flex items-center justify-center bg-black active:scale-95 transition-all shadow-lg shadow-amber-500/20">
         <div class="w-14 h-14 rounded-full bg-amber-400 active:bg-amber-300"></div>
@@ -53,7 +57,7 @@
       <span id="sessionCounter" class="hidden absolute -top-2 bg-amber-400 text-black text-xs font-black px-2.5 py-0.5 rounded-full shadow">0/4</span>
     </div>
 
-    <!-- Flip Camera OR Done Button (Switches when photos are taken) -->
+    <!-- زر قلب الكاميرا أو زر Done -->
     <div class="w-14 h-14 flex items-center justify-center">
       <button id="flipBtn" class="w-14 h-14 rounded-2xl bg-neutral-900/80 border border-white/20 flex items-center justify-center active:scale-90 transition-transform text-white">
         <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -61,14 +65,14 @@
         </svg>
       </button>
 
-      <!-- Done Button (Builds Collage) -->
+      <!-- يظهر زر Done بعد التقاط أول صورة -->
       <button id="doneBtn" class="hidden px-3.5 py-2.5 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-black font-black text-xs uppercase tracking-wider active:scale-90 transition-all shadow-lg shadow-emerald-500/30">
         Done
       </button>
     </div>
   </div>
 
-  <!-- Full-Screen Gallery Viewer -->
+  <!-- شاشة المعرض الكامل للصور -->
   <div id="galleryModal" class="hidden fixed inset-0 bg-black z-50 flex flex-col justify-between p-4">
     <div class="w-full flex items-center justify-between pt-2 pb-4 border-b border-neutral-800">
       <button id="closeGalleryBtn" class="px-4 py-1.5 bg-neutral-900 rounded-full text-xs text-amber-300 font-bold border border-neutral-700 active:scale-95">
@@ -86,7 +90,7 @@
 
     <div class="w-full flex items-center justify-between px-6 pb-4">
       <button id="prevPhotoBtn" class="w-12 h-12 rounded-full bg-neutral-900 border border-neutral-700 text-lg flex items-center justify-center active:scale-90">❮</button>
-      <span class="text-[11px] text-neutral-500">Graduation Strips</span>
+      <span class="text-[11px] text-neutral-500">Graduation Memories</span>
       <button id="nextPhotoBtn" class="w-12 h-12 rounded-full bg-neutral-900 border border-neutral-700 text-lg flex items-center justify-center active:scale-90">❯</button>
     </div>
   </div>
@@ -97,15 +101,14 @@
     const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyJqgbbH2UBN-KzefwQspwHAU-iIx-W0gbcBGafuoFNNdzqT5lTlV3-C1lp8KCjuIhH/exec";
 
     const video = document.getElementById('video');
-    const overlayCanvas = document.getElementById('overlayCanvas');
-    const overlayCtx = overlayCanvas.getContext('2d');
+    const liveSticker = document.getElementById('liveSticker');
+    const switchLogoBtn = document.getElementById('switchLogoBtn');
     const canvas = document.getElementById('compositeCanvas');
     const ctx = canvas.getContext('2d');
 
     const snapBtn = document.getElementById('snapBtn');
     const flipBtn = document.getElementById('flipBtn');
     const doneBtn = document.getElementById('doneBtn');
-    const switchLogoBtn = document.getElementById('switchLogoBtn');
     const sessionCounter = document.getElementById('sessionCounter');
     const flashEffect = document.getElementById('flashEffect');
     const uploadStatus = document.getElementById('uploadStatus');
@@ -127,119 +130,75 @@
     let sessionShots = [];
     let savedCollages = [];
     let currentGalleryIndex = 0;
+    let lastUsedFrame = {};
 
-    // --- 1. تحميل وضبط استيكرات الكاميرا (logo1 إلى logo5) ---
-    const logoSources = ['logo1.png', 'logo2.png', 'logo3.png', 'logo4.png', 'logo5.png'];
-    const logoCanvases = [null, null, null, null, null];
-    let activeLogoIndex = Math.floor(Math.random() * 5);
+    // 1. نظام الاستيكرات المباشر وتحديد موضع كل استيكر
+    const STICKERS = [
+      { id: 0, src: 'logo1.png', style: 'bottom: 10%; left: 50%; transform: translateX(-50%); width: 44%; max-height: 25%;' },
+      { id: 1, src: 'logo2.png', style: 'right: 5%; top: 50%; transform: translateY(-50%); height: 42%; width: auto;' },
+      { id: 2, src: 'logo3.png', style: 'left: 6%; bottom: 22%; width: 42%; max-height: 35%;' },
+      { id: 3, src: 'logo4.png', style: 'top: 6%; left: 50%; transform: translateX(-50%); width: 62%; max-height: 25%;' },
+      { id: 4, src: 'logo5.png', style: 'bottom: 22%; left: 50%; transform: translateX(-50%); width: 55%; max-height: 25%;' }
+    ];
 
-    function prepareTransparentLogo(img, index) {
-      const c = document.createElement('canvas');
-      c.width = img.naturalWidth || 600;
-      c.height = img.naturalHeight || 600;
-      const cctx = c.getContext('2d');
-      cctx.drawImage(img, 0, 0);
+    let activeStickerIdx = Math.floor(Math.random() * STICKERS.length);
 
-      const imgData = cctx.getImageData(0, 0, c.width, c.height);
-      const data = imgData.data;
-      let hasAlpha = false;
-      for (let i = 3; i < data.length; i += 4) {
-        if (data[i] < 240) { hasAlpha = true; break; }
-      }
-      if (!hasAlpha) {
-        for (let i = 0; i < data.length; i += 4) {
-          if (data[i] > 230 && data[i+1] > 230 && data[i+2] > 230) data[i+3] = 0;
-        }
-        cctx.putImageData(imgData, 0, 0);
-      }
-      logoCanvases[index] = c;
-      renderLiveOverlay();
-    }
-
-    logoSources.forEach((src, idx) => {
+    // تحميل مسبق لصور الاستيكرات
+    const loadedStickerImgs = {};
+    STICKERS.forEach(s => {
       const img = new Image();
-      img.crossOrigin = "anonymous";
-      img.onload = () => prepareTransparentLogo(img, idx);
-      img.src = src;
+      img.src = s.src;
+      loadedStickerImgs[s.id] = img;
     });
 
-    function drawSelectedLogo(targetCtx, index, targetW, targetH) {
-      const logo = logoCanvases[index];
-      if (!logo) return;
-      const lw = logo.width;
-      const lh = logo.height;
-      const aspect = lw / lh;
-      let drawW, drawH, drawX, drawY;
-
-      switch(index) {
-        case 0: // logo1: أسفل الكادر في المنتصف
-          drawW = targetW * 0.45;
-          drawH = drawW / aspect;
-          drawX = (targetW - drawW) / 2;
-          drawY = targetH - drawH - (targetH * 0.08);
-          break;
-        case 1: // logo2: على اليمين بالطول
-          drawH = targetH * 0.40;
-          drawW = drawH * aspect;
-          drawX = targetW - drawW - (targetW * 0.05);
-          drawY = (targetH - drawH) / 2;
-          break;
-        case 2: // logo3: على الشمال بارتفاع 25% من تحت
-          drawW = targetW * 0.42;
-          drawH = drawW / aspect;
-          drawX = targetW * 0.05;
-          drawY = (targetH * 0.75) - (drawH / 2);
-          break;
-        case 3: // logo4: أعلى الكادر في المنتصف
-          drawW = targetW * 0.65;
-          drawH = drawW / aspect;
-          drawX = (targetW - drawW) / 2;
-          drawY = targetH * 0.05;
-          break;
-        case 4: // logo5: في النص أفقياً بارتفاع 25% من تحت
-          drawW = targetW * 0.58;
-          drawH = drawW / aspect;
-          drawX = (targetW - drawW) / 2;
-          drawY = (targetH * 0.75) - (drawH / 2);
-          break;
-      }
-      targetCtx.drawImage(logo, drawX, drawY, drawW, drawH);
+    function applyLiveSticker() {
+      const s = STICKERS[activeStickerIdx];
+      liveSticker.src = s.src;
+      liveSticker.style.cssText = s.style;
     }
-
-    function renderLiveOverlay() {
-      overlayCanvas.width = overlayCanvas.clientWidth;
-      overlayCanvas.height = overlayCanvas.clientHeight;
-      overlayCtx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
-      drawSelectedLogo(overlayCtx, activeLogoIndex, overlayCanvas.width, overlayCanvas.height);
-    }
-    window.addEventListener('resize', renderLiveOverlay);
+    applyLiveSticker();
 
     switchLogoBtn.addEventListener('click', () => {
-      activeLogoIndex = (activeLogoIndex + 1) % 5;
-      renderLiveOverlay();
+      activeStickerIdx = (activeStickerIdx + 1) % STICKERS.length;
+      applyLiveSticker();
     });
 
-    // --- 2. مكتبة الفريمات بعد التصوير (مع تمدد Bleed لمنع الحواف السوداء) ---
+    // 2. مكتبة الفريمات مع زوايا الدوران (Angles) ومراكز الكروت (Centers)
     const FRAMES_CONFIG = {
       1: [
-        { src: 'f1_1.png', slots: [{ x: 120, y: 350, w: 840, h: 1000 }] },
-        { src: 'f1_2.png', slots: [{ x: 130, y: 300, w: 820, h: 950 }] },
-        { src: 'f1_3.png', slots: [{ x: 120, y: 370, w: 840, h: 970 }] }
+        { 
+          src: 'f1_1.png', 
+          slots: [{ cx: 540, cy: 900, w: 860, h: 1050, rot: 0 }] 
+        },
+        { 
+          src: 'f1_2.png', 
+          slots: [{ cx: 540, cy: 820, w: 840, h: 1020, rot: 0 }] 
+        },
+        { 
+          src: 'f1_3.png', 
+          slots: [{ cx: 540, cy: 920, w: 860, h: 1050, rot: 0 }] 
+        }
       ],
       2: [
         { 
-          src: 'f2_1.png', 
-          // تم توسيع الإحداثيات (Bleed) لتدخل الصورة تحت البولارويد المايل تماماً
+          src: 'f2_1.png', // كروت بولارويد مائلة
           slots: [
-            { x: 100, y: 190, w: 880, h: 720 },
-            { x: 100, y: 920, w: 880, h: 720 }
+            { cx: 350, cy: 460, w: 600, h: 620, rot: -8 }, // الكارت العلوي مائل لليسار
+            { cx: 520, cy: 1260, w: 600, h: 620, rot: 6 }   // الكارت السفلي مائل لليمين
           ] 
         },
         { 
           src: 'f2_2.png', 
           slots: [
-            { x: 110, y: 170, w: 860, h: 740 },
-            { x: 110, y: 940, w: 860, h: 740 }
+            { cx: 540, cy: 550, w: 860, h: 720, rot: 0 },
+            { cx: 540, cy: 1320, w: 860, h: 720, rot: 0 }
+          ] 
+        },
+        { 
+          src: 'f2_3.png', 
+          slots: [
+            { cx: 480, cy: 580, w: 620, h: 640, rot: -4 },
+            { cx: 560, cy: 1300, w: 620, h: 640, rot: 4 }
           ] 
         }
       ],
@@ -247,36 +206,52 @@
         { 
           src: 'f3_1.png', 
           slots: [
-            { x: 110, y: 160, w: 860, h: 500 },
-            { x: 110, y: 660, w: 860, h: 500 },
-            { x: 110, y: 1160, w: 860, h: 500 }
+            { cx: 540, cy: 420, w: 840, h: 520, rot: 0 },
+            { cx: 540, cy: 930, w: 840, h: 520, rot: 0 },
+            { cx: 540, cy: 1440, w: 840, h: 520, rot: 0 }
+          ] 
+        },
+        { 
+          src: 'f3_2.png', 
+          slots: [
+            { cx: 540, cy: 430, w: 880, h: 530, rot: 0 },
+            { cx: 540, cy: 950, w: 880, h: 530, rot: 0 },
+            { cx: 540, cy: 1470, w: 880, h: 530, rot: 0 }
           ] 
         }
       ],
       4: [
         { 
-          src: 'f4_1.png', 
+          src: 'f4_1.png', // فريم البولارويد الـ 4 المائل مع الديسكو والكاميرا
           slots: [
-            { x: 70, y: 230, w: 460, h: 620 },
-            { x: 550, y: 230, w: 460, h: 620 },
-            { x: 70, y: 860, w: 460, h: 620 },
-            { x: 550, y: 860, w: 460, h: 620 }
+            { cx: 420, cy: 415, w: 420, h: 440, rot: -7 },   // أعلى يسار مائل -7 درجات
+            { cx: 680, cy: 635, w: 420, h: 440, rot: 15 },   // وسط يمين مائل +15 درجة
+            { cx: 285, cy: 1380, w: 420, h: 440, rot: -5 },  // أسفل يسار مائل -5 درجات
+            { cx: 680, cy: 1550, w: 420, h: 440, rot: 7 }    // أسفل يمين مائل +7 درجات
+          ] 
+        },
+        { 
+          src: 'f4_2.png', // فريم الـ 4 الممزق (شبكة متناسقة)
+          slots: [
+            { cx: 270, cy: 480, w: 540, h: 960, rot: 0 },
+            { cx: 810, cy: 480, w: 540, h: 960, rot: 0 },
+            { cx: 270, cy: 1440, w: 540, h: 960, rot: 0 },
+            { cx: 810, cy: 1440, w: 540, h: 960, rot: 0 }
           ] 
         }
       ]
     };
 
     const loadedFrameImgs = {};
-    Object.keys(FRAMES_CONFIG).forEach(count => {
-      FRAMES_CONFIG[count].forEach(f => {
+    Object.keys(FRAMES_CONFIG).forEach(c => {
+      FRAMES_CONFIG[c].forEach(f => {
         const img = new Image();
-        img.crossOrigin = "anonymous";
         img.src = f.src;
         loadedFrameImgs[f.src] = img;
       });
     });
 
-    // --- 3. تشغيل الكاميرا ---
+    // 3. تشغيل الكاميرا
     async function startCamera() {
       if (video.srcObject) video.srcObject.getTracks().forEach(t => t.stop());
       try {
@@ -290,7 +265,7 @@
         else video.classList.remove('-scale-x-100');
       } catch (err) {
         errorBox.classList.remove('hidden');
-        errorBox.textContent = 'Please allow camera permissions.';
+        errorBox.textContent = 'Please enable camera permissions.';
       }
     }
     startCamera();
@@ -300,14 +275,57 @@
       await startCamera();
     });
 
-    // --- 4. التقاط صورة عادية مع الاستيكر النشط ---
+    // رسم الاستيكر المختار داخل الصورة عند التقاطها
+    function stampStickerOnPhoto(tCtx, stickerId, w, h) {
+      const stImg = loadedStickerImgs[stickerId];
+      if (!stImg || !stImg.complete || stImg.naturalWidth === 0) return;
+
+      const aspect = stImg.naturalWidth / stImg.naturalHeight;
+      let dw, dh, dx, dy;
+
+      switch(stickerId) {
+        case 0: // logo1: bottom center
+          dw = w * 0.44;
+          dh = dw / aspect;
+          dx = (w - dw) / 2;
+          dy = h - dh - (h * 0.10);
+          break;
+        case 1: // logo2: right vertical
+          dh = h * 0.42;
+          dw = dh * aspect;
+          dx = w - dw - (w * 0.05);
+          dy = (h - dh) / 2;
+          break;
+        case 2: // logo3: left ~25% from bottom
+          dw = w * 0.42;
+          dh = dw / aspect;
+          dx = w * 0.06;
+          dy = (h * 0.78) - dh;
+          break;
+        case 3: // logo4: top center
+          dw = w * 0.62;
+          dh = dw / aspect;
+          dx = (w - dw) / 2;
+          dy = h * 0.06;
+          break;
+        case 4: // logo5: center ~25% from bottom
+          dw = w * 0.55;
+          dh = dw / aspect;
+          dx = (w - dw) / 2;
+          dy = (h * 0.78) - (dh / 2);
+          break;
+      }
+      tCtx.drawImage(stImg, dx, dy, dw, dh);
+    }
+
+    // 4. التقاط اللقطة مع الاستيكر
     snapBtn.addEventListener('click', () => {
       flashEffect.style.opacity = '0.85';
       setTimeout(() => { flashEffect.style.opacity = '0'; }, 120);
 
       const shotCanvas = document.createElement('canvas');
       const w = 1080;
-      const h = 1440; // نسبة طولية ممتازة للقطات
+      const h = 1350; // أبعاد صورة مربعة-مستطيلة مثالية للبولارويد
       shotCanvas.width = w;
       shotCanvas.height = h;
       const sCtx = shotCanvas.getContext('2d');
@@ -330,7 +348,6 @@
         sy = (vh - sCropH) / 2;
       }
 
-      // رسم الكاميرا
       sCtx.save();
       if (currentFacingMode === 'user') {
         sCtx.translate(w, 0);
@@ -339,12 +356,11 @@
       sCtx.drawImage(video, sx, sy, sCropW, sCropH, 0, 0, w, h);
       sCtx.restore();
 
-      // دمج اللوجو اللي كان ظاهر لايف فوق الصورة
-      drawSelectedLogo(sCtx, activeLogoIndex, w, h);
+      // دمج الاستيكر الحي النشط فوق الصورة
+      stampStickerOnPhoto(sCtx, activeStickerIdx, w, h);
 
       sessionShots.push(shotCanvas);
 
-      // تحديث واجهة المستخدم
       sessionCounter.classList.remove('hidden');
       sessionCounter.textContent = `${sessionShots.length}/4`;
       flipBtn.classList.add('hidden');
@@ -359,11 +375,18 @@
       if (sessionShots.length > 0) buildCollageAndFinalize();
     });
 
-    // --- 5. دمج الصور داخل فريم عشوائي مطابق للعدد بدون حواف سوداء ---
+    // 5. دمج الصور مع التدوير الحقيقي (Rotation) ومنع تكرار الفريم
     function buildCollageAndFinalize() {
       const count = Math.min(Math.max(sessionShots.length, 1), 4);
-      const pool = FRAMES_CONFIG[count] || FRAMES_CONFIG[1];
-      const selectedFrame = pool[Math.floor(Math.random() * pool.length)];
+      const pool = FRAMES_CONFIG[count];
+
+      // خوارزمية منع تكرار نفس الفريم مرتين متتاليتين
+      let availableFrames = pool;
+      if (pool.length > 1 && lastUsedFrame[count]) {
+        availableFrames = pool.filter(f => f.src !== lastUsedFrame[count]);
+      }
+      const selectedFrame = availableFrames[Math.floor(Math.random() * availableFrames.length)];
+      lastUsedFrame[count] = selectedFrame.src;
 
       const targetW = 1080;
       const targetH = 1920;
@@ -371,22 +394,27 @@
       canvas.height = targetH;
       ctx.clearRect(0, 0, targetW, targetH);
 
-      // خلفية بيضاء نقية متناسقة مع كروت البولارويد
       ctx.fillStyle = "#ffffff";
       ctx.fillRect(0, 0, targetW, targetH);
 
-      // رسم كل صورة في مكانها مع تمديد الحواف (Bleed) لمنع أي مساحة سوداء
+      // رسم كل صورة مع زاوية ميلانها المحددة (Rotate & Translate)
       selectedFrame.slots.forEach((slot, i) => {
         const shot = sessionShots[i];
         if (shot) {
           ctx.save();
-          // رسم الصورة بتغطية كاملة للمستطيل
-          ctx.drawImage(shot, slot.x, slot.y, slot.w, slot.h);
+          // الانتقال لمركز كارت البولارويد
+          ctx.translate(slot.cx, slot.cy);
+          // تدوير الكانفاس بزاوية الكارت
+          if (slot.rot) {
+            ctx.rotate((slot.rot * Math.PI) / 180);
+          }
+          // رسم الصورة متمركزة وممتدة تحت حواف البولارويد
+          ctx.drawImage(shot, -slot.w / 2, -slot.h / 2, slot.w, slot.h);
           ctx.restore();
         }
       });
 
-      // رسم الفريم المفرغ فوق الصور
+      // رسم الفريم المفرغ في النهاية فوق كل الصور
       const frameImg = loadedFrameImgs[selectedFrame.src];
       if (frameImg && frameImg.complete && frameImg.naturalWidth > 0) {
         ctx.drawImage(frameImg, 0, 0, targetW, targetH);
@@ -396,28 +424,27 @@
       savedCollages.unshift(finalDataUrl);
       updateGalleryThumb();
 
-      // فتح المعرض التلقائي
       openGalleryAt(0);
 
-      // رفع صامت لجوجل درايف
+      // حفظ في درايف
       uploadStatus.style.opacity = '1';
       fetch(GOOGLE_SCRIPT_URL, {
         method: 'POST',
         mode: 'no-cors',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ image: finalDataUrl, filename: `Booth_Collage_${Date.now()}.jpg` })
+        body: JSON.stringify({ image: finalDataUrl, filename: `Grad_${count}Shots_${Date.now()}.jpg` })
       }).finally(() => {
         setTimeout(() => { uploadStatus.style.opacity = '0'; }, 3000);
       });
 
-      // إعادة تصفير الجلسة للتصوير القادم
+      // تصفير الجلسة
       sessionShots = [];
       sessionCounter.classList.add('hidden');
       doneBtn.classList.add('hidden');
       flipBtn.classList.remove('hidden');
     }
 
-    // --- 6. المعرض والتنزيل ---
+    // 6. المعرض والتنزيل
     function updateGalleryThumb() {
       if (savedCollages.length > 0) {
         thumbImg.src = savedCollages[0];
