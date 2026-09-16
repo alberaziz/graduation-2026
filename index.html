@@ -8,16 +8,13 @@
 </head>
 <body class="bg-black text-white h-[100dvh] w-full overflow-hidden select-none font-sans relative flex flex-col justify-between">
 
-  <!-- فيديو الكاميرا المخفي -->
-  <video id="video" autoplay playsinline muted class="hidden"></video>
-
   <!-- الشريط العلوي واختيار عدد اللقطات -->
   <div class="absolute top-0 inset-x-0 z-30 flex flex-col items-center pt-3 pb-5 bg-gradient-to-b from-black/90 to-transparent">
     <div class="w-full flex items-center justify-between px-5 mb-4 text-xs tracking-widest font-mono">
       <span class="text-amber-300 font-bold">CLASS OF 2026</span>
       
       <!-- زرار تغيير الاستيكر -->
-      <button id="switchLogoBtn" class="px-3 py-1.5 rounded-full bg-black/80 border border-white/20 text-[11px] font-bold text-amber-300 active:scale-95 transition-all shadow-lg">
+      <button id="switchLogoBtn" class="px-3.5 py-1.5 rounded-full bg-black/80 border border-white/20 text-[11px] font-bold text-amber-300 active:scale-95 transition-all shadow-lg backdrop-blur-sm">
         ✨ Change Sticker
       </button>
     </div>
@@ -33,16 +30,22 @@
 
   <div id="errorBox" class="hidden absolute top-20 inset-x-4 z-40 bg-red-900/90 border border-red-500 p-3 rounded-2xl text-center text-xs text-red-200"></div>
 
-  <!-- مساحة الكاميرا والاستيكر اللايف -->
+  <!-- الكاميرا والاستيكر الحي (Native Overlay) -->
   <div class="relative w-full h-full overflow-hidden bg-neutral-950 flex items-center justify-center">
-    <canvas id="liveCameraCanvas" class="w-full h-full object-cover"></canvas>
-    <canvas id="overlayCanvas" class="absolute inset-0 w-full h-full pointer-events-none z-10"></canvas>
-    <div id="flashEffect" class="absolute inset-0 bg-white pointer-events-none opacity-0 transition-opacity duration-150 z-20"></div>
+    
+    <!-- فيديو الكاميرا المباشر -->
+    <video id="video" autoplay playsinline muted class="w-full h-full object-cover transform -scale-x-100"></video>
+    
+    <!-- الاستيكر المباشر فوق الكاميرا -->
+    <img id="liveSticker" src="" alt="Sticker" class="absolute pointer-events-none z-20 object-contain drop-shadow-xl transition-all duration-300">
+
+    <div id="flashEffect" class="absolute inset-0 bg-white pointer-events-none opacity-0 transition-opacity duration-150 z-30"></div>
   </div>
 
   <!-- الشريط السفلي -->
   <div class="absolute bottom-0 inset-x-0 z-30 flex items-center justify-around px-5 pt-10 pb-8 bg-gradient-to-t from-black/95 via-black/50 to-transparent">
     
+    <!-- مصغرة المعرض -->
     <div class="relative w-14 h-14 flex items-center justify-center">
       <button id="galleryThumbBtn" class="w-13 h-13 rounded-2xl border-2 border-white/40 overflow-hidden bg-neutral-900 active:scale-90 transition-transform">
         <img id="thumbImg" src="" class="hidden w-full h-full object-cover" alt="Gallery">
@@ -59,6 +62,7 @@
       <span id="sessionCounter" class="absolute -top-3 bg-amber-400 text-black text-[11px] font-black px-2 py-0.5 rounded-full shadow">0/1</span>
     </div>
 
+    <!-- زرار قلب الكاميرا -->
     <div class="w-14 h-14 flex items-center justify-center">
       <button id="flipBtn" class="w-14 h-14 rounded-2xl bg-neutral-800 border border-white/20 flex items-center justify-center active:scale-90 transition-transform text-white">
         <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -89,16 +93,14 @@
     </div>
   </div>
 
+  <!-- كانفاس مخفي للدمج النهائي -->
   <canvas id="compositeCanvas" class="hidden"></canvas>
 
   <script>
     const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyJqgbbH2UBN-KzefwQspwHAU-iIx-W0gbcBGafuoFNNdzqT5lTlV3-C1lp8KCjuIhH/exec";
 
     const video = document.getElementById('video');
-    const liveCameraCanvas = document.getElementById('liveCameraCanvas');
-    const liveCamCtx = liveCameraCanvas.getContext('2d');
-    const overlayCanvas = document.getElementById('overlayCanvas');
-    const overlayCtx = overlayCanvas.getContext('2d');
+    const liveSticker = document.getElementById('liveSticker');
     const canvas = document.getElementById('compositeCanvas');
     const ctx = canvas.getContext('2d');
 
@@ -128,22 +130,40 @@
     let savedCollages = [];
     let currentGalleryIndex = 0;
 
-    // --- 1. الاستيكرات الحية ---
-    const stickerSources = ['logo1.png', 'logo2.png', 'logo3.png', 'logo4.png', 'logo5.png'];
-    const loadedStickers = [];
-    let activeStickerIdx = 0;
+    // --- 1. إعدادات الـ 5 استيكرات الحية ---
+    const STICKERS_CONFIG = [
+      { src: 'logo1.png', css: 'bottom: 5%; left: 50%; transform: translateX(-50%); width: 40%;' }, // The End
+      { src: 'logo2.png', css: 'right: 5%; top: 50%; transform: translateY(-50%); height: 45%; width: auto;' }, // Vertical 2026
+      { src: 'logo3.png', css: 'bottom: 20%; left: 5%; width: 40%;' }, // Flork
+      { src: 'logo4.png', css: 'top: 5%; left: 50%; transform: translateX(-50%); width: 60%;' }, // Top 2026
+      { src: 'logo5.png', css: 'bottom: 25%; left: 50%; transform: translateX(-50%); width: 55%;' } // Line Art
+    ];
 
-    stickerSources.forEach(src => {
+    let activeStickerIdx = 0;
+    const loadedStickers = [];
+
+    // تحميل صور الاستيكرات لاستخدامها وقت الدمج
+    STICKERS_CONFIG.forEach(cfg => {
       const img = new Image();
-      img.src = src;
+      img.src = cfg.src;
       loadedStickers.push(img);
     });
 
+    // تطبيق الاستيكر لايف على الشاشة
+    function applyLiveSticker() {
+      const cfg = STICKERS_CONFIG[activeStickerIdx];
+      liveSticker.src = cfg.src;
+      liveSticker.style.cssText = cfg.css;
+    }
+    applyLiveSticker();
+
     switchLogoBtn.addEventListener('click', () => {
-      activeStickerIdx = (activeStickerIdx + 1) % stickerSources.length;
+      activeStickerIdx = (activeStickerIdx + 1) % STICKERS_CONFIG.length;
+      applyLiveSticker();
     });
 
-    function drawSticker(tCtx, idx, targetW, targetH) {
+    // رسم الاستيكر فوق الصورة عند التقاطها بنفس أبعاد الـ CSS
+    function stampStickerOnPhoto(tCtx, idx, targetW, targetH) {
       const sticker = loadedStickers[idx];
       if (!sticker || !sticker.complete || sticker.naturalWidth === 0) return;
 
@@ -152,75 +172,74 @@
 
       switch(idx) {
         case 0:
-          drawW = targetW * 0.45; drawH = drawW / aspect;
-          drawX = (targetW - drawW) / 2; drawY = targetH - drawH - (targetH * 0.08);
+          drawW = targetW * 0.40; drawH = drawW / aspect;
+          drawX = (targetW - drawW) / 2; drawY = targetH - drawH - (targetH * 0.05);
           break;
         case 1:
-          drawH = targetH * 0.40; drawW = drawH * aspect;
+          drawH = targetH * 0.45; drawW = drawH * aspect;
           drawX = targetW - drawW - (targetW * 0.05); drawY = (targetH - drawH) / 2;
           break;
         case 2:
-          drawW = targetW * 0.42; drawH = drawW / aspect;
-          drawX = targetW * 0.05; drawY = (targetH * 0.75) - (drawH / 2);
+          drawW = targetW * 0.40; drawH = drawW / aspect;
+          drawX = targetW * 0.05; drawY = (targetH * 0.80) - drawH;
           break;
         case 3:
-          drawW = targetW * 0.65; drawH = drawW / aspect;
+          drawW = targetW * 0.60; drawH = drawW / aspect;
           drawX = (targetW - drawW) / 2; drawY = targetH * 0.05;
           break;
         case 4:
-          drawW = targetW * 0.58; drawH = drawW / aspect;
+          drawW = targetW * 0.55; drawH = drawW / aspect;
           drawX = (targetW - drawW) / 2; drawY = (targetH * 0.75) - (drawH / 2);
           break;
       }
       tCtx.drawImage(sticker, drawX, drawY, drawW, drawH);
     }
 
-    // --- 2. إعدادات الفريمات الدقيقة (نظام الشبابيك) ---
-    // (cx: مركز الطول، cy: مركز العرض، w: عرض الشباك، h: طول الشباك، rot: درجة الميل)
+    // --- 2. إحداثيات الفريمات الاحترافية الدقيقة ---
     const FRAMES_CONFIG = {
       1: [
-        { src: 'f1_1.png', slots: [{ cx: 540, cy: 960, w: 900, h: 1050, rot: -2 }] },
-        { src: 'f1_2.png', slots: [{ cx: 540, cy: 960, w: 900, h: 1050, rot: 2 }] },
-        { src: 'f1_3.png', slots: [{ cx: 540, cy: 960, w: 900, h: 1050, rot: 0 }] }
+        { src: 'f1_1.png', slots: [{ cx: 540, cy: 1000, w: 750, h: 800, rot: 0 }] },
+        { src: 'f1_2.png', slots: [{ cx: 540, cy: 960, w: 750, h: 800, rot: 0 }] },
+        { src: 'f1_3.png', slots: [{ cx: 540, cy: 960, w: 750, h: 800, rot: 0 }] }
       ],
       2: [
         { src: 'f2_1.png', slots: [
-            { cx: 480, cy: 500, w: 850, h: 850, rot: -6 }, 
-            { cx: 600, cy: 1350, w: 850, h: 850, rot: 8 }
+            { cx: 400, cy: 650, w: 650, h: 700, rot: -8 },
+            { cx: 680, cy: 1250, w: 650, h: 700, rot: 10 }
         ]},
         { src: 'f2_2.png', slots: [
-            { cx: 540, cy: 500, w: 900, h: 900, rot: 0 }, 
-            { cx: 540, cy: 1350, w: 900, h: 900, rot: 0 }
+            { cx: 540, cy: 500, w: 850, h: 850, rot: 0 },
+            { cx: 540, cy: 1400, w: 850, h: 850, rot: 0 }
         ]},
         { src: 'f2_3.png', slots: [
-            { cx: 450, cy: 450, w: 800, h: 850, rot: -4 }, 
-            { cx: 620, cy: 1350, w: 800, h: 850, rot: 5 }
+            { cx: 450, cy: 600, w: 680, h: 730, rot: -5 },
+            { cx: 620, cy: 1400, w: 680, h: 730, rot: 5 }
         ]}
       ],
       3: [
         { src: 'f3_1.png', slots: [
-            { cx: 540, cy: 400, w: 900, h: 550, rot: 0 },
-            { cx: 540, cy: 950, w: 900, h: 550, rot: 0 },
-            { cx: 540, cy: 1500, w: 900, h: 550, rot: 0 }
+            { cx: 540, cy: 320, w: 1150, h: 700, rot: 0 },
+            { cx: 540, cy: 960, w: 1150, h: 700, rot: 0 },
+            { cx: 540, cy: 1600, w: 1150, h: 700, rot: 0 }
         ]},
         { src: 'f3_2.png', slots: [
-            { cx: 520, cy: 420, w: 900, h: 550, rot: -2 },
-            { cx: 560, cy: 960, w: 900, h: 550, rot: 2 },
-            { cx: 520, cy: 1500, w: 900, h: 550, rot: -2 }
+            { cx: 720, cy: 300, w: 600, h: 650, rot: 5 },
+            { cx: 350, cy: 950, w: 650, h: 700, rot: -15 },
+            { cx: 680, cy: 1550, w: 600, h: 650, rot: -5 }
         ]}
       ],
       4: [
         { src: 'f4_1.png', slots: [
-            { cx: 380, cy: 430, w: 550, h: 580, rot: -7 },   
-            { cx: 700, cy: 650, w: 550, h: 580, rot: 15 },   
-            { cx: 280, cy: 1400, w: 550, h: 580, rot: -5 },  
-            { cx: 720, cy: 1570, w: 550, h: 580, rot: 7 }    
+            { cx: 480, cy: 380, w: 600, h: 650, rot: -5 },
+            { cx: 750, cy: 880, w: 600, h: 650, rot: 15 },
+            { cx: 350, cy: 1350, w: 600, h: 650, rot: -12 },
+            { cx: 750, cy: 1700, w: 600, h: 650, rot: 5 }
         ]},
         { src: 'f4_2.png', slots: [
-            { cx: 280, cy: 480, w: 600, h: 1000, rot: 0 },
-            { cx: 800, cy: 480, w: 600, h: 1000, rot: 0 },
-            { cx: 280, cy: 1440, w: 600, h: 1000, rot: 0 },
-            { cx: 800, cy: 1440, w: 600, h: 1000, rot: 0 }
+            { cx: 270, cy: 480, w: 600, h: 1000, rot: 0 },
+            { cx: 810, cy: 480, w: 600, h: 1000, rot: 0 },
+            { cx: 270, cy: 1440, w: 600, h: 1000, rot: 0 },
+            { cx: 810, cy: 1440, w: 600, h: 1000, rot: 0 }
         ]}
       ]
     };
@@ -265,7 +284,7 @@
         await video.play();
       } catch (err) {
         document.getElementById('errorBox').classList.remove('hidden');
-        document.getElementById('errorBox').textContent = 'Camera permission needed.';
+        document.getElementById('errorBox').textContent = 'Camera permission is required.';
       }
     }
     startCamera();
@@ -273,6 +292,11 @@
     flipBtn.addEventListener('click', async () => {
       currentFacingMode = (currentFacingMode === 'user') ? 'environment' : 'user';
       await startCamera();
+      if (currentFacingMode === 'user') {
+        video.classList.add('-scale-x-100');
+      } else {
+        video.classList.remove('-scale-x-100');
+      }
     });
 
     // دالة الرسم بدون تشويه
@@ -308,22 +332,7 @@
       tCtx.restore();
     }
 
-    function renderLiveView() {
-      if (video.readyState >= 2) {
-        liveCameraCanvas.width = liveCameraCanvas.clientWidth;
-        liveCameraCanvas.height = liveCameraCanvas.clientHeight;
-        drawCoverImage(liveCamCtx, video, 0, 0, liveCameraCanvas.width, liveCameraCanvas.height, currentFacingMode === 'user');
-        
-        overlayCanvas.width = overlayCanvas.clientWidth;
-        overlayCanvas.height = overlayCanvas.clientHeight;
-        overlayCtx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
-        drawSticker(overlayCtx, activeStickerIdx, overlayCanvas.width, overlayCanvas.height);
-      }
-      requestAnimationFrame(renderLiveView);
-    }
-    requestAnimationFrame(renderLiveView);
-
-    // --- 5. التقاط الصور والدمج الحقيقي في الشبابيك ---
+    // --- 5. التقاط وبناء الصورة ---
     snapBtn.addEventListener('click', () => {
       flashEffect.style.opacity = '0.85';
       setTimeout(() => { flashEffect.style.opacity = '0'; }, 120);
@@ -335,10 +344,10 @@
       shotCanvas.height = h;
       const sCtx = shotCanvas.getContext('2d');
 
-      // رسم الكاميرا
+      // 1. رسم الكاميرا
       drawCoverImage(sCtx, video, 0, 0, w, h, currentFacingMode === 'user');
-      // رسم الاستيكر فوقها
-      drawSticker(sCtx, activeStickerIdx, w, h);
+      // 2. رسم الاستيكر فوقها
+      stampStickerOnPhoto(sCtx, activeStickerIdx, w, h);
 
       sessionShots.push(shotCanvas);
       sessionCounter.textContent = `${sessionShots.length}/${targetShots}`;
@@ -351,7 +360,6 @@
 
     function buildExactCollage() {
       const pool = FRAMES_CONFIG[targetShots];
-      // سحب فريم عشوائي من فئة العدد المختار
       const selectedFrame = pool[Math.floor(Math.random() * pool.length)];
 
       const targetW = 1080;
@@ -359,29 +367,26 @@
       canvas.width = targetW;
       canvas.height = targetH;
       
-      // 1. تنظيف ووضع خلفية بيضاء كقاعدة
+      // خلفية بيضاء لملء الفراغات
       ctx.clearRect(0, 0, targetW, targetH);
       ctx.fillStyle = "#ffffff";
       ctx.fillRect(0, 0, targetW, targetH);
 
-      // 2. وضع الصور في شبابيكها بدقة (تمركز + دوران)
+      // زرع الصور في شبابيكها المحسوبة بدقة (دوران + تحديد المركز)
       selectedFrame.slots.forEach((slot, i) => {
         const shot = sessionShots[i];
         if (shot) {
           ctx.save();
-          // الانتقال لمركز الشباك بالضبط
           ctx.translate(slot.cx, slot.cy);
-          // تدوير الصورة بنفس ميل الشباك
           if (slot.rot) {
             ctx.rotate((slot.rot * Math.PI) / 180);
           }
-          // وضع الصورة بحيث يكون المركز هو نقطة الصفر
           drawCoverImage(ctx, shot, -slot.w / 2, -slot.h / 2, slot.w, slot.h, false);
           ctx.restore();
         }
       });
 
-      // 3. رسم الفريم المفرغ فوق الصور في النهاية عشان يخفي الحواف
+      // رسم الفريم الشفاف في الأعلى
       const frameImg = loadedFrameImgs[selectedFrame.src];
       if (frameImg && frameImg.complete && frameImg.naturalWidth > 0) {
         ctx.drawImage(frameImg, 0, 0, targetW, targetH);
@@ -392,7 +397,6 @@
       updateGalleryThumb();
       openGalleryAt(0);
 
-      // رفع لجوجل درايف
       uploadStatus.style.opacity = '1';
       fetch(GOOGLE_SCRIPT_URL, {
         method: 'POST',
@@ -406,7 +410,7 @@
       resetSession();
     }
 
-    // --- 6. المعرض والتنزيل ---
+    // --- 6. المعرض ---
     function updateGalleryThumb() {
       if (savedCollages.length > 0) {
         thumbImg.src = savedCollages[0];
