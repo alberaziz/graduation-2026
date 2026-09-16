@@ -72,6 +72,10 @@
           <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
         </svg>
       </button>
+
+      <button id="doneBtn" class="hidden px-3.5 py-2.5 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-black font-black text-xs uppercase tracking-wider active:scale-90 transition-all shadow-lg shadow-emerald-500/30">
+        Done
+      </button>
     </div>
   </div>
 
@@ -81,7 +85,7 @@
       <button id="closeGalleryBtn" class="px-4 py-1.5 bg-neutral-900 rounded-full text-xs text-amber-300 font-bold border border-neutral-700 active:scale-95">
         Back
       </button>
-      <span id="uploadStatus" class="text-emerald-400 text-xs font-bold opacity-0 transition-opacity">● Saved to Drive</span>
+      <span id="uploadStatus" class="text-emerald-400 text-xs font-bold opacity-0 transition-opacity">● Saved</span>
       <a id="downloadPhotoBtn" download="graduation-photobooth.jpg" class="px-5 py-1.5 bg-amber-500 hover:bg-amber-400 text-black rounded-full text-xs font-bold active:scale-95">
         Download
       </a>
@@ -116,6 +120,7 @@
     const sessionCounter = document.getElementById('sessionCounter');
     const flashEffect = document.getElementById('flashEffect');
     const uploadStatus = document.getElementById('uploadStatus');
+    const doneBtn = document.getElementById('doneBtn');
 
     const galleryThumbBtn = document.getElementById('galleryThumbBtn');
     const thumbImg = document.getElementById('thumbImg');
@@ -150,7 +155,7 @@
       activeStickerIdx = (activeStickerIdx + 1) % stickerSources.length;
     });
 
-    // رسم الاستيكر في مكانه الصحيح (على الكانفاس)
+    // رسم الاستيكر
     function drawSticker(tCtx, idx, targetW, targetH) {
       const sticker = loadedStickers[idx];
       if (!sticker || !sticker.complete || sticker.naturalWidth === 0) return;
@@ -159,23 +164,23 @@
       let drawW, drawH, drawX, drawY;
 
       switch(idx) {
-        case 0: // logo1: bottom center
+        case 0:
           drawW = targetW * 0.45; drawH = drawW / aspect;
           drawX = (targetW - drawW) / 2; drawY = targetH - drawH - (targetH * 0.08);
           break;
-        case 1: // logo2: right vertical
+        case 1:
           drawH = targetH * 0.40; drawW = drawH * aspect;
           drawX = targetW - drawW - (targetW * 0.05); drawY = (targetH - drawH) / 2;
           break;
-        case 2: // logo3: left bottom
+        case 2:
           drawW = targetW * 0.42; drawH = drawW / aspect;
           drawX = targetW * 0.05; drawY = (targetH * 0.75) - (drawH / 2);
           break;
-        case 3: // logo4: top center
+        case 3:
           drawW = targetW * 0.65; drawH = drawW / aspect;
           drawX = (targetW - drawW) / 2; drawY = targetH * 0.05;
           break;
-        case 4: // logo5: center bottom
+        case 4:
           drawW = targetW * 0.58; drawH = drawW / aspect;
           drawX = (targetW - drawW) / 2; drawY = (targetH * 0.75) - (drawH / 2);
           break;
@@ -183,52 +188,52 @@
       tCtx.drawImage(sticker, drawX, drawY, drawW, drawH);
     }
 
-    // --- 2. إعدادات فريمات الكولاج (مركز cx,cy - حجم الشباك w,h - الدوران rot) ---
-    // يمكنك تعديل الأرقام لضبط ميل الصور بدقة حسب تصميمات الفريمات التي رفعتها
+    // --- 2. إعدادات فريمات الكولاج (تعديل الإحداثيات لتكبير الصورة المزروعة) ---
+    // تم تكبير قيم w و h بنسبة 30% لضمان تغطية الحواف البيضاء
     const FRAMES_CONFIG = {
       1: [
-        { src: 'f1_1.png', slots: [{ cx: 540, cy: 960, w: 800, h: 900, rot: -2 }] },
-        { src: 'f1_2.png', slots: [{ cx: 540, cy: 960, w: 800, h: 900, rot: 2 }] },
-        { src: 'f1_3.png', slots: [{ cx: 540, cy: 960, w: 800, h: 900, rot: 0 }] }
+        { src: 'f1_1.png', slots: [{ cx: 540, cy: 960, w: 900, h: 1050, rot: -2 }] },
+        { src: 'f1_2.png', slots: [{ cx: 540, cy: 960, w: 900, h: 1050, rot: 2 }] },
+        { src: 'f1_3.png', slots: [{ cx: 540, cy: 960, w: 900, h: 1050, rot: 0 }] }
       ],
       2: [
         { src: 'f2_1.png', slots: [
-            { cx: 480, cy: 500, w: 700, h: 700, rot: -6 }, 
-            { cx: 600, cy: 1350, w: 700, h: 700, rot: 8 }
+            { cx: 480, cy: 500, w: 850, h: 850, rot: -6 }, 
+            { cx: 600, cy: 1350, w: 850, h: 850, rot: 8 }
         ]},
         { src: 'f2_2.png', slots: [
-            { cx: 540, cy: 500, w: 750, h: 750, rot: 0 }, 
-            { cx: 540, cy: 1350, w: 750, h: 750, rot: 0 }
+            { cx: 540, cy: 500, w: 900, h: 900, rot: 0 }, 
+            { cx: 540, cy: 1350, w: 900, h: 900, rot: 0 }
         ]},
         { src: 'f2_3.png', slots: [
-            { cx: 450, cy: 450, w: 650, h: 700, rot: -4 }, 
-            { cx: 620, cy: 1350, w: 650, h: 700, rot: 5 }
+            { cx: 450, cy: 450, w: 800, h: 850, rot: -4 }, 
+            { cx: 620, cy: 1350, w: 800, h: 850, rot: 5 }
         ]}
       ],
       3: [
         { src: 'f3_1.png', slots: [
-            { cx: 540, cy: 400, w: 800, h: 480, rot: 0 },
-            { cx: 540, cy: 950, w: 800, h: 480, rot: 0 },
-            { cx: 540, cy: 1500, w: 800, h: 480, rot: 0 }
+            { cx: 540, cy: 400, w: 900, h: 550, rot: 0 },
+            { cx: 540, cy: 950, w: 900, h: 550, rot: 0 },
+            { cx: 540, cy: 1500, w: 900, h: 550, rot: 0 }
         ]},
         { src: 'f3_2.png', slots: [
-            { cx: 520, cy: 420, w: 780, h: 480, rot: -2 },
-            { cx: 560, cy: 960, w: 780, h: 480, rot: 2 },
-            { cx: 520, cy: 1500, w: 780, h: 480, rot: -2 }
+            { cx: 520, cy: 420, w: 900, h: 550, rot: -2 },
+            { cx: 560, cy: 960, w: 900, h: 550, rot: 2 },
+            { cx: 520, cy: 1500, w: 900, h: 550, rot: -2 }
         ]}
       ],
       4: [
         { src: 'f4_1.png', slots: [
-            { cx: 380, cy: 430, w: 450, h: 480, rot: -7 },   // Top Left
-            { cx: 700, cy: 650, w: 450, h: 480, rot: 15 },   // Top Right
-            { cx: 280, cy: 1400, w: 450, h: 480, rot: -5 },  // Bottom Left
-            { cx: 720, cy: 1570, w: 450, h: 480, rot: 7 }    // Bottom Right
+            { cx: 380, cy: 430, w: 550, h: 580, rot: -7 },   
+            { cx: 700, cy: 650, w: 550, h: 580, rot: 15 },   
+            { cx: 280, cy: 1400, w: 550, h: 580, rot: -5 },  
+            { cx: 720, cy: 1570, w: 550, h: 580, rot: 7 }    
         ]},
         { src: 'f4_2.png', slots: [
-            { cx: 280, cy: 480, w: 500, h: 900, rot: 0 },
-            { cx: 800, cy: 480, w: 500, h: 900, rot: 0 },
-            { cx: 280, cy: 1440, w: 500, h: 900, rot: 0 },
-            { cx: 800, cy: 1440, w: 500, h: 900, rot: 0 }
+            { cx: 280, cy: 480, w: 600, h: 1000, rot: 0 },
+            { cx: 800, cy: 480, w: 600, h: 1000, rot: 0 },
+            { cx: 280, cy: 1440, w: 600, h: 1000, rot: 0 },
+            { cx: 800, cy: 1440, w: 600, h: 1000, rot: 0 }
         ]}
       ]
     };
@@ -259,9 +264,11 @@
       sessionShots = [];
       sessionCounter.textContent = `0/${targetShots}`;
       snapBtn.disabled = false;
+      doneBtn.classList.add('hidden');
+      flipBtn.classList.remove('hidden');
     }
 
-    // --- 4. تشغيل ورسم الكاميرا اللايف (بدون تشوه) ---
+    // --- 4. تشغيل ورسم الكاميرا اللايف ---
     async function startCamera() {
       if (video.srcObject) video.srcObject.getTracks().forEach(t => t.stop());
       try {
@@ -283,7 +290,6 @@
       await startCamera();
     });
 
-    // الدالة السحرية لرسم الكاميرا أو الصورة لتملا المربع بدون "مط" (Object-fit: Cover)
     function drawCoverImage(tCtx, source, dx, dy, dw, dh, isMirrored) {
       const sw = source.videoWidth || source.width;
       const sh = source.videoHeight || source.height;
@@ -316,15 +322,12 @@
       tCtx.restore();
     }
 
-    // حلقة عرض الكاميرا والاستيكر
     function renderLiveView() {
       if (video.readyState >= 2) {
-        // رسم الكاميرا
         liveCameraCanvas.width = liveCameraCanvas.clientWidth;
         liveCameraCanvas.height = liveCameraCanvas.clientHeight;
         drawCoverImage(liveCamCtx, video, 0, 0, liveCameraCanvas.width, liveCameraCanvas.height, currentFacingMode === 'user');
         
-        // رسم الاستيكر فوقها
         overlayCanvas.width = overlayCanvas.clientWidth;
         overlayCanvas.height = overlayCanvas.clientHeight;
         overlayCtx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
@@ -339,10 +342,9 @@
       flashEffect.style.opacity = '0.85';
       setTimeout(() => { flashEffect.style.opacity = '0'; }, 120);
 
-      // حفظ الصورة النظيفة مع الاستيكر
       const shotCanvas = document.createElement('canvas');
       const w = 1080;
-      const h = 1440; // نسبة طولية
+      const h = 1440; 
       shotCanvas.width = w;
       shotCanvas.height = h;
       const sCtx = shotCanvas.getContext('2d');
@@ -353,14 +355,22 @@
       sessionShots.push(shotCanvas);
       sessionCounter.textContent = `${sessionShots.length}/${targetShots}`;
 
+      flipBtn.classList.add('hidden');
+      doneBtn.classList.remove('hidden');
+
       if (sessionShots.length === targetShots) {
         snapBtn.disabled = true;
         setTimeout(buildCollageAndFinalize, 200);
       }
     });
 
+    doneBtn.addEventListener('click', () => {
+      if (sessionShots.length > 0) buildCollageAndFinalize();
+    });
+
     function buildCollageAndFinalize() {
-      const pool = FRAMES_CONFIG[targetShots];
+      const count = Math.min(Math.max(sessionShots.length, 1), 4);
+      const pool = FRAMES_CONFIG[count] || FRAMES_CONFIG[1];
       const selectedFrame = pool[Math.floor(Math.random() * pool.length)];
 
       const targetW = 1080;
@@ -371,24 +381,21 @@
       ctx.fillStyle = "#ffffff";
       ctx.fillRect(0, 0, targetW, targetH);
 
-      // رسم الصور مع الميل والمط المضبوط (Cover) لمنع الحواف السوداء والتشوه
+      // رسم الصور مع الميل المضبوط وتكبير الصورة لتغطية الحواف البيضاء تماماً
       selectedFrame.slots.forEach((slot, i) => {
         const shot = sessionShots[i];
         if (shot) {
           ctx.save();
-          // الانتقال لمركز كارت البولارويد
           ctx.translate(slot.cx, slot.cy);
-          // الدوران
           if (slot.rot) {
             ctx.rotate((slot.rot * Math.PI) / 180);
           }
-          // الرسم مع القص التلقائي
           drawCoverImage(ctx, shot, -slot.w / 2, -slot.h / 2, slot.w, slot.h, false);
           ctx.restore();
         }
       });
 
-      // رسم الفريم الشفاف فوق كل شيء
+      // الفريم النهائي
       const frameImg = loadedFrameImgs[selectedFrame.src];
       if (frameImg && frameImg.complete && frameImg.naturalWidth > 0) {
         ctx.drawImage(frameImg, 0, 0, targetW, targetH);
@@ -399,13 +406,12 @@
       updateGalleryThumb();
       openGalleryAt(0);
 
-      // رفع لدرايف
       uploadStatus.style.opacity = '1';
       fetch(GOOGLE_SCRIPT_URL, {
         method: 'POST',
         mode: 'no-cors',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ image: finalDataUrl, filename: `Booth_${targetShots}Shots_${Date.now()}.jpg` })
+        body: JSON.stringify({ image: finalDataUrl, filename: `Booth_${count}Shots_${Date.now()}.jpg` })
       }).finally(() => {
         setTimeout(() => { uploadStatus.style.opacity = '0'; }, 3000);
       });
