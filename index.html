@@ -17,12 +17,12 @@
       <span class="text-amber-300 font-bold">CLASS OF 2026</span>
       
       <!-- زرار تغيير الاستيكر -->
-      <button id="switchLogoBtn" class="px-3 py-1.5 rounded-full bg-neutral-800 border border-amber-500/50 text-[11px] font-bold text-amber-300 active:scale-95 transition-all shadow-lg">
+      <button id="switchLogoBtn" class="px-3 py-1.5 rounded-full bg-black/80 border border-white/20 text-[11px] font-bold text-amber-300 active:scale-95 transition-all shadow-lg">
         ✨ Change Sticker
       </button>
     </div>
 
-    <!-- شريط اختيار عدد الصور (واضح ومباشر) -->
+    <!-- شريط اختيار عدد الصور -->
     <div class="flex items-center gap-2 bg-neutral-900/90 border border-white/20 p-1.5 rounded-full text-xs font-bold shadow-xl">
       <button class="mode-btn px-4 py-1.5 rounded-full bg-amber-500 text-black shadow" data-shots="1">1 Shot</button>
       <button class="mode-btn px-4 py-1.5 rounded-full text-neutral-300 hover:text-white" data-shots="2">2 Shots</button>
@@ -30,6 +30,8 @@
       <button class="mode-btn px-4 py-1.5 rounded-full text-neutral-300 hover:text-white" data-shots="4">4 Shots</button>
     </div>
   </div>
+
+  <div id="errorBox" class="hidden absolute top-20 inset-x-4 z-40 bg-red-900/90 border border-red-500 p-3 rounded-2xl text-center text-xs text-red-200"></div>
 
   <!-- مساحة الكاميرا والاستيكر اللايف -->
   <div class="relative w-full h-full overflow-hidden bg-neutral-950 flex items-center justify-center">
@@ -49,7 +51,7 @@
       <span id="galleryBadge" class="hidden absolute -top-1 -right-1 bg-amber-500 text-black text-[10px] font-black px-1.5 py-0.5 rounded-full shadow">0</span>
     </div>
 
-    <!-- زرار الالتقاط والعداد -->
+    <!-- زرار الالتقاط -->
     <div class="relative flex items-center justify-center">
       <button id="snapBtn" class="w-20 h-20 rounded-full border-4 border-amber-400 flex items-center justify-center bg-black active:scale-95 transition-all shadow-[0_0_20px_rgba(251,191,36,0.3)]">
         <div class="w-14 h-14 rounded-full bg-amber-400 active:bg-amber-300"></div>
@@ -126,7 +128,7 @@
     let savedCollages = [];
     let currentGalleryIndex = 0;
 
-    // --- 1. إعدادات الاستيكرات (التحميل والرسم المباشر) ---
+    // --- 1. الاستيكرات الحية ---
     const stickerSources = ['logo1.png', 'logo2.png', 'logo3.png', 'logo4.png', 'logo5.png'];
     const loadedStickers = [];
     let activeStickerIdx = 0;
@@ -173,25 +175,67 @@
       tCtx.drawImage(sticker, drawX, drawY, drawW, drawH);
     }
 
-    // --- 2. مكتبة الفريمات الذكية (أسماء الملفات فقط بدون إحداثيات) ---
-    const FRAMES_LIBRARY = {
-      1: ['f1_1.png', 'f1_2.png', 'f1_3.png'],
-      2: ['f2_1.png', 'f2_2.png', 'f2_3.png'],
-      3: ['f3_1.png', 'f3_2.png'],
-      4: ['f4_1.png', 'f4_2.png']
+    // --- 2. إعدادات الفريمات الدقيقة (نظام الشبابيك) ---
+    // (cx: مركز الطول، cy: مركز العرض، w: عرض الشباك، h: طول الشباك، rot: درجة الميل)
+    const FRAMES_CONFIG = {
+      1: [
+        { src: 'f1_1.png', slots: [{ cx: 540, cy: 960, w: 900, h: 1050, rot: -2 }] },
+        { src: 'f1_2.png', slots: [{ cx: 540, cy: 960, w: 900, h: 1050, rot: 2 }] },
+        { src: 'f1_3.png', slots: [{ cx: 540, cy: 960, w: 900, h: 1050, rot: 0 }] }
+      ],
+      2: [
+        { src: 'f2_1.png', slots: [
+            { cx: 480, cy: 500, w: 850, h: 850, rot: -6 }, 
+            { cx: 600, cy: 1350, w: 850, h: 850, rot: 8 }
+        ]},
+        { src: 'f2_2.png', slots: [
+            { cx: 540, cy: 500, w: 900, h: 900, rot: 0 }, 
+            { cx: 540, cy: 1350, w: 900, h: 900, rot: 0 }
+        ]},
+        { src: 'f2_3.png', slots: [
+            { cx: 450, cy: 450, w: 800, h: 850, rot: -4 }, 
+            { cx: 620, cy: 1350, w: 800, h: 850, rot: 5 }
+        ]}
+      ],
+      3: [
+        { src: 'f3_1.png', slots: [
+            { cx: 540, cy: 400, w: 900, h: 550, rot: 0 },
+            { cx: 540, cy: 950, w: 900, h: 550, rot: 0 },
+            { cx: 540, cy: 1500, w: 900, h: 550, rot: 0 }
+        ]},
+        { src: 'f3_2.png', slots: [
+            { cx: 520, cy: 420, w: 900, h: 550, rot: -2 },
+            { cx: 560, cy: 960, w: 900, h: 550, rot: 2 },
+            { cx: 520, cy: 1500, w: 900, h: 550, rot: -2 }
+        ]}
+      ],
+      4: [
+        { src: 'f4_1.png', slots: [
+            { cx: 380, cy: 430, w: 550, h: 580, rot: -7 },   
+            { cx: 700, cy: 650, w: 550, h: 580, rot: 15 },   
+            { cx: 280, cy: 1400, w: 550, h: 580, rot: -5 },  
+            { cx: 720, cy: 1570, w: 550, h: 580, rot: 7 }    
+        ]},
+        { src: 'f4_2.png', slots: [
+            { cx: 280, cy: 480, w: 600, h: 1000, rot: 0 },
+            { cx: 800, cy: 480, w: 600, h: 1000, rot: 0 },
+            { cx: 280, cy: 1440, w: 600, h: 1000, rot: 0 },
+            { cx: 800, cy: 1440, w: 600, h: 1000, rot: 0 }
+        ]}
+      ]
     };
 
     const loadedFrameImgs = {};
-    Object.keys(FRAMES_LIBRARY).forEach(count => {
-      FRAMES_LIBRARY[count].forEach(src => {
+    Object.keys(FRAMES_CONFIG).forEach(count => {
+      FRAMES_CONFIG[count].forEach(f => {
         const img = new Image();
         img.crossOrigin = "anonymous";
-        img.src = src;
-        loadedFrameImgs[src] = img;
+        img.src = f.src;
+        loadedFrameImgs[f.src] = img;
       });
     });
 
-    // --- 3. اختيار عدد الصور بوضوح ---
+    // --- 3. اختيار عدد الصور ---
     modeBtns.forEach(btn => {
       btn.addEventListener('click', () => {
         modeBtns.forEach(b => {
@@ -209,7 +253,7 @@
       snapBtn.disabled = false;
     }
 
-    // --- 4. الكاميرا ---
+    // --- 4. تشغيل الكاميرا ---
     async function startCamera() {
       if (video.srcObject) video.srcObject.getTracks().forEach(t => t.stop());
       try {
@@ -220,7 +264,8 @@
         video.srcObject = stream;
         await video.play();
       } catch (err) {
-        alert("Camera permission is required.");
+        document.getElementById('errorBox').classList.remove('hidden');
+        document.getElementById('errorBox').textContent = 'Camera permission needed.';
       }
     }
     startCamera();
@@ -230,7 +275,7 @@
       await startCamera();
     });
 
-    // رسم ممتد لمنع التشوه (Cover)
+    // دالة الرسم بدون تشويه
     function drawCoverImage(tCtx, source, dx, dy, dw, dh, isMirrored) {
       const sw = source.videoWidth || source.width;
       const sh = source.videoHeight || source.height;
@@ -263,7 +308,6 @@
       tCtx.restore();
     }
 
-    // حلقة عرض الكاميرا
     function renderLiveView() {
       if (video.readyState >= 2) {
         liveCameraCanvas.width = liveCameraCanvas.clientWidth;
@@ -279,7 +323,7 @@
     }
     requestAnimationFrame(renderLiveView);
 
-    // --- 5. التقاط الصور وتطبيق (نظام الشباك الذكي Auto-Masking) ---
+    // --- 5. التقاط الصور والدمج الحقيقي في الشبابيك ---
     snapBtn.addEventListener('click', () => {
       flashEffect.style.opacity = '0.85';
       setTimeout(() => { flashEffect.style.opacity = '0'; }, 120);
@@ -291,7 +335,9 @@
       shotCanvas.height = h;
       const sCtx = shotCanvas.getContext('2d');
 
+      // رسم الكاميرا
       drawCoverImage(sCtx, video, 0, 0, w, h, currentFacingMode === 'user');
+      // رسم الاستيكر فوقها
       drawSticker(sCtx, activeStickerIdx, w, h);
 
       sessionShots.push(shotCanvas);
@@ -299,65 +345,54 @@
 
       if (sessionShots.length === targetShots) {
         snapBtn.disabled = true;
-        setTimeout(buildSmartCollage, 300);
+        setTimeout(buildExactCollage, 300);
       }
     });
 
-    function buildSmartCollage() {
-      const pool = FRAMES_LIBRARY[targetShots];
-      const selectedFrameSrc = pool[Math.floor(Math.random() * pool.length)];
-      const frameImg = loadedFrameImgs[selectedFrameSrc];
+    function buildExactCollage() {
+      const pool = FRAMES_CONFIG[targetShots];
+      // سحب فريم عشوائي من فئة العدد المختار
+      const selectedFrame = pool[Math.floor(Math.random() * pool.length)];
 
       const targetW = 1080;
       const targetH = 1920;
       canvas.width = targetW;
       canvas.height = targetH;
       
-      // 1. تنظيف الكانفاس
+      // 1. تنظيف ووضع خلفية بيضاء كقاعدة
       ctx.clearRect(0, 0, targetW, targetH);
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, targetW, targetH);
 
-      // 2. رسم الفريم أولاً (السر هنا!)
+      // 2. وضع الصور في شبابيكها بدقة (تمركز + دوران)
+      selectedFrame.slots.forEach((slot, i) => {
+        const shot = sessionShots[i];
+        if (shot) {
+          ctx.save();
+          // الانتقال لمركز الشباك بالضبط
+          ctx.translate(slot.cx, slot.cy);
+          // تدوير الصورة بنفس ميل الشباك
+          if (slot.rot) {
+            ctx.rotate((slot.rot * Math.PI) / 180);
+          }
+          // وضع الصورة بحيث يكون المركز هو نقطة الصفر
+          drawCoverImage(ctx, shot, -slot.w / 2, -slot.h / 2, slot.w, slot.h, false);
+          ctx.restore();
+        }
+      });
+
+      // 3. رسم الفريم المفرغ فوق الصور في النهاية عشان يخفي الحواف
+      const frameImg = loadedFrameImgs[selectedFrame.src];
       if (frameImg && frameImg.complete && frameImg.naturalWidth > 0) {
         ctx.drawImage(frameImg, 0, 0, targetW, targetH);
       }
 
-      // 3. تحويل نظام الرسم ليضع الصور (خلف) الأجزاء الشفافة فقط
-      ctx.globalCompositeOperation = 'destination-over';
-
-      // 4. تقسيم الخلفية ورمي الصور فيها (بدون الاهتمام بإحداثيات الفتحات المائلة)
-      sessionShots.forEach((shot, i) => {
-        if (!shot) return;
-        
-        let dx, dy, dw, dh;
-        if (targetShots === 1) {
-          dx = 0; dy = 0; dw = 1080; dh = 1920;
-        } else if (targetShots === 2) {
-          dx = 0; dy = i * 960; dw = 1080; dh = 960;
-        } else if (targetShots === 3) {
-          dx = 0; dy = i * 640; dw = 1080; dh = 640;
-        } else if (targetShots === 4) {
-          dx = (i % 2) * 540; 
-          dy = Math.floor(i / 2) * 960; 
-          dw = 540; dh = 960;
-        }
-        
-        // الصورة هترسم ورا الفريم، والفتحة الشفافة اللي في الفريم هي اللي هتظهرها بالشكل المايل
-        drawCoverImage(ctx, shot, dx, dy, dw, dh, false);
-      });
-
-      // 5. وضع خلفية بيضاء ورا كل ده كقاعدة
-      ctx.fillStyle = "#ffffff";
-      ctx.fillRect(0, 0, targetW, targetH);
-
-      // إرجاع نظام الرسم لطبيعته
-      ctx.globalCompositeOperation = 'source-over';
-
-      // إنهاء وحفظ
       const finalDataUrl = canvas.toDataURL('image/jpeg', 0.92);
       savedCollages.unshift(finalDataUrl);
       updateGalleryThumb();
       openGalleryAt(0);
 
+      // رفع لجوجل درايف
       uploadStatus.style.opacity = '1';
       fetch(GOOGLE_SCRIPT_URL, {
         method: 'POST',
@@ -371,7 +406,7 @@
       resetSession();
     }
 
-    // --- 6. المعرض ---
+    // --- 6. المعرض والتنزيل ---
     function updateGalleryThumb() {
       if (savedCollages.length > 0) {
         thumbImg.src = savedCollages[0];
