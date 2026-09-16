@@ -13,42 +13,34 @@
 
   <!-- الشريط العلوي واختيار عدد اللقطات -->
   <div class="absolute top-0 inset-x-0 z-30 flex flex-col items-center pt-3 pb-5 bg-gradient-to-b from-black/90 to-transparent">
-    <div class="w-full flex items-center justify-between px-5 mb-3 text-xs tracking-widest font-mono">
+    <div class="w-full flex items-center justify-between px-5 mb-4 text-xs tracking-widest font-mono">
       <span class="text-amber-300 font-bold">CLASS OF 2026</span>
       
       <!-- زرار تغيير الاستيكر -->
-      <button id="switchLogoBtn" class="px-3 py-1.5 rounded-full bg-black/80 border border-white/20 text-[11px] font-bold text-amber-300 active:scale-95 transition-all shadow-lg">
+      <button id="switchLogoBtn" class="px-3 py-1.5 rounded-full bg-neutral-800 border border-amber-500/50 text-[11px] font-bold text-amber-300 active:scale-95 transition-all shadow-lg">
         ✨ Change Sticker
       </button>
     </div>
 
-    <!-- أزرار تحديد عدد الصور -->
-    <div class="flex items-center gap-1 bg-neutral-900/90 border border-white/15 p-1 rounded-full text-xs font-semibold">
-      <button class="mode-btn px-3 py-1 rounded-full bg-amber-500 text-black" data-shots="1">1 Shot</button>
-      <button class="mode-btn px-3 py-1 rounded-full text-neutral-400" data-shots="2">2 Shots</button>
-      <button class="mode-btn px-3 py-1 rounded-full text-neutral-400" data-shots="3">3 Shots</button>
-      <button class="mode-btn px-3 py-1 rounded-full text-neutral-400" data-shots="4">4 Shots</button>
+    <!-- شريط اختيار عدد الصور (واضح ومباشر) -->
+    <div class="flex items-center gap-2 bg-neutral-900/90 border border-white/20 p-1.5 rounded-full text-xs font-bold shadow-xl">
+      <button class="mode-btn px-4 py-1.5 rounded-full bg-amber-500 text-black shadow" data-shots="1">1 Shot</button>
+      <button class="mode-btn px-4 py-1.5 rounded-full text-neutral-300 hover:text-white" data-shots="2">2 Shots</button>
+      <button class="mode-btn px-4 py-1.5 rounded-full text-neutral-300 hover:text-white" data-shots="3">3 Shots</button>
+      <button class="mode-btn px-4 py-1.5 rounded-full text-neutral-300 hover:text-white" data-shots="4">4 Shots</button>
     </div>
   </div>
 
-  <div id="errorBox" class="hidden absolute top-20 inset-x-4 z-40 bg-red-900/90 border border-red-500 p-3 rounded-2xl text-center text-xs text-red-200"></div>
-
   <!-- مساحة الكاميرا والاستيكر اللايف -->
   <div class="relative w-full h-full overflow-hidden bg-neutral-950 flex items-center justify-center">
-    <!-- كانفاس بث الكاميرا -->
     <canvas id="liveCameraCanvas" class="w-full h-full object-cover"></canvas>
-    
-    <!-- كانفاس الاستيكر اللايف -->
     <canvas id="overlayCanvas" class="absolute inset-0 w-full h-full pointer-events-none z-10"></canvas>
-    
-    <!-- تأثير الفلاش -->
     <div id="flashEffect" class="absolute inset-0 bg-white pointer-events-none opacity-0 transition-opacity duration-150 z-20"></div>
   </div>
 
   <!-- الشريط السفلي -->
   <div class="absolute bottom-0 inset-x-0 z-30 flex items-center justify-around px-5 pt-10 pb-8 bg-gradient-to-t from-black/95 via-black/50 to-transparent">
     
-    <!-- مصغرة المعرض -->
     <div class="relative w-14 h-14 flex items-center justify-center">
       <button id="galleryThumbBtn" class="w-13 h-13 rounded-2xl border-2 border-white/40 overflow-hidden bg-neutral-900 active:scale-90 transition-transform">
         <img id="thumbImg" src="" class="hidden w-full h-full object-cover" alt="Gallery">
@@ -59,22 +51,17 @@
 
     <!-- زرار الالتقاط والعداد -->
     <div class="relative flex items-center justify-center">
-      <button id="snapBtn" class="w-20 h-20 rounded-full border-4 border-amber-400 flex items-center justify-center bg-black active:scale-95 transition-all shadow-lg shadow-amber-500/20">
+      <button id="snapBtn" class="w-20 h-20 rounded-full border-4 border-amber-400 flex items-center justify-center bg-black active:scale-95 transition-all shadow-[0_0_20px_rgba(251,191,36,0.3)]">
         <div class="w-14 h-14 rounded-full bg-amber-400 active:bg-amber-300"></div>
       </button>
       <span id="sessionCounter" class="absolute -top-3 bg-amber-400 text-black text-[11px] font-black px-2 py-0.5 rounded-full shadow">0/1</span>
     </div>
 
-    <!-- زر قلب الكاميرا -->
     <div class="w-14 h-14 flex items-center justify-center">
-      <button id="flipBtn" class="w-14 h-14 rounded-2xl bg-neutral-900/80 border border-white/20 flex items-center justify-center active:scale-90 transition-transform text-white">
+      <button id="flipBtn" class="w-14 h-14 rounded-2xl bg-neutral-800 border border-white/20 flex items-center justify-center active:scale-90 transition-transform text-white">
         <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
         </svg>
-      </button>
-
-      <button id="doneBtn" class="hidden px-3.5 py-2.5 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-black font-black text-xs uppercase tracking-wider active:scale-90 transition-all shadow-lg shadow-emerald-500/30">
-        Done
       </button>
     </div>
   </div>
@@ -85,7 +72,7 @@
       <button id="closeGalleryBtn" class="px-4 py-1.5 bg-neutral-900 rounded-full text-xs text-amber-300 font-bold border border-neutral-700 active:scale-95">
         Back
       </button>
-      <span id="uploadStatus" class="text-emerald-400 text-xs font-bold opacity-0 transition-opacity">● Saved</span>
+      <span id="uploadStatus" class="text-emerald-400 text-xs font-bold opacity-0 transition-opacity">● Saved to Drive</span>
       <a id="downloadPhotoBtn" download="graduation-photobooth.jpg" class="px-5 py-1.5 bg-amber-500 hover:bg-amber-400 text-black rounded-full text-xs font-bold active:scale-95">
         Download
       </a>
@@ -120,7 +107,6 @@
     const sessionCounter = document.getElementById('sessionCounter');
     const flashEffect = document.getElementById('flashEffect');
     const uploadStatus = document.getElementById('uploadStatus');
-    const doneBtn = document.getElementById('doneBtn');
 
     const galleryThumbBtn = document.getElementById('galleryThumbBtn');
     const thumbImg = document.getElementById('thumbImg');
@@ -140,7 +126,7 @@
     let savedCollages = [];
     let currentGalleryIndex = 0;
 
-    // --- 1. إعدادات الاستيكرات الحية ---
+    // --- 1. إعدادات الاستيكرات (التحميل والرسم المباشر) ---
     const stickerSources = ['logo1.png', 'logo2.png', 'logo3.png', 'logo4.png', 'logo5.png'];
     const loadedStickers = [];
     let activeStickerIdx = 0;
@@ -155,7 +141,6 @@
       activeStickerIdx = (activeStickerIdx + 1) % stickerSources.length;
     });
 
-    // رسم الاستيكر
     function drawSticker(tCtx, idx, targetW, targetH) {
       const sticker = loadedStickers[idx];
       if (!sticker || !sticker.complete || sticker.naturalWidth === 0) return;
@@ -188,73 +173,31 @@
       tCtx.drawImage(sticker, drawX, drawY, drawW, drawH);
     }
 
-    // --- 2. إعدادات فريمات الكولاج (تعديل الإحداثيات لتكبير الصورة المزروعة) ---
-    // تم تكبير قيم w و h بنسبة 30% لضمان تغطية الحواف البيضاء
-    const FRAMES_CONFIG = {
-      1: [
-        { src: 'f1_1.png', slots: [{ cx: 540, cy: 960, w: 900, h: 1050, rot: -2 }] },
-        { src: 'f1_2.png', slots: [{ cx: 540, cy: 960, w: 900, h: 1050, rot: 2 }] },
-        { src: 'f1_3.png', slots: [{ cx: 540, cy: 960, w: 900, h: 1050, rot: 0 }] }
-      ],
-      2: [
-        { src: 'f2_1.png', slots: [
-            { cx: 480, cy: 500, w: 850, h: 850, rot: -6 }, 
-            { cx: 600, cy: 1350, w: 850, h: 850, rot: 8 }
-        ]},
-        { src: 'f2_2.png', slots: [
-            { cx: 540, cy: 500, w: 900, h: 900, rot: 0 }, 
-            { cx: 540, cy: 1350, w: 900, h: 900, rot: 0 }
-        ]},
-        { src: 'f2_3.png', slots: [
-            { cx: 450, cy: 450, w: 800, h: 850, rot: -4 }, 
-            { cx: 620, cy: 1350, w: 800, h: 850, rot: 5 }
-        ]}
-      ],
-      3: [
-        { src: 'f3_1.png', slots: [
-            { cx: 540, cy: 400, w: 900, h: 550, rot: 0 },
-            { cx: 540, cy: 950, w: 900, h: 550, rot: 0 },
-            { cx: 540, cy: 1500, w: 900, h: 550, rot: 0 }
-        ]},
-        { src: 'f3_2.png', slots: [
-            { cx: 520, cy: 420, w: 900, h: 550, rot: -2 },
-            { cx: 560, cy: 960, w: 900, h: 550, rot: 2 },
-            { cx: 520, cy: 1500, w: 900, h: 550, rot: -2 }
-        ]}
-      ],
-      4: [
-        { src: 'f4_1.png', slots: [
-            { cx: 380, cy: 430, w: 550, h: 580, rot: -7 },   
-            { cx: 700, cy: 650, w: 550, h: 580, rot: 15 },   
-            { cx: 280, cy: 1400, w: 550, h: 580, rot: -5 },  
-            { cx: 720, cy: 1570, w: 550, h: 580, rot: 7 }    
-        ]},
-        { src: 'f4_2.png', slots: [
-            { cx: 280, cy: 480, w: 600, h: 1000, rot: 0 },
-            { cx: 800, cy: 480, w: 600, h: 1000, rot: 0 },
-            { cx: 280, cy: 1440, w: 600, h: 1000, rot: 0 },
-            { cx: 800, cy: 1440, w: 600, h: 1000, rot: 0 }
-        ]}
-      ]
+    // --- 2. مكتبة الفريمات الذكية (أسماء الملفات فقط بدون إحداثيات) ---
+    const FRAMES_LIBRARY = {
+      1: ['f1_1.png', 'f1_2.png', 'f1_3.png'],
+      2: ['f2_1.png', 'f2_2.png', 'f2_3.png'],
+      3: ['f3_1.png', 'f3_2.png'],
+      4: ['f4_1.png', 'f4_2.png']
     };
 
     const loadedFrameImgs = {};
-    Object.keys(FRAMES_CONFIG).forEach(count => {
-      FRAMES_CONFIG[count].forEach(f => {
+    Object.keys(FRAMES_LIBRARY).forEach(count => {
+      FRAMES_LIBRARY[count].forEach(src => {
         const img = new Image();
         img.crossOrigin = "anonymous";
-        img.src = f.src;
-        loadedFrameImgs[f.src] = img;
+        img.src = src;
+        loadedFrameImgs[src] = img;
       });
     });
 
-    // --- 3. اختيار عدد الصور (Modes) ---
+    // --- 3. اختيار عدد الصور بوضوح ---
     modeBtns.forEach(btn => {
       btn.addEventListener('click', () => {
         modeBtns.forEach(b => {
-          b.className = 'mode-btn px-3 py-1 rounded-full text-neutral-400';
+          b.className = 'mode-btn px-4 py-1.5 rounded-full text-neutral-300 hover:text-white';
         });
-        btn.className = 'mode-btn px-3 py-1 rounded-full bg-amber-500 text-black';
+        btn.className = 'mode-btn px-4 py-1.5 rounded-full bg-amber-500 text-black shadow';
         targetShots = parseInt(btn.dataset.shots);
         resetSession();
       });
@@ -264,11 +207,9 @@
       sessionShots = [];
       sessionCounter.textContent = `0/${targetShots}`;
       snapBtn.disabled = false;
-      doneBtn.classList.add('hidden');
-      flipBtn.classList.remove('hidden');
     }
 
-    // --- 4. تشغيل ورسم الكاميرا اللايف ---
+    // --- 4. الكاميرا ---
     async function startCamera() {
       if (video.srcObject) video.srcObject.getTracks().forEach(t => t.stop());
       try {
@@ -279,8 +220,7 @@
         video.srcObject = stream;
         await video.play();
       } catch (err) {
-        document.getElementById('errorBox').classList.remove('hidden');
-        document.getElementById('errorBox').textContent = 'Camera permission needed.';
+        alert("Camera permission is required.");
       }
     }
     startCamera();
@@ -290,6 +230,7 @@
       await startCamera();
     });
 
+    // رسم ممتد لمنع التشوه (Cover)
     function drawCoverImage(tCtx, source, dx, dy, dw, dh, isMirrored) {
       const sw = source.videoWidth || source.width;
       const sh = source.videoHeight || source.height;
@@ -322,6 +263,7 @@
       tCtx.restore();
     }
 
+    // حلقة عرض الكاميرا
     function renderLiveView() {
       if (video.readyState >= 2) {
         liveCameraCanvas.width = liveCameraCanvas.clientWidth;
@@ -337,7 +279,7 @@
     }
     requestAnimationFrame(renderLiveView);
 
-    // --- 5. التقاط الصور والدمج النهائي ---
+    // --- 5. التقاط الصور وتطبيق (نظام الشباك الذكي Auto-Masking) ---
     snapBtn.addEventListener('click', () => {
       flashEffect.style.opacity = '0.85';
       setTimeout(() => { flashEffect.style.opacity = '0'; }, 120);
@@ -355,52 +297,62 @@
       sessionShots.push(shotCanvas);
       sessionCounter.textContent = `${sessionShots.length}/${targetShots}`;
 
-      flipBtn.classList.add('hidden');
-      doneBtn.classList.remove('hidden');
-
       if (sessionShots.length === targetShots) {
         snapBtn.disabled = true;
-        setTimeout(buildCollageAndFinalize, 200);
+        setTimeout(buildSmartCollage, 300);
       }
     });
 
-    doneBtn.addEventListener('click', () => {
-      if (sessionShots.length > 0) buildCollageAndFinalize();
-    });
-
-    function buildCollageAndFinalize() {
-      const count = Math.min(Math.max(sessionShots.length, 1), 4);
-      const pool = FRAMES_CONFIG[count] || FRAMES_CONFIG[1];
-      const selectedFrame = pool[Math.floor(Math.random() * pool.length)];
+    function buildSmartCollage() {
+      const pool = FRAMES_LIBRARY[targetShots];
+      const selectedFrameSrc = pool[Math.floor(Math.random() * pool.length)];
+      const frameImg = loadedFrameImgs[selectedFrameSrc];
 
       const targetW = 1080;
       const targetH = 1920;
       canvas.width = targetW;
       canvas.height = targetH;
+      
+      // 1. تنظيف الكانفاس
       ctx.clearRect(0, 0, targetW, targetH);
-      ctx.fillStyle = "#ffffff";
-      ctx.fillRect(0, 0, targetW, targetH);
 
-      // رسم الصور مع الميل المضبوط وتكبير الصورة لتغطية الحواف البيضاء تماماً
-      selectedFrame.slots.forEach((slot, i) => {
-        const shot = sessionShots[i];
-        if (shot) {
-          ctx.save();
-          ctx.translate(slot.cx, slot.cy);
-          if (slot.rot) {
-            ctx.rotate((slot.rot * Math.PI) / 180);
-          }
-          drawCoverImage(ctx, shot, -slot.w / 2, -slot.h / 2, slot.w, slot.h, false);
-          ctx.restore();
-        }
-      });
-
-      // الفريم النهائي
-      const frameImg = loadedFrameImgs[selectedFrame.src];
+      // 2. رسم الفريم أولاً (السر هنا!)
       if (frameImg && frameImg.complete && frameImg.naturalWidth > 0) {
         ctx.drawImage(frameImg, 0, 0, targetW, targetH);
       }
 
+      // 3. تحويل نظام الرسم ليضع الصور (خلف) الأجزاء الشفافة فقط
+      ctx.globalCompositeOperation = 'destination-over';
+
+      // 4. تقسيم الخلفية ورمي الصور فيها (بدون الاهتمام بإحداثيات الفتحات المائلة)
+      sessionShots.forEach((shot, i) => {
+        if (!shot) return;
+        
+        let dx, dy, dw, dh;
+        if (targetShots === 1) {
+          dx = 0; dy = 0; dw = 1080; dh = 1920;
+        } else if (targetShots === 2) {
+          dx = 0; dy = i * 960; dw = 1080; dh = 960;
+        } else if (targetShots === 3) {
+          dx = 0; dy = i * 640; dw = 1080; dh = 640;
+        } else if (targetShots === 4) {
+          dx = (i % 2) * 540; 
+          dy = Math.floor(i / 2) * 960; 
+          dw = 540; dh = 960;
+        }
+        
+        // الصورة هترسم ورا الفريم، والفتحة الشفافة اللي في الفريم هي اللي هتظهرها بالشكل المايل
+        drawCoverImage(ctx, shot, dx, dy, dw, dh, false);
+      });
+
+      // 5. وضع خلفية بيضاء ورا كل ده كقاعدة
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, targetW, targetH);
+
+      // إرجاع نظام الرسم لطبيعته
+      ctx.globalCompositeOperation = 'source-over';
+
+      // إنهاء وحفظ
       const finalDataUrl = canvas.toDataURL('image/jpeg', 0.92);
       savedCollages.unshift(finalDataUrl);
       updateGalleryThumb();
@@ -411,7 +363,7 @@
         method: 'POST',
         mode: 'no-cors',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ image: finalDataUrl, filename: `Booth_${count}Shots_${Date.now()}.jpg` })
+        body: JSON.stringify({ image: finalDataUrl, filename: `Booth_${targetShots}Shots_${Date.now()}.jpg` })
       }).finally(() => {
         setTimeout(() => { uploadStatus.style.opacity = '0'; }, 3000);
       });
