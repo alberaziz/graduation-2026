@@ -13,10 +13,10 @@
     .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     .hide-scrollbar::-webkit-scrollbar { display: none; }
 
-    /* حركات ظهور سلسة ومخففة (Fade In + Slide Up) */
+    /* حركات ظهور سلسة ومخففة */
     .animate-slide-up {
       animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-      will-change: transform, opacity; /* تحسين أداء المعالج */
+      will-change: transform, opacity;
     }
     @keyframes slideUp {
       0% { opacity: 0; transform: translateY(30px); }
@@ -34,6 +34,16 @@
       100% { transform: translateY(0px); }
     }
 
+    /* تأثير نبض خفيف لزرار التصوير */
+    .animate-pulse-ring-light {
+      animation: pulseRingLight 3s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+    }
+    @keyframes pulseRingLight {
+      0% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.5); }
+      70% { box-shadow: 0 0 0 15px rgba(245, 158, 11, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
+    }
+
     /* شكل الزرار لما تختاره (Pop-in Effect) */
     .selected-ring { 
       outline: 4px solid #f59e0b; 
@@ -44,7 +54,7 @@
       box-shadow: 0 10px 30px -10px rgba(245, 158, 11, 0.7);
     }
 
-    /* زرار الاستيكر النشط في الشريط (تم تبسيطه وتخفيفه) */
+    /* زرار الاستيكر النشط في الشريط (تم تبسيطه وتثبيت لونه الأبيض) */
     .sticker-active {
       transform: scale(1.03); /* تكبير بسيط جداً لمنع القَص */
       background-color: #f59e0b !important;
@@ -52,9 +62,10 @@
       box-shadow: 0 8px 25px -5px rgba(245, 158, 11, 0.6);
       z-index: 10;
     }
-    .sticker-active img { filter: brightness(0); } /* الاستيكر المختار بيكون أسود على خلفية صفرا */
+    /* الملصق المختار يفضل أبيض (تم حذف filter: brightness(0)) */
+    .sticker-active img { filter: none !important; } 
 
-    /* حركات تبديل الاستيكر النشط لايف */
+    /* حركات تبديل الاستيكر النشط لايف على الشاشة */
     .sticker-pop-out { transform: scale(0) rotate(-15deg); opacity: 0; }
     .sticker-pop-in { transform: scale(1) rotate(0deg); opacity: 1; }
   </style>
@@ -88,7 +99,7 @@
     </div>
   </div>
 
-  <!-- ==================== 2. شاشة الإعدادات ==================== -->
+  <!-- ==================== 2. شاشة الإعدادات (اختيار عدد الصور فقط) ==================== -->
   <div id="view-setup" class="hidden absolute inset-0 z-40 flex flex-col bg-black p-6 overflow-y-auto">
     <div class="absolute top-0 right-0 w-96 h-96 bg-amber-500/5 rounded-full blur-[120px] pointer-events-none"></div>
 
@@ -137,11 +148,11 @@
       <div id="flashEffect" class="absolute inset-0 bg-white pointer-events-none opacity-0 transition-opacity duration-150 z-30"></div>
     </div>
 
-    <!-- شريط الاستيكرات المتحرك (تم توسيع الهامش العلوي والسفلي pt-6 pb-4) -->
+    <!-- شريط الاستيكرات المتحرك -->
     <div class="absolute bottom-[110px] inset-x-0 z-40 bg-gradient-to-t from-black/70 via-black/50 to-transparent pt-6 pb-4">
       <p class="text-center text-[10px] text-white font-black tracking-[0.2em] uppercase mb-4 drop-shadow-md">Swipe to select a sticker</p>
       <div id="sticker-carousel" class="flex items-center gap-3.5 overflow-x-auto px-6 snap-x hide-scrollbar">
-        <!-- هيتملي أوتوماتيك من الـ JS -->
+        <!-- هيتملي أوتوماتيك من الـ JS بالـ 9 ستيكرات -->
       </div>
     </div>
 
@@ -149,7 +160,7 @@
       <div class="w-14 h-14"></div> 
       
       <div class="relative flex items-center justify-center">
-        <button id="snapBtn" class="w-20 h-20 rounded-full border-4 border-amber-400 flex items-center justify-center bg-black active:scale-95 transition-transform shadow-[0_0_30px_rgba(251,191,36,0.6)]">
+        <button id="snapBtn" class="w-20 h-20 rounded-full border-4 border-amber-400 flex items-center justify-center bg-black active:scale-95 transition-transform shadow-[0_0_30px_rgba(251,191,36,0.6)] animate-pulse-ring-light">
           <div id="snapInner" class="w-[52px] h-[52px] rounded-full bg-amber-400 flex items-center justify-center text-black font-bold text-xs transition-colors"></div>
         </button>
         <span id="sessionCounter" class="absolute -top-4 bg-white text-black text-[11px] font-black px-2.5 py-1 rounded-full shadow-lg border-2 border-black transform -rotate-12">0/1</span>
@@ -261,7 +272,7 @@
       { src: 'logo2.png', css: 'right: -2%; top: 50%; transform: translateY(-50%); width: 30%;' }, // منتصف يمين
       { src: 'logo3.png', css: 'bottom: 5%; left: 5%; width: 40%;' }, // أسفل يسار
       { src: 'logo4.png', css: 'top: 6%; left: 50%; transform: translateX(-50%); width: 60%;' }, // منتصف علوي
-      { src: 'logo5.png', css: 'bottom: -2%; left: 0; width: 100%; object-fit: contain;' }, // عرض الشاشة السفلي
+      { src: 'logo5.png', css: 'bottom: -2%; left: 0; width: 100%; object-fit: contain;' }, // عرض الشاشة سفلي
       { src: 'logo6.png', css: 'top: 8%; right: 5%; width: 35%;' }, // أعلى يمين
       { src: 'logo7.png', css: 'bottom: 10%; right: 5%; width: 35%;' }, // أسفل يمين
       { src: 'logo8.png', css: 'top: 50%; left: 5%; transform: translateY(-50%); width: 35%;' }, // منتصف يسار
@@ -279,12 +290,12 @@
 
       const btn = document.createElement('div');
       // تم حذف الـ blur واستبداله بـ bg سادة أبيض (خفيف جداً على المعالج)
-      // Transition صغرت لـ duration-150 لتكون فورية
+      // Transition صغرت لتكون فورية
       btn.className = `flex-shrink-0 w-[60px] h-[60px] bg-white rounded-2xl p-2 flex items-center justify-center transition-all duration-150 ease-out cursor-pointer snap-center border-4 border-black shadow-md ${idx === 0 ? 'sticker-active' : ''}`;
       
       const thumbImg = document.createElement('img');
       thumbImg.src = cfg.src;
-      // عشان لو الصورة مش موجودة على السيرفر ميظهرش مربع مكسور، هنخفيه
+      // الإخفاء لو مش موجود
       thumbImg.onerror = () => btn.style.display = 'none'; 
       thumbImg.className = "max-w-full max-h-full object-contain";
       btn.appendChild(thumbImg);
@@ -321,7 +332,7 @@
           liveSticker.style.cssText = cfg.css;
           // Pop In سريع
           liveSticker.classList.replace('sticker-pop-out', 'sticker-pop-in');
-        }, 200); // قللت الوقت عشان التبديل يكون أسرع
+        }, 200); 
       }
     }
 
@@ -364,7 +375,7 @@
       tCtx.restore();
     }
 
-    // --- 4. الالتقاط وتجميع الـ 9 استيكرات في الصورة النهائية ---
+    // --- 4. الالتقاط ودمج الـ 9 استيكرات في الصورة النهائية ---
     document.getElementById('snapBtn').addEventListener('click', () => {
       document.getElementById('flashEffect').style.opacity = '1';
       setTimeout(() => { document.getElementById('flashEffect').style.opacity = '0'; }, 150);
@@ -391,15 +402,15 @@
         const aspect = sticker.naturalWidth / sticker.naturalHeight;
         let dw, dh, dx, dy;
         switch(activeStickerIdx) {
-          case 0: dw = w * 0.40; dh = dw / aspect; dx = (w - dw) / 2; dy = h - dh - (h * 0.08); break; 
-          case 1: dw = w * 0.30; dh = dw / aspect; dx = w - dw; dy = (h - dh) / 2; break; 
-          case 2: dw = w * 0.40; dh = dw / aspect; dx = w * 0.05; dy = h - dh - (h * 0.05); break; 
-          case 3: dw = w * 0.60; dh = dw / aspect; dx = (w - dw) / 2; dy = h * 0.06; break; 
-          case 4: dw = w; dh = dw / aspect; dx = 0; dy = h - dh; break; 
-          case 5: dw = w * 0.35; dh = dw / aspect; dx = w - dw - (w * 0.05); dy = h * 0.08; break;
-          case 6: dw = w * 0.35; dh = dw / aspect; dx = w - dw - (w * 0.05); dy = h - dh - (h * 0.1); break;
-          case 7: dw = w * 0.35; dh = dw / aspect; dx = w * 0.05; dy = (h - dh) / 2; break;
-          case 8: dw = w * 0.35; dh = dw / aspect; dx = w * 0.05; dy = h * 0.08; break;
+          case 0: dw = w * 0.40; dh = dw / aspect; dx = (w - dw) / 2; dy = h - dh - (h * 0.08); break; // منتصف سفلي
+          case 1: dw = w * 0.30; dh = dw / aspect; dx = w - dw; dy = (h - dh) / 2; break; // منتصف يمين
+          case 2: dw = w * 0.40; dh = dw / aspect; dx = w * 0.05; dy = h - dh - (h * 0.05); break; // أسفل يسار
+          case 3: dw = w * 0.60; dh = dw / aspect; dx = (w - dw) / 2; dy = h * 0.06; break; // منتصف علوي
+          case 4: dw = w; dh = dw / aspect; dx = 0; dy = h - dh; break; // عرض الشاشة سفلي
+          case 5: dw = w * 0.35; dh = dw / aspect; dx = w - dw - (w * 0.05); dy = h * 0.08; break; // أعلى يمين
+          case 6: dw = w * 0.35; dh = dw / aspect; dx = w - dw - (w * 0.05); dy = h - dh - (h * 0.1); break; // أسفل يمين
+          case 7: dw = w * 0.35; dh = dw / aspect; dx = w * 0.05; dy = (h - dh) / 2; break; // منتصف يسار
+          case 8: dw = w * 0.35; dh = dw / aspect; dx = w * 0.05; dy = h * 0.08; break; // أعلى يسار
         }
         ctx.drawImage(sticker, dx, dy, dw, dh);
       }
