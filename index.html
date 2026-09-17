@@ -6,80 +6,35 @@
   <title>Class of 2026 - Graduation Booth</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    /* تحسينات بروفيشنال للأداء */
+    /* تحسينات بروفيشنال للأداء والبساطة */
     body { background-color: #050505; }
     
-    /* إخفاء شريط التمرير */
+    /* إخفاء شريط التمرير الافتراضي */
     .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     .hide-scrollbar::-webkit-scrollbar { display: none; }
 
-    /* حركات ظهور سلسة ومخففة */
-    .animate-slide-up {
-      animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-      will-change: transform, opacity;
-    }
-    @keyframes slideUp {
-      0% { opacity: 0; transform: translateY(30px); }
-      100% { opacity: 1; transform: translateY(0); }
-    }
-
-    /* حركة عائمة مخففة لشاشة الدخول */
-    .animate-float {
-      animation: float 4s ease-in-out infinite;
-      will-change: transform;
-    }
-    @keyframes float {
-      0% { transform: translateY(0px); }
-      50% { transform: translateY(-10px); }
-      100% { transform: translateY(0px); }
-    }
-
-    /* تأثير نبض خفيف لزرار التصوير */
-    .animate-pulse-ring-light {
-      animation: pulseRingLight 3s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
-    }
-    @keyframes pulseRingLight {
-      0% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.5); }
-      70% { box-shadow: 0 0 0 15px rgba(245, 158, 11, 0); }
-      100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
-    }
-
-    /* شكل الزرار لما تختاره (Pop-in Effect) */
+    /* شكل الزرار لما تختاره (بدون أنيميشن، مجرد تغيير لون وحافة) */
     .selected-ring { 
       outline: 4px solid #f59e0b; 
       outline-offset: 3px; 
-      transform: scale(1.05); 
       background-color: #f59e0b;
       color: #000;
-      box-shadow: 0 10px 30px -10px rgba(245, 158, 11, 0.7);
     }
 
-    /* زرار الاستيكر النشط في الشريط (تم تبسيطه وتثبيت لونه الأبيض) */
+    /* زرار الاستيكر النشط في الشريط (بسيط ومباشر) */
     .sticker-active {
-      transform: scale(1.03); /* تكبير بسيط جداً لمنع القَص */
       background-color: #f59e0b !important;
       border-color: #000000 !important;
-      box-shadow: 0 8px 25px -5px rgba(245, 158, 11, 0.6);
       z-index: 10;
     }
-    /* الملصق المختار يفضل أبيض (تم حذف filter: brightness(0)) */
-    .sticker-active img { filter: none !important; } 
-
-    /* حركات تبديل الاستيكر النشط لايف على الشاشة */
-    .sticker-pop-out { transform: scale(0) rotate(-15deg); opacity: 0; }
-    .sticker-pop-in { transform: scale(1) rotate(0deg); opacity: 1; }
   </style>
 </head>
 <body class="text-white h-[100dvh] w-full overflow-hidden select-none font-sans relative">
 
   <!-- ==================== 1. شاشة تسجيل الدخول ==================== -->
-  <div id="view-login" class="absolute inset-0 z-50 flex flex-col items-center justify-center p-6 transition-all duration-500 ease-in-out">
-    <!-- خلفية مضيئة متحركة -->
-    <div class="absolute top-[-10%] left-[-10%] w-72 h-72 bg-amber-500/10 rounded-full blur-[100px] animate-float" style="animation-delay: 1s;"></div>
-    <div class="absolute bottom-[-10%] right-[-10%] w-72 h-72 bg-emerald-500/10 rounded-full blur-[100px] animate-float"></div>
-
-    <div class="w-full max-w-sm bg-neutral-900 border border-white/10 p-8 rounded-[2rem] shadow-2xl animate-slide-up relative z-10">
-      <div class="text-center mb-10 animate-float">
+  <div id="view-login" class="absolute inset-0 z-50 flex flex-col items-center justify-center p-6 bg-black">
+    <div class="w-full max-w-sm bg-neutral-900 border border-white/10 p-8 rounded-[2rem] shadow-2xl relative z-10">
+      <div class="text-center mb-10">
         <h1 class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-300 to-amber-500 mb-2">Class of '26</h1>
         <p class="text-xs font-bold text-neutral-400 tracking-[0.2em] uppercase">Photobooth Experience</p>
       </div>
@@ -87,23 +42,21 @@
       <div class="space-y-5">
         <div>
           <label class="text-[11px] font-bold text-neutral-500 uppercase tracking-widest mb-2 block ml-1">Your Name</label>
-          <input type="text" id="userName" placeholder="Enter your full name..." class="w-full bg-neutral-800 border border-neutral-700/50 rounded-2xl px-5 py-4 text-sm text-white placeholder-neutral-600 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-colors">
+          <input type="text" id="userName" placeholder="Enter your full name..." class="w-full bg-neutral-800 border border-neutral-700/50 rounded-2xl px-5 py-4 text-sm text-white placeholder-neutral-600 focus:outline-none focus:border-amber-500">
         </div>
         
-        <div id="loginError" class="hidden text-xs text-red-400 text-center font-bold bg-red-900/30 py-2.5 rounded-xl transition-all">Please enter your name!</div>
+        <div id="loginError" class="hidden text-xs text-red-400 text-center font-bold bg-red-900/30 py-2.5 rounded-xl">Please enter your name!</div>
         
-        <button id="loginBtn" class="w-full mt-2 bg-gradient-to-r from-amber-400 to-amber-500 text-black font-black uppercase tracking-widest py-4 rounded-2xl active:scale-95 shadow-[0_10px_30px_rgba(245,158,11,0.3)] transition-transform">
+        <button id="loginBtn" class="w-full mt-2 bg-gradient-to-r from-amber-400 to-amber-500 text-black font-black uppercase tracking-widest py-4 rounded-2xl active:scale-95 transition-transform shadow-[0_10px_30px_rgba(245,158,11,0.3)]">
           Enter Booth
         </button>
       </div>
     </div>
   </div>
 
-  <!-- ==================== 2. شاشة الإعدادات (اختيار عدد الصور فقط) ==================== -->
+  <!-- ==================== 2. شاشة الإعدادات ==================== -->
   <div id="view-setup" class="hidden absolute inset-0 z-40 flex flex-col bg-black p-6 overflow-y-auto">
-    <div class="absolute top-0 right-0 w-96 h-96 bg-amber-500/5 rounded-full blur-[120px] pointer-events-none"></div>
-
-    <div class="w-full max-w-sm mx-auto pt-10 pb-32 animate-slide-up">
+    <div class="w-full max-w-sm mx-auto pt-10 pb-32">
       <h2 class="text-3xl font-black mb-1">Hey, <span id="displayName" class="text-amber-400"></span>! 👋</h2>
       <p class="text-xs font-semibold text-neutral-400 mb-10 tracking-wider">Ready to make some memories?</p>
 
@@ -113,17 +66,17 @@
           Number of Shots
         </h3>
         <div class="grid grid-cols-2 gap-4">
-          <button class="shot-btn bg-neutral-800 border border-neutral-700 py-6 rounded-2xl font-black text-xl text-neutral-300 transition-all duration-300 selected-ring" data-shots="1">1 Shot</button>
-          <button class="shot-btn bg-neutral-800 border border-neutral-700 py-6 rounded-2xl font-black text-xl text-neutral-300 transition-all duration-300" data-shots="2">2 Shots</button>
-          <button class="shot-btn bg-neutral-800 border border-neutral-700 py-6 rounded-2xl font-black text-xl text-neutral-300 transition-all duration-300" data-shots="3">3 Shots</button>
-          <button class="shot-btn bg-neutral-800 border border-neutral-700 py-6 rounded-2xl font-black text-xl text-neutral-300 transition-all duration-300" data-shots="4">4 Shots</button>
+          <button class="shot-btn bg-neutral-800 border border-neutral-700 py-6 rounded-2xl font-black text-xl text-neutral-300 selected-ring" data-shots="1">1 Shot</button>
+          <button class="shot-btn bg-neutral-800 border border-neutral-700 py-6 rounded-2xl font-black text-xl text-neutral-300" data-shots="2">2 Shots</button>
+          <button class="shot-btn bg-neutral-800 border border-neutral-700 py-6 rounded-2xl font-black text-xl text-neutral-300" data-shots="3">3 Shots</button>
+          <button class="shot-btn bg-neutral-800 border border-neutral-700 py-6 rounded-2xl font-black text-xl text-neutral-300" data-shots="4">4 Shots</button>
         </div>
       </div>
     </div>
 
     <!-- زرار فتح الكاميرا -->
     <div class="fixed bottom-0 inset-x-0 p-6 bg-gradient-to-t from-black via-black/90 to-transparent flex justify-center z-50">
-      <button id="openCameraBtn" class="w-full max-w-sm bg-amber-500 text-black font-black uppercase tracking-widest py-4 rounded-2xl active:scale-95 shadow-[0_0_30px_rgba(245,158,11,0.4)] transition-transform">
+      <button id="openCameraBtn" class="w-full max-w-sm bg-amber-500 text-black font-black uppercase tracking-widest py-4 rounded-2xl active:scale-95 shadow-[0_0_30px_rgba(245,158,11,0.4)]">
         Open Camera
       </button>
     </div>
@@ -133,26 +86,26 @@
   <div id="view-camera" class="hidden absolute inset-0 z-30 flex flex-col justify-between bg-black">
     
     <div class="absolute top-0 inset-x-0 z-40 flex items-center justify-between px-5 pt-6 pb-10 bg-gradient-to-b from-black/90 via-black/70 to-transparent">
-      <button id="backToSetupBtn" class="text-xs font-bold text-white bg-white/10 px-4 py-2 rounded-full border border-white/20 flex items-center gap-2 active:scale-90 transition-transform">
+      <button id="backToSetupBtn" class="text-xs font-bold text-white bg-white/10 px-4 py-2 rounded-full border border-white/20 flex items-center gap-2 active:scale-90">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" /></svg> Back
       </button>
       <span class="text-[10px] tracking-[0.3em] font-black text-amber-400 bg-amber-500/10 px-3 py-1.5 rounded-full border border-amber-500/20">CLASS OF '26</span>
     </div>
 
     <div class="relative w-full h-full overflow-hidden bg-neutral-950 flex items-center justify-center">
-      <video id="video" autoplay playsinline muted class="w-full h-full object-cover transform -scale-x-100 transition-opacity duration-500 opacity-0"></video>
+      <video id="video" autoplay playsinline muted class="w-full h-full object-cover transform -scale-x-100 opacity-0"></video>
       
-      <!-- الاستيكر الحي مع الأنيميشن المحسن -->
-      <img id="liveSticker" src="" alt="Sticker" class="absolute pointer-events-none z-20 object-contain drop-shadow-2xl transition-all duration-400 ease-out sticker-pop-out">
+      <!-- الاستيكر الحي (مباشر وبدون أنيميشن) -->
+      <img id="liveSticker" src="" alt="Sticker" class="absolute pointer-events-none z-20 object-contain drop-shadow-2xl opacity-100 scale-100">
       
-      <div id="flashEffect" class="absolute inset-0 bg-white pointer-events-none opacity-0 transition-opacity duration-150 z-30"></div>
+      <div id="flashEffect" class="absolute inset-0 bg-white pointer-events-none opacity-0 z-30"></div>
     </div>
 
     <!-- شريط الاستيكرات المتحرك -->
     <div class="absolute bottom-[110px] inset-x-0 z-40 bg-gradient-to-t from-black/70 via-black/50 to-transparent pt-6 pb-4">
       <p class="text-center text-[10px] text-white font-black tracking-[0.2em] uppercase mb-4 drop-shadow-md">Swipe to select a sticker</p>
       <div id="sticker-carousel" class="flex items-center gap-3.5 overflow-x-auto px-6 snap-x hide-scrollbar">
-        <!-- هيتملي أوتوماتيك من الـ JS بالـ 9 ستيكرات -->
+        <!-- هيتملي أوتوماتيك من الـ JS -->
       </div>
     </div>
 
@@ -160,14 +113,15 @@
       <div class="w-14 h-14"></div> 
       
       <div class="relative flex items-center justify-center">
-        <button id="snapBtn" class="w-20 h-20 rounded-full border-4 border-amber-400 flex items-center justify-center bg-black active:scale-95 transition-transform shadow-[0_0_30px_rgba(251,191,36,0.6)] animate-pulse-ring-light">
-          <div id="snapInner" class="w-[52px] h-[52px] rounded-full bg-amber-400 flex items-center justify-center text-black font-bold text-xs transition-colors"></div>
+        <!-- شلت أنيميشن النبض من الزرار -->
+        <button id="snapBtn" class="w-20 h-20 rounded-full border-4 border-amber-400 flex items-center justify-center bg-black active:scale-95 shadow-[0_0_30px_rgba(251,191,36,0.6)]">
+          <div id="snapInner" class="w-[52px] h-[52px] rounded-full bg-amber-400 flex items-center justify-center text-black font-bold text-xs"></div>
         </button>
         <span id="sessionCounter" class="absolute -top-4 bg-white text-black text-[11px] font-black px-2.5 py-1 rounded-full shadow-lg border-2 border-black transform -rotate-12">0/1</span>
       </div>
 
       <div class="w-14 h-14 flex items-center justify-center">
-        <button id="flipBtn" class="w-12 h-12 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white active:scale-90 transition-transform">
+        <button id="flipBtn" class="w-12 h-12 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white active:scale-90">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
         </button>
       </div>
@@ -175,21 +129,22 @@
   </div>
 
   <!-- ==================== 4. شاشة النتيجة النهائية ==================== -->
-  <div id="view-result" class="hidden absolute inset-0 z-50 flex flex-col justify-between bg-neutral-950 p-6">
-    <div class="w-full flex items-center justify-between pt-4 pb-6 animate-slide-up">
-      <button id="newSessionBtn" class="px-5 py-2.5 bg-neutral-800 rounded-full text-xs text-amber-400 font-bold border border-neutral-700 active:scale-90 transition-transform">
+  <div id="view-result" class="hidden absolute inset-0 z-50 flex flex-col justify-between bg-neutral-950 p-6 bg-black">
+    <div class="w-full flex items-center justify-between pt-4 pb-6">
+      <button id="newSessionBtn" class="px-5 py-2.5 bg-neutral-800 rounded-full text-xs text-amber-400 font-bold border border-neutral-700 active:scale-90">
         + New Session
       </button>
-      <span id="uploadStatus" class="text-emerald-400 text-xs font-bold opacity-0 transition-opacity bg-emerald-400/10 px-3 py-1 rounded-full flex items-center gap-2">
-        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Saved
+      <span id="uploadStatus" class="text-emerald-400 text-xs font-bold opacity-0 bg-emerald-400/10 px-3 py-1 rounded-full flex items-center gap-2">
+        Saved
       </span>
-      <a id="downloadPhotoBtn" download="graduation-photobooth.jpg" class="px-5 py-2.5 bg-amber-500 text-black rounded-full text-xs font-black uppercase tracking-wider active:scale-95 transition-transform shadow-lg shadow-amber-500/20">
+      <a id="downloadPhotoBtn" download="graduation-photobooth.jpg" class="px-5 py-2.5 bg-amber-500 text-black rounded-full text-xs font-black uppercase tracking-wider active:scale-95 shadow-lg shadow-amber-500/20">
         Download
       </a>
     </div>
 
-    <div class="relative flex-1 flex items-center justify-center p-2 animate-slide-up" style="animation-delay: 0.2s;">
-      <img id="galleryMainImg" class="max-w-full max-h-[75vh] object-contain rounded-lg shadow-2xl bg-white p-3 rotate-[-1.5deg] transition-transform duration-300 hover:rotate-0" alt="Final Shot">
+    <div class="relative flex-1 flex items-center justify-center p-2">
+      <!-- شريط الصور النهائي (بسيط وبخلفية بيضا) -->
+      <img id="galleryMainImg" class="max-w-full max-h-[75vh] object-contain rounded-lg shadow-2xl bg-white p-3 rotate-[-1.5deg]" alt="Final Shot">
     </div>
     
     <p class="text-center text-[10px] text-neutral-500 font-bold tracking-[0.2em] uppercase pb-4">Thank you for celebrating with us</p>
@@ -213,23 +168,21 @@
     const video = document.getElementById('video');
     const liveSticker = document.getElementById('liveSticker');
 
-    // --- 1. Login ---
+    // --- 1. Login (فوري) ---
     document.getElementById('loginBtn').addEventListener('click', () => {
       const nameInput = document.getElementById('userName').value.trim();
       if (nameInput !== '') {
         registeredUserName = nameInput;
         document.getElementById('displayName').textContent = registeredUserName;
-        vLogin.classList.add('opacity-0');
-        setTimeout(() => {
-          vLogin.classList.add('hidden');
-          vSetup.classList.remove('hidden');
-        }, 500);
+        // تبديل فوري للشاشات
+        vLogin.classList.add('hidden');
+        vSetup.classList.remove('hidden');
       } else {
         document.getElementById('loginError').classList.remove('hidden');
       }
     });
 
-    // --- 2. Setup (اختيار عدد الصور فقط) ---
+    // --- 2. Setup (تحديد فوري) ---
     const modeBtns = document.querySelectorAll('.shot-btn');
     modeBtns.forEach(btn => {
       btn.addEventListener('click', () => {
@@ -252,7 +205,7 @@
       document.getElementById('snapInner').textContent = '';
       document.getElementById('snapInner').classList.replace('bg-neutral-500', 'bg-amber-400');
       
-      applyLiveSticker(true); 
+      applyLiveSticker(); 
       await startCamera();
     });
 
@@ -265,78 +218,62 @@
 
 
     // =========================================================================
-    // الـ 9 استيكرات متبرمجين بالكامل في أماكن ومقاسات مختلفة
+    // إعدادات الاستيكرات (ضفتلك لحد 9 أماكن، تقدر ترفع الصور على طول)
     // =========================================================================
     const STICKERS_CONFIG = [
-      { src: 'logo1.png', css: 'bottom: 8%; left: 50%; transform: translateX(-50%); width: 40%;' }, // منتصف سفلي
-      { src: 'logo2.png', css: 'right: -2%; top: 50%; transform: translateY(-50%); width: 30%;' }, // منتصف يمين
-      { src: 'logo3.png', css: 'bottom: 5%; left: 5%; width: 40%;' }, // أسفل يسار
-      { src: 'logo4.png', css: 'top: 6%; left: 50%; transform: translateX(-50%); width: 60%;' }, // منتصف علوي
-      { src: 'logo5.png', css: 'bottom: -2%; left: 0; width: 100%; object-fit: contain;' }, // عرض الشاشة سفلي
-      { src: 'logo6.png', css: 'top: 8%; right: 5%; width: 35%;' }, // أعلى يمين
-      { src: 'logo7.png', css: 'bottom: 10%; right: 5%; width: 35%;' }, // أسفل يمين
-      { src: 'logo8.png', css: 'top: 50%; left: 5%; transform: translateY(-50%); width: 35%;' }, // منتصف يسار
-      { src: 'logo9.png', css: 'top: 8%; left: 5%; width: 35%;' } // أعلى يسار
+      { src: 'logo1.png', css: 'bottom: 8%; left: 50%; transform: translateX(-50%); width: 40%;' }, 
+      { src: 'logo2.png', css: 'right: -2%; top: 50%; transform: translateY(-50%); width: 30%;' }, 
+      { src: 'logo3.png', css: 'bottom: 5%; left: 5%; width: 40%;' }, 
+      { src: 'logo4.png', css: 'top: 6%; left: 50%; transform: translateX(-50%); width: 60%;' }, 
+      { src: 'logo5.png', css: 'bottom: -2%; left: 0; width: 100%; object-fit: contain;' },
+      { src: 'logo6.png', css: 'top: 8%; right: 5%; width: 35%;' }, 
+      { src: 'logo7.png', css: 'bottom: 10%; right: 5%; width: 35%;' }, 
+      { src: 'logo8.png', css: 'top: 50%; left: 5%; transform: translateY(-50%); width: 35%;' },
+      { src: 'logo9.png', css: 'top: 8%; left: 5%; width: 35%;' }
     ];
 
     const loadedStickers = [];
     const carousel = document.getElementById('sticker-carousel');
 
-    // بناء شريط الاستيكرات أوتوماتيكياً (تم تبسيطه وتخفيفه برمجياً)
+    // بناء شريط الاستيكرات ديناميكياً
     STICKERS_CONFIG.forEach((cfg, idx) => {
       const img = new Image(); 
       img.src = cfg.src; 
       loadedStickers.push(img);
 
       const btn = document.createElement('div');
-      // تم حذف الـ blur واستبداله بـ bg سادة أبيض (خفيف جداً على المعالج)
-      // Transition صغرت لتكون فورية
-      btn.className = `flex-shrink-0 w-[60px] h-[60px] bg-white rounded-2xl p-2 flex items-center justify-center transition-all duration-150 ease-out cursor-pointer snap-center border-4 border-black shadow-md ${idx === 0 ? 'sticker-active' : ''}`;
+      // شلت التغبيش والأنيميشن، التبديل فوري وبسيط
+      btn.className = `flex-shrink-0 w-[60px] h-[60px] bg-white rounded-2xl p-2 flex items-center justify-center cursor-pointer snap-center border-4 border-black shadow-md ${idx === 0 ? 'sticker-active' : ''}`;
       
       const thumbImg = document.createElement('img');
       thumbImg.src = cfg.src;
-      // الإخفاء لو مش موجود
       thumbImg.onerror = () => btn.style.display = 'none'; 
       thumbImg.className = "max-w-full max-h-full object-contain";
       btn.appendChild(thumbImg);
 
-      // التبديل بقى فوري ولحظي
+      // التبديل فوري
       btn.addEventListener('click', () => {
         if (activeStickerIdx === idx) return; 
         
-        // شيل كلاس النشط فوراً
         Array.from(carousel.children).forEach(c => c.classList.remove('sticker-active'));
-        // ضيف كلاس النشط فوراً
         btn.classList.add('sticker-active');
         
         activeStickerIdx = idx;
-        applyLiveSticker(false); // انيميشن التبديل النشط
+        applyLiveSticker(); // تبديل فوري على الشاشة
       });
 
       carousel.appendChild(btn);
     });
 
-    // دالة تبديل الاستيكر لايف على الشاشة (أنيميشن ناعم بس سريع)
-    function applyLiveSticker(instant = false) {
+    // دالة تبديل الاستيكر لايف على الشاشة (فورية)
+    function applyLiveSticker() {
       const cfg = STICKERS_CONFIG[activeStickerIdx];
-      
-      if (instant) {
-        liveSticker.className = "absolute pointer-events-none z-20 object-contain drop-shadow-2xl transition-all duration-400 ease-out sticker-pop-in";
-        liveSticker.src = cfg.src;
-        liveSticker.style.cssText = cfg.css;
-      } else {
-        // Pop Out سريع
-        liveSticker.classList.replace('sticker-pop-in', 'sticker-pop-out');
-        setTimeout(() => {
-          liveSticker.src = cfg.src;
-          liveSticker.style.cssText = cfg.css;
-          // Pop In سريع
-          liveSticker.classList.replace('sticker-pop-out', 'sticker-pop-in');
-        }, 200); 
-      }
+      // مفيش Pop-in أو Pop-out، مجرد تغيير للـ src فوراً
+      liveSticker.src = cfg.src;
+      liveSticker.style.cssText = cfg.css;
     }
 
-    // --- 3. تشغيل الكاميرا ---
+    // --- 3. تشغيل الكاميرا (ظهور فوري) ---
     async function startCamera() {
       if (video.srcObject) video.srcObject.getTracks().forEach(t => t.stop());
       try {
@@ -346,7 +283,7 @@
         video.srcObject = stream;
         video.onloadedmetadata = () => { 
           video.play(); 
-          video.classList.remove('opacity-0'); 
+          video.classList.remove('opacity-0'); // ظهور سلس للكاميرا (فوري)
         };
         if (currentFacingMode === 'user') video.classList.add('-scale-x-100');
         else video.classList.remove('-scale-x-100');
@@ -375,42 +312,33 @@
       tCtx.restore();
     }
 
-    // --- 4. الالتقاط ودمج الـ 9 استيكرات في الصورة النهائية ---
+    // --- 4. الالتقاط والتجميع (فوري بعد الفلاش) ---
     document.getElementById('snapBtn').addEventListener('click', () => {
       document.getElementById('flashEffect').style.opacity = '1';
-      setTimeout(() => { document.getElementById('flashEffect').style.opacity = '0'; }, 150);
+      // فلاش سريع جداً
+      setTimeout(() => { document.getElementById('flashEffect').style.opacity = '0'; }, 100);
 
       const cvs = document.createElement('canvas');
       const w = 1080; const h = 1440; 
       cvs.width = w; cvs.height = h;
       const ctx = cvs.getContext('2d');
 
-      const sw = video.videoWidth; const sh = video.videoHeight;
-      const sRatio = sw / sh; const dRatio = w / h;
-      let sx, sy, sCropW, sCropH;
-      if (sRatio > dRatio) { sCropH = sh; sCropW = sh * dRatio; sx = (sw - sCropW) / 2; sy = 0; } 
-      else { sCropW = sw; sCropH = sw / dRatio; sx = 0; sy = (sh - sCropH) / 2; }
-      
-      ctx.save();
-      if (currentFacingMode === 'user') { ctx.translate(w, 0); ctx.scale(-1, 1); }
-      ctx.drawImage(video, sx, sy, sCropW, sCropH, 0, 0, w, h);
-      ctx.restore();
+      drawCoverImage(ctx, video, 0, 0, w, h, currentFacingMode === 'user');
 
-      // دمج الاستيكر النشط جوه الصورة
       const sticker = loadedStickers[activeStickerIdx];
       if (sticker && sticker.complete && sticker.naturalWidth > 0) {
         const aspect = sticker.naturalWidth / sticker.naturalHeight;
         let dw, dh, dx, dy;
         switch(activeStickerIdx) {
-          case 0: dw = w * 0.40; dh = dw / aspect; dx = (w - dw) / 2; dy = h - dh - (h * 0.08); break; // منتصف سفلي
-          case 1: dw = w * 0.30; dh = dw / aspect; dx = w - dw; dy = (h - dh) / 2; break; // منتصف يمين
-          case 2: dw = w * 0.40; dh = dw / aspect; dx = w * 0.05; dy = h - dh - (h * 0.05); break; // أسفل يسار
-          case 3: dw = w * 0.60; dh = dw / aspect; dx = (w - dw) / 2; dy = h * 0.06; break; // منتصف علوي
-          case 4: dw = w; dh = dw / aspect; dx = 0; dy = h - dh; break; // عرض الشاشة سفلي
-          case 5: dw = w * 0.35; dh = dw / aspect; dx = w - dw - (w * 0.05); dy = h * 0.08; break; // أعلى يمين
-          case 6: dw = w * 0.35; dh = dw / aspect; dx = w - dw - (w * 0.05); dy = h - dh - (h * 0.1); break; // أسفل يمين
-          case 7: dw = w * 0.35; dh = dw / aspect; dx = w * 0.05; dy = (h - dh) / 2; break; // منتصف يسار
-          case 8: dw = w * 0.35; dh = dw / aspect; dx = w * 0.05; dy = h * 0.08; break; // أعلى يسار
+          case 0: dw = w * 0.40; dh = dw / aspect; dx = (w - dw) / 2; dy = h - dh - (h * 0.08); break; 
+          case 1: dw = w * 0.30; dh = dw / aspect; dx = w - dw; dy = (h - dh) / 2; break; 
+          case 2: dw = w * 0.40; dh = dw / aspect; dx = w * 0.05; dy = h - dh - (h * 0.05); break; 
+          case 3: dw = w * 0.60; dh = dw / aspect; dx = (w - dw) / 2; dy = h * 0.06; break; 
+          case 4: dw = w; dh = dw / aspect; dx = 0; dy = h - dh; break; 
+          case 5: dw = w * 0.35; dh = dw / aspect; dx = w - dw - (w * 0.05); dy = h * 0.08; break;
+          case 6: dw = w * 0.35; dh = dw / aspect; dx = w - dw - (w * 0.05); dy = h - dh - (h * 0.1); break;
+          case 7: dw = w * 0.35; dh = dw / aspect; dx = w * 0.05; dy = (h - dh) / 2; break;
+          case 8: dw = w * 0.35; dh = dw / aspect; dx = w * 0.05; dy = h * 0.08; break;
         }
         ctx.drawImage(sticker, dx, dy, dw, dh);
       }
@@ -421,17 +349,17 @@
       if (sessionShots.length === targetShots) {
         document.getElementById('snapBtn').disabled = true;
         document.getElementById('snapInner').classList.replace('bg-amber-400', 'bg-neutral-500');
-        setTimeout(buildPhotoboothStrip, 400);
+        // تجميع فوري
+        setTimeout(buildPhotoboothStrip, 300);
       }
     });
 
-    // --- 5. تجميع الصور في شريط كلاسيكي بدون فريمات ---
     function buildPhotoboothStrip() {
       const canvas = document.getElementById('compositeCanvas');
       const ctx = canvas.getContext('2d');
       
       const photoW = 1080; const photoH = 1440;
-      const padding = 60; // هامش أعرض ليعطي شكل كارت أجمل
+      const padding = 60; 
 
       let cols, rows;
       if (targetShots === 1) { cols = 1; rows = 1; }
@@ -442,11 +370,9 @@
       canvas.width = (photoW * cols) + (padding * (cols + 1));
       canvas.height = (photoH * rows) + (padding * (rows + 1));
 
-      // خلفية الكارت البيضاء
       ctx.fillStyle = "#ffffff";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      // رسم الصور
       sessionShots.forEach((shotCanvas, i) => {
         let col = i % cols;
         let row = Math.floor(i / cols);
@@ -459,6 +385,7 @@
       
       document.getElementById('galleryMainImg').src = finalDataUrl;
       document.getElementById('downloadPhotoBtn').href = finalDataUrl;
+      // تبديل شاشات فوري
       vCamera.classList.add('hidden');
       vResult.classList.remove('hidden');
 
