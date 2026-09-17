@@ -52,12 +52,26 @@
 
       <h3 class="text-sm font-bold text-white mb-3">2. Choose Your Sticker</h3>
       <div class="grid grid-cols-3 gap-3 mb-8">
-        <!-- الاستيكرات بتتعرض بوضوح بدون فلاتر تشوه الألوان -->
-        <div class="sticker-btn bg-neutral-200 rounded-xl p-2 h-24 flex items-center justify-center transition-all cursor-pointer selected-ring" data-idx="0"><img src="logo1.png" class="max-h-full max-w-full object-contain" onerror="this.style.display='none'"></div>
-        <div class="sticker-btn bg-neutral-200 rounded-xl p-2 h-24 flex items-center justify-center transition-all cursor-pointer" data-idx="1"><img src="logo2.png" class="max-h-full max-w-full object-contain" onerror="this.style.display='none'"></div>
-        <div class="sticker-btn bg-neutral-200 rounded-xl p-2 h-24 flex items-center justify-center transition-all cursor-pointer" data-idx="2"><img src="logo3.png" class="max-h-full max-w-full object-contain" onerror="this.style.display='none'"></div>
-        <div class="sticker-btn bg-neutral-200 rounded-xl p-2 h-24 flex items-center justify-center transition-all cursor-pointer" data-idx="3"><img src="logo4.png" class="max-h-full max-w-full object-contain" onerror="this.style.display='none'"></div>
-        <div class="sticker-btn bg-neutral-200 rounded-xl p-2 h-24 flex items-center justify-center transition-all cursor-pointer" data-idx="4"><img src="logo5.png" class="max-h-full max-w-full object-contain" onerror="this.style.display='none'"></div>
+        <div class="sticker-btn bg-neutral-200 rounded-xl p-2 h-24 flex flex-col items-center justify-center transition-all cursor-pointer selected-ring relative" data-idx="0">
+          <span class="text-[10px] text-neutral-400 font-bold absolute top-1">Sticker 1</span>
+          <img src="logo1.png" class="max-h-full max-w-full object-contain mt-3" onerror="this.style.display='none'">
+        </div>
+        <div class="sticker-btn bg-neutral-200 rounded-xl p-2 h-24 flex flex-col items-center justify-center transition-all cursor-pointer relative" data-idx="1">
+          <span class="text-[10px] text-neutral-400 font-bold absolute top-1">Sticker 2</span>
+          <img src="logo2.png" class="max-h-full max-w-full object-contain mt-3" onerror="this.style.display='none'">
+        </div>
+        <div class="sticker-btn bg-neutral-200 rounded-xl p-2 h-24 flex flex-col items-center justify-center transition-all cursor-pointer relative" data-idx="2">
+          <span class="text-[10px] text-neutral-400 font-bold absolute top-1">Sticker 3</span>
+          <img src="logo3.png" class="max-h-full max-w-full object-contain mt-3" onerror="this.style.display='none'">
+        </div>
+        <div class="sticker-btn bg-neutral-200 rounded-xl p-2 h-24 flex flex-col items-center justify-center transition-all cursor-pointer relative" data-idx="3">
+          <span class="text-[10px] text-neutral-400 font-bold absolute top-1">Sticker 4</span>
+          <img src="logo4.png" class="max-h-full max-w-full object-contain mt-3" onerror="this.style.display='none'">
+        </div>
+        <div class="sticker-btn bg-neutral-200 rounded-xl p-2 h-24 flex flex-col items-center justify-center transition-all cursor-pointer relative" data-idx="4">
+          <span class="text-[10px] text-neutral-400 font-bold absolute top-1">Sticker 5</span>
+          <img src="logo5.png" class="max-h-full max-w-full object-contain mt-3" onerror="this.style.display='none'">
+        </div>
       </div>
     </div>
 
@@ -77,7 +91,7 @@
 
     <div class="relative w-full h-full overflow-hidden bg-neutral-950 flex items-center justify-center">
       <canvas id="liveCameraCanvas" class="w-full h-full object-cover"></canvas>
-      <img id="liveSticker" src="" alt="" class="absolute pointer-events-none z-20 object-contain drop-shadow-xl transition-all duration-300" onerror="this.style.display='none'" onload="this.style.display='block'">
+      <img id="liveSticker" src="" alt="" class="absolute pointer-events-none z-20 object-contain drop-shadow-2xl transition-all duration-300" onerror="this.style.display='none'" onload="this.style.display='block'">
       <div id="flashEffect" class="absolute inset-0 bg-white pointer-events-none opacity-0 transition-opacity duration-150 z-30"></div>
     </div>
 
@@ -105,7 +119,7 @@
       <button id="newSessionBtn" class="px-4 py-2 bg-neutral-900 rounded-full text-xs text-amber-300 font-bold border border-neutral-700 active:scale-95">
         + New Session
       </button>
-      <span id="uploadStatus" class="text-emerald-400 text-xs font-bold opacity-0 transition-opacity">● Saved to Drive</span>
+      <span id="uploadStatus" class="text-emerald-400 text-xs font-bold opacity-0 transition-opacity">● Saved to Folder</span>
       <a id="downloadPhotoBtn" download="graduation-photobooth.jpg" class="px-5 py-2 bg-amber-500 text-black rounded-full text-xs font-bold active:scale-95">
         Download
       </a>
@@ -249,25 +263,26 @@
       if (isCameraActive) requestAnimationFrame(renderLiveView);
     }
 
-    // --- 4. مقاسات الإحداثيات بالمللي (دوران + مكان) لكل صورة من صورك ---
+    // --- 4. مقاسات الإحداثيات (تم التكبير بنسبة 40% لمنع قطع الحواف) ---
+    // w و h كبار جداً عشان يغطوا أي فراغ تحت البولارويد
     const FRAMES_CONFIG = {
       1: [
-        { src: 'f1_1.png', slots: [{ cx: 540, cy: 960, w: 850, h: 950, rot: 0 }] },
-        { src: 'f1_2.png', slots: [{ cx: 540, cy: 960, w: 850, h: 950, rot: 0 }] },
-        { src: 'f1_3.png', slots: [{ cx: 540, cy: 960, w: 850, h: 950, rot: 0 }] }
+        { src: 'f1_1.png', slots: [{ cx: 540, cy: 960, w: 1000, h: 1000, rot: 0 }] },
+        { src: 'f1_2.png', slots: [{ cx: 540, cy: 960, w: 1000, h: 1000, rot: 0 }] },
+        { src: 'f1_3.png', slots: [{ cx: 540, cy: 960, w: 1000, h: 1000, rot: 0 }] }
       ],
       2: [
-        { src: 'f2_1.png', slots: [{ cx: 380, cy: 650, w: 680, h: 720, rot: -8 }, { cx: 700, cy: 1250, w: 680, h: 720, rot: 10 }] },
-        { src: 'f2_2.png', slots: [{ cx: 540, cy: 500, w: 850, h: 850, rot: 0 }, { cx: 540, cy: 1400, w: 850, h: 850, rot: 0 }] },
-        { src: 'f2_3.png', slots: [{ cx: 480, cy: 600, w: 750, h: 800, rot: -5 }, { cx: 620, cy: 1400, w: 750, h: 800, rot: 5 }] }
+        { src: 'f2_1.png', slots: [{ cx: 420, cy: 680, w: 850, h: 900, rot: -12 }, { cx: 700, cy: 1280, w: 850, h: 900, rot: 12 }] },
+        { src: 'f2_2.png', slots: [{ cx: 540, cy: 500, w: 950, h: 950, rot: 0 }, { cx: 540, cy: 1400, w: 950, h: 950, rot: 0 }] },
+        { src: 'f2_3.png', slots: [{ cx: 480, cy: 600, w: 850, h: 900, rot: -5 }, { cx: 620, cy: 1400, w: 850, h: 900, rot: 5 }] }
       ],
       3: [
-        { src: 'f3_1.png', slots: [{ cx: 540, cy: 350, w: 1100, h: 650, rot: 0 }, { cx: 540, cy: 960, w: 1100, h: 650, rot: 0 }, { cx: 540, cy: 1570, w: 1100, h: 650, rot: 0 }] },
-        { src: 'f3_2.png', slots: [{ cx: 720, cy: 400, w: 600, h: 650, rot: 8 }, { cx: 380, cy: 1050, w: 650, h: 700, rot: -15 }, { cx: 700, cy: 1600, w: 600, h: 650, rot: -5 }] }
+        { src: 'f3_1.png', slots: [{ cx: 540, cy: 350, w: 1100, h: 750, rot: 0 }, { cx: 540, cy: 960, w: 1100, h: 750, rot: 0 }, { cx: 540, cy: 1570, w: 1100, h: 750, rot: 0 }] },
+        { src: 'f3_2.png', slots: [{ cx: 720, cy: 380, w: 750, h: 800, rot: 8 }, { cx: 380, cy: 1000, w: 750, h: 800, rot: -15 }, { cx: 680, cy: 1600, w: 750, h: 800, rot: -5 }] }
       ],
       4: [
-        { src: 'f4_1.png', slots: [{ cx: 450, cy: 400, w: 550, h: 600, rot: -5 }, { cx: 750, cy: 800, w: 550, h: 600, rot: 15 }, { cx: 350, cy: 1250, w: 550, h: 600, rot: -10 }, { cx: 750, cy: 1650, w: 550, h: 600, rot: 5 }] },
-        { src: 'f4_2.png', slots: [{ cx: 270, cy: 480, w: 550, h: 980, rot: 0 }, { cx: 810, cy: 480, w: 550, h: 980, rot: 0 }, { cx: 270, cy: 1440, w: 550, h: 980, rot: 0 }, { cx: 810, cy: 1440, w: 550, h: 980, rot: 0 }] }
+        { src: 'f4_1.png', slots: [{ cx: 450, cy: 400, w: 700, h: 750, rot: -8 }, { cx: 750, cy: 800, w: 700, h: 750, rot: 15 }, { cx: 350, cy: 1250, w: 700, h: 750, rot: -10 }, { cx: 750, cy: 1650, w: 700, h: 750, rot: 8 }] },
+        { src: 'f4_2.png', slots: [{ cx: 270, cy: 480, w: 650, h: 1050, rot: 0 }, { cx: 810, cy: 480, w: 650, h: 1050, rot: 0 }, { cx: 270, cy: 1440, w: 650, h: 1050, rot: 0 }, { cx: 810, cy: 1440, w: 650, h: 1050, rot: 0 }] }
       ]
     };
 
@@ -278,7 +293,6 @@
       });
     });
 
-    // عداد لمنع تكرار الفريمات (بيختار بالتتابع بدل العشوائي)
     let frameIndexCounters = { 1: 0, 2: 0, 3: 0, 4: 0 };
 
     // --- 5. الالتقاط والتجميع ---
@@ -293,7 +307,6 @@
 
       drawCoverImage(sCtx, video, 0, 0, w, h, currentFacingMode === 'user');
 
-      // طبع الاستيكر
       const sticker = loadedStickers[activeStickerIdx];
       if (sticker && sticker.complete && sticker.naturalWidth > 0) {
         const aspect = sticker.naturalWidth / sticker.naturalHeight;
@@ -322,20 +335,18 @@
       const ctx = canvas.getContext('2d');
       
       const pool = FRAMES_CONFIG[targetShots];
-      // اختيار الفريم بالتتابع لمنع التكرار
       const selectedFrame = pool[frameIndexCounters[targetShots] % pool.length];
       frameIndexCounters[targetShots]++;
 
       canvas.width = 1080; canvas.height = 1920;
       ctx.fillStyle = "#ffffff"; ctx.fillRect(0, 0, 1080, 1920);
 
-      // رسم الصورة مع الدوران والسنترة
       selectedFrame.slots.forEach((slot, i) => {
         const shot = sessionShots[i];
         if (shot) {
           ctx.save();
-          ctx.translate(slot.cx, slot.cy); // انتقال لمركز الكارت
-          if (slot.rot) ctx.rotate((slot.rot * Math.PI) / 180); // ميل الصورة مع الكارت
+          ctx.translate(slot.cx, slot.cy); 
+          if (slot.rot) ctx.rotate((slot.rot * Math.PI) / 180); 
           drawCoverImage(ctx, shot, -slot.w / 2, -slot.h / 2, slot.w, slot.h, false);
           ctx.restore();
         }
