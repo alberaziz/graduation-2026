@@ -52,25 +52,26 @@
 
       <h3 class="text-sm font-bold text-white mb-3">2. Choose Your Sticker</h3>
       <div class="grid grid-cols-3 gap-3 mb-8">
+        <!-- أزلت إخفاء الصور عند الخطأ عشان لو في خطأ في الاسم يظهرلك علامة الصورة المكسورة فتعرف إن المشكلة في اسم الملف -->
         <div class="sticker-btn bg-neutral-200 rounded-xl p-2 h-24 flex flex-col items-center justify-center transition-all cursor-pointer selected-ring relative" data-idx="0">
-          <span class="text-[10px] text-neutral-400 font-bold absolute top-1">Sticker 1</span>
-          <img src="logo1.png" class="max-h-full max-w-full object-contain mt-3" onerror="this.style.display='none'">
+          <span class="text-[10px] text-neutral-600 font-bold absolute top-1">Sticker 1</span>
+          <img src="logo1.png" class="max-h-full max-w-full object-contain mt-3" alt="1">
         </div>
         <div class="sticker-btn bg-neutral-200 rounded-xl p-2 h-24 flex flex-col items-center justify-center transition-all cursor-pointer relative" data-idx="1">
-          <span class="text-[10px] text-neutral-400 font-bold absolute top-1">Sticker 2</span>
-          <img src="logo2.png" class="max-h-full max-w-full object-contain mt-3" onerror="this.style.display='none'">
+          <span class="text-[10px] text-neutral-600 font-bold absolute top-1">Sticker 2</span>
+          <img src="logo2.png" class="max-h-full max-w-full object-contain mt-3" alt="2">
         </div>
         <div class="sticker-btn bg-neutral-200 rounded-xl p-2 h-24 flex flex-col items-center justify-center transition-all cursor-pointer relative" data-idx="2">
-          <span class="text-[10px] text-neutral-400 font-bold absolute top-1">Sticker 3</span>
-          <img src="logo3.png" class="max-h-full max-w-full object-contain mt-3" onerror="this.style.display='none'">
+          <span class="text-[10px] text-neutral-600 font-bold absolute top-1">Sticker 3</span>
+          <img src="logo3.png" class="max-h-full max-w-full object-contain mt-3" alt="3">
         </div>
         <div class="sticker-btn bg-neutral-200 rounded-xl p-2 h-24 flex flex-col items-center justify-center transition-all cursor-pointer relative" data-idx="3">
-          <span class="text-[10px] text-neutral-400 font-bold absolute top-1">Sticker 4</span>
-          <img src="logo4.png" class="max-h-full max-w-full object-contain mt-3" onerror="this.style.display='none'">
+          <span class="text-[10px] text-neutral-600 font-bold absolute top-1">Sticker 4</span>
+          <img src="logo4.png" class="max-h-full max-w-full object-contain mt-3" alt="4">
         </div>
         <div class="sticker-btn bg-neutral-200 rounded-xl p-2 h-24 flex flex-col items-center justify-center transition-all cursor-pointer relative" data-idx="4">
-          <span class="text-[10px] text-neutral-400 font-bold absolute top-1">Sticker 5</span>
-          <img src="logo5.png" class="max-h-full max-w-full object-contain mt-3" onerror="this.style.display='none'">
+          <span class="text-[10px] text-neutral-600 font-bold absolute top-1">Sticker 5</span>
+          <img src="logo5.png" class="max-h-full max-w-full object-contain mt-3" alt="5">
         </div>
       </div>
     </div>
@@ -91,7 +92,7 @@
 
     <div class="relative w-full h-full overflow-hidden bg-neutral-950 flex items-center justify-center">
       <canvas id="liveCameraCanvas" class="w-full h-full object-cover"></canvas>
-      <img id="liveSticker" src="" alt="" class="absolute pointer-events-none z-20 object-contain drop-shadow-2xl transition-all duration-300" onerror="this.style.display='none'" onload="this.style.display='block'">
+      <img id="liveSticker" src="" alt="" class="absolute pointer-events-none z-20 object-contain drop-shadow-2xl transition-all duration-300">
       <div id="flashEffect" class="absolute inset-0 bg-white pointer-events-none opacity-0 transition-opacity duration-150 z-30"></div>
     </div>
 
@@ -148,7 +149,7 @@
     const vCamera = document.getElementById('view-camera');
     const vResult = document.getElementById('view-result');
 
-    // --- 1. Login ---
+    // --- Login ---
     document.getElementById('loginBtn').addEventListener('click', () => {
       const nameInput = document.getElementById('userName').value.trim();
       if (nameInput !== '') {
@@ -161,7 +162,7 @@
       }
     });
 
-    // --- 2. Setup ---
+    // --- Setup ---
     const modeBtns = document.querySelectorAll('.shot-btn');
     modeBtns.forEach(btn => {
       btn.addEventListener('click', () => {
@@ -195,18 +196,19 @@
       vSetup.classList.remove('hidden');
     });
 
-    // --- 3. Camera & Stickers ---
+    // --- Camera & Stickers Config ---
     const video = document.getElementById('video');
     const liveCameraCanvas = document.getElementById('liveCameraCanvas');
     const liveCamCtx = liveCameraCanvas.getContext('2d');
     const liveSticker = document.getElementById('liveSticker');
     
+    // تعديلات الاستيكرات زي ما طلبت بالظبط
     const STICKERS_CONFIG = [
-      { src: 'logo1.png', css: 'bottom: 5%; left: 50%; transform: translateX(-50%); width: 40%;' },
-      { src: 'logo2.png', css: 'right: 5%; top: 50%; transform: translateY(-50%); height: 45%; width: auto;' },
-      { src: 'logo3.png', css: 'bottom: 20%; left: 5%; width: 40%;' },
-      { src: 'logo4.png', css: 'top: 5%; left: 50%; transform: translateX(-50%); width: 60%;' },
-      { src: 'logo5.png', css: 'bottom: 25%; left: 50%; transform: translateX(-50%); width: 55%;' }
+      { src: 'logo1.png', css: 'bottom: 5%; left: 50%; transform: translateX(-50%); width: 40%;' }, // The End
+      { src: 'logo2.png', css: 'right: 0; top: 50%; transform: translateY(-50%); height: 45%; width: auto;' }, // الحافة اليمين
+      { src: 'logo3.png', css: 'bottom: 5%; left: 5%; width: 40%;' }, // نزل لتحت
+      { src: 'logo4.png', css: 'top: 5%; left: 50%; transform: translateX(-50%); width: 60%;' }, // Top
+      { src: 'logo5.png', css: 'bottom: 0; left: 0; width: 100%; object-fit: cover;' } // بعرض الشاشة بالكامل من تحت
     ];
 
     const loadedStickers = [];
@@ -240,7 +242,7 @@
       await startCamera();
     });
 
-    function drawCoverImage(tCtx, source, dx, dy, dw, dh, isMirrored) {
+    function drawLiveCamera(tCtx, source, dx, dy, dw, dh, isMirrored) {
       const sw = source.videoWidth || source.width;
       const sh = source.videoHeight || source.height;
       if (!sw || !sh) return;
@@ -258,31 +260,30 @@
       if (video.readyState >= 2 && !vCamera.classList.contains('hidden')) {
         liveCameraCanvas.width = liveCameraCanvas.clientWidth;
         liveCameraCanvas.height = liveCameraCanvas.clientHeight;
-        drawCoverImage(liveCamCtx, video, 0, 0, liveCameraCanvas.width, liveCameraCanvas.height, currentFacingMode === 'user');
+        drawLiveCamera(liveCamCtx, video, 0, 0, liveCameraCanvas.width, liveCameraCanvas.height, currentFacingMode === 'user');
       }
       if (isCameraActive) requestAnimationFrame(renderLiveView);
     }
 
-    // --- 4. مقاسات الإحداثيات (تم التكبير بنسبة 40% لمنع قطع الحواف) ---
-    // w و h كبار جداً عشان يغطوا أي فراغ تحت البولارويد
+    // --- مقاسات الشباك الدقيقة (بدون تكبير عشوائي عشان الصورة تبان كاملة) ---
     const FRAMES_CONFIG = {
       1: [
-        { src: 'f1_1.png', slots: [{ cx: 540, cy: 960, w: 1000, h: 1000, rot: 0 }] },
-        { src: 'f1_2.png', slots: [{ cx: 540, cy: 960, w: 1000, h: 1000, rot: 0 }] },
-        { src: 'f1_3.png', slots: [{ cx: 540, cy: 960, w: 1000, h: 1000, rot: 0 }] }
+        { src: 'f1_1.png', slots: [{ cx: 540, cy: 960, w: 780, h: 860, rot: 0 }] },
+        { src: 'f1_2.png', slots: [{ cx: 540, cy: 960, w: 780, h: 860, rot: 0 }] },
+        { src: 'f1_3.png', slots: [{ cx: 540, cy: 960, w: 780, h: 860, rot: 0 }] }
       ],
       2: [
-        { src: 'f2_1.png', slots: [{ cx: 420, cy: 680, w: 850, h: 900, rot: -12 }, { cx: 700, cy: 1280, w: 850, h: 900, rot: 12 }] },
-        { src: 'f2_2.png', slots: [{ cx: 540, cy: 500, w: 950, h: 950, rot: 0 }, { cx: 540, cy: 1400, w: 950, h: 950, rot: 0 }] },
-        { src: 'f2_3.png', slots: [{ cx: 480, cy: 600, w: 850, h: 900, rot: -5 }, { cx: 620, cy: 1400, w: 850, h: 900, rot: 5 }] }
+        { src: 'f2_1.png', slots: [{ cx: 390, cy: 660, w: 560, h: 620, rot: -8 }, { cx: 690, cy: 1260, w: 560, h: 620, rot: 10 }] },
+        { src: 'f2_2.png', slots: [{ cx: 540, cy: 500, w: 750, h: 750, rot: 0 }, { cx: 540, cy: 1400, w: 750, h: 750, rot: 0 }] },
+        { src: 'f2_3.png', slots: [{ cx: 460, cy: 590, w: 600, h: 650, rot: -5 }, { cx: 620, cy: 1400, w: 600, h: 650, rot: 5 }] }
       ],
       3: [
-        { src: 'f3_1.png', slots: [{ cx: 540, cy: 350, w: 1100, h: 750, rot: 0 }, { cx: 540, cy: 960, w: 1100, h: 750, rot: 0 }, { cx: 540, cy: 1570, w: 1100, h: 750, rot: 0 }] },
-        { src: 'f3_2.png', slots: [{ cx: 720, cy: 380, w: 750, h: 800, rot: 8 }, { cx: 380, cy: 1000, w: 750, h: 800, rot: -15 }, { cx: 680, cy: 1600, w: 750, h: 800, rot: -5 }] }
+        { src: 'f3_1.png', slots: [{ cx: 540, cy: 350, w: 1000, h: 500, rot: 0 }, { cx: 540, cy: 960, w: 1000, h: 500, rot: 0 }, { cx: 540, cy: 1570, w: 1000, h: 500, rot: 0 }] },
+        { src: 'f3_2.png', slots: [{ cx: 720, cy: 380, w: 500, h: 550, rot: 8 }, { cx: 370, cy: 1010, w: 500, h: 550, rot: -15 }, { cx: 680, cy: 1600, w: 500, h: 550, rot: -5 }] }
       ],
       4: [
-        { src: 'f4_1.png', slots: [{ cx: 450, cy: 400, w: 700, h: 750, rot: -8 }, { cx: 750, cy: 800, w: 700, h: 750, rot: 15 }, { cx: 350, cy: 1250, w: 700, h: 750, rot: -10 }, { cx: 750, cy: 1650, w: 700, h: 750, rot: 8 }] },
-        { src: 'f4_2.png', slots: [{ cx: 270, cy: 480, w: 650, h: 1050, rot: 0 }, { cx: 810, cy: 480, w: 650, h: 1050, rot: 0 }, { cx: 270, cy: 1440, w: 650, h: 1050, rot: 0 }, { cx: 810, cy: 1440, w: 650, h: 1050, rot: 0 }] }
+        { src: 'f4_1.png', slots: [{ cx: 450, cy: 400, w: 440, h: 480, rot: -5 }, { cx: 750, cy: 800, w: 440, h: 480, rot: 15 }, { cx: 350, cy: 1280, w: 440, h: 480, rot: -10 }, { cx: 750, cy: 1650, w: 440, h: 480, rot: 8 }] },
+        { src: 'f4_2.png', slots: [{ cx: 270, cy: 480, w: 480, h: 900, rot: 0 }, { cx: 810, cy: 480, w: 480, h: 900, rot: 0 }, { cx: 270, cy: 1440, w: 480, h: 900, rot: 0 }, { cx: 810, cy: 1440, w: 480, h: 900, rot: 0 }] }
       ]
     };
 
@@ -292,7 +293,6 @@
         const img = new Image(); img.crossOrigin = "anonymous"; img.src = f.src; loadedFrameImgs[f.src] = img;
       });
     });
-
     let frameIndexCounters = { 1: 0, 2: 0, 3: 0, 4: 0 };
 
     // --- 5. الالتقاط والتجميع ---
@@ -305,18 +305,19 @@
       shotCanvas.width = w; shotCanvas.height = h;
       const sCtx = shotCanvas.getContext('2d');
 
-      drawCoverImage(sCtx, video, 0, 0, w, h, currentFacingMode === 'user');
+      drawLiveCamera(sCtx, video, 0, 0, w, h, currentFacingMode === 'user');
 
+      // طباعة الاستيكر على الصورة حسب التعديلات الجديدة
       const sticker = loadedStickers[activeStickerIdx];
       if (sticker && sticker.complete && sticker.naturalWidth > 0) {
         const aspect = sticker.naturalWidth / sticker.naturalHeight;
         let dw, dh, dx, dy;
         switch(activeStickerIdx) {
           case 0: dw = w * 0.40; dh = dw / aspect; dx = (w - dw) / 2; dy = h - dh - (h * 0.05); break;
-          case 1: dh = h * 0.45; dw = dh * aspect; dx = w - dw - (w * 0.05); dy = (h - dh) / 2; break;
-          case 2: dw = w * 0.40; dh = dw / aspect; dx = w * 0.05; dy = (h * 0.80) - dh; break;
+          case 1: dh = h * 0.45; dw = dh * aspect; dx = w - dw; dy = (h - dh) / 2; break; // حافة يمين
+          case 2: dw = w * 0.40; dh = dw / aspect; dx = w * 0.05; dy = h - dh - (h * 0.05); break; // نزل لتحت
           case 3: dw = w * 0.60; dh = dw / aspect; dx = (w - dw) / 2; dy = h * 0.05; break;
-          case 4: dw = w * 0.55; dh = dw / aspect; dx = (w - dw) / 2; dy = (h * 0.75) - (dh / 2); break;
+          case 4: dw = w; dh = dw / aspect; dx = 0; dy = h - dh; break; // عرض الشاشة بالكامل من تحت
         }
         sCtx.drawImage(sticker, dx, dy, dw, dh);
       }
@@ -341,13 +342,17 @@
       canvas.width = 1080; canvas.height = 1920;
       ctx.fillStyle = "#ffffff"; ctx.fillRect(0, 0, 1080, 1920);
 
+      // هنا بناءً على طلبك: هنحط الصورة بالكامل من أولها لآخرها في الشباك (بدون ما تتقص)
       selectedFrame.slots.forEach((slot, i) => {
         const shot = sessionShots[i];
         if (shot) {
           ctx.save();
           ctx.translate(slot.cx, slot.cy); 
           if (slot.rot) ctx.rotate((slot.rot * Math.PI) / 180); 
-          drawCoverImage(ctx, shot, -slot.w / 2, -slot.h / 2, slot.w, slot.h, false);
+          
+          // رسم الصورة لتملا أبعاد الشباك بالظبط
+          ctx.drawImage(shot, -slot.w / 2, -slot.h / 2, slot.w, slot.h);
+          
           ctx.restore();
         }
       });
