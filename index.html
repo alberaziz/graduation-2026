@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Class of 2026 - Graduation Booth</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- مكتبة تحويل الطبقات المرئية لصور -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <style>
     .selected-ring { outline: 3px solid #f59e0b; outline-offset: 2px; transform: scale(0.95); }
     .fade-in { animation: fadeIn 0.4s ease-in-out; }
@@ -52,26 +54,20 @@
 
       <h3 class="text-sm font-bold text-white mb-3">2. Choose Your Sticker</h3>
       <div class="grid grid-cols-3 gap-3 mb-8">
-        <!-- أزلت إخفاء الصور عند الخطأ عشان لو في خطأ في الاسم يظهرلك علامة الصورة المكسورة فتعرف إن المشكلة في اسم الملف -->
         <div class="sticker-btn bg-neutral-200 rounded-xl p-2 h-24 flex flex-col items-center justify-center transition-all cursor-pointer selected-ring relative" data-idx="0">
-          <span class="text-[10px] text-neutral-600 font-bold absolute top-1">Sticker 1</span>
-          <img src="logo1.png" class="max-h-full max-w-full object-contain mt-3" alt="1">
+          <img src="logo1.png" class="max-h-full max-w-full object-contain" alt="1">
         </div>
         <div class="sticker-btn bg-neutral-200 rounded-xl p-2 h-24 flex flex-col items-center justify-center transition-all cursor-pointer relative" data-idx="1">
-          <span class="text-[10px] text-neutral-600 font-bold absolute top-1">Sticker 2</span>
-          <img src="logo2.png" class="max-h-full max-w-full object-contain mt-3" alt="2">
+          <img src="logo2.png" class="max-h-full max-w-full object-contain" alt="2">
         </div>
         <div class="sticker-btn bg-neutral-200 rounded-xl p-2 h-24 flex flex-col items-center justify-center transition-all cursor-pointer relative" data-idx="2">
-          <span class="text-[10px] text-neutral-600 font-bold absolute top-1">Sticker 3</span>
-          <img src="logo3.png" class="max-h-full max-w-full object-contain mt-3" alt="3">
+          <img src="logo3.png" class="max-h-full max-w-full object-contain" alt="3">
         </div>
         <div class="sticker-btn bg-neutral-200 rounded-xl p-2 h-24 flex flex-col items-center justify-center transition-all cursor-pointer relative" data-idx="3">
-          <span class="text-[10px] text-neutral-600 font-bold absolute top-1">Sticker 4</span>
-          <img src="logo4.png" class="max-h-full max-w-full object-contain mt-3" alt="4">
+          <img src="logo4.png" class="max-h-full max-w-full object-contain" alt="4">
         </div>
         <div class="sticker-btn bg-neutral-200 rounded-xl p-2 h-24 flex flex-col items-center justify-center transition-all cursor-pointer relative" data-idx="4">
-          <span class="text-[10px] text-neutral-600 font-bold absolute top-1">Sticker 5</span>
-          <img src="logo5.png" class="max-h-full max-w-full object-contain mt-3" alt="5">
+          <img src="logo5.png" class="max-h-full max-w-full object-contain" alt="5">
         </div>
       </div>
     </div>
@@ -91,8 +87,8 @@
     </div>
 
     <div class="relative w-full h-full overflow-hidden bg-neutral-950 flex items-center justify-center">
-      <canvas id="liveCameraCanvas" class="w-full h-full object-cover"></canvas>
-      <img id="liveSticker" src="" alt="" class="absolute pointer-events-none z-20 object-contain drop-shadow-2xl transition-all duration-300">
+      <video id="video" autoplay playsinline muted class="w-full h-full object-cover transform -scale-x-100"></video>
+      <img id="liveSticker" src="" class="absolute pointer-events-none z-20 drop-shadow-2xl transition-all duration-300" style="object-fit: contain;">
       <div id="flashEffect" class="absolute inset-0 bg-white pointer-events-none opacity-0 transition-opacity duration-150 z-30"></div>
     </div>
 
@@ -101,7 +97,7 @@
       
       <div class="relative flex items-center justify-center">
         <button id="snapBtn" class="w-20 h-20 rounded-full border-4 border-amber-400 flex items-center justify-center bg-black active:scale-95 transition-all shadow-[0_0_20px_rgba(251,191,36,0.3)]">
-          <div class="w-14 h-14 rounded-full bg-amber-400 active:bg-amber-300"></div>
+          <div id="snapInner" class="w-14 h-14 rounded-full bg-amber-400 active:bg-amber-300 flex items-center justify-center text-black font-bold text-xs"></div>
         </button>
         <span id="sessionCounter" class="absolute -top-3 bg-amber-400 text-black text-[11px] font-black px-2 py-0.5 rounded-full shadow">0/1</span>
       </div>
@@ -120,7 +116,7 @@
       <button id="newSessionBtn" class="px-4 py-2 bg-neutral-900 rounded-full text-xs text-amber-300 font-bold border border-neutral-700 active:scale-95">
         + New Session
       </button>
-      <span id="uploadStatus" class="text-emerald-400 text-xs font-bold opacity-0 transition-opacity">● Saved to Folder</span>
+      <span id="uploadStatus" class="text-emerald-400 text-xs font-bold opacity-0 transition-opacity">● Saved to Drive</span>
       <a id="downloadPhotoBtn" download="graduation-photobooth.jpg" class="px-5 py-2 bg-amber-500 text-black rounded-full text-xs font-bold active:scale-95">
         Download
       </a>
@@ -131,8 +127,18 @@
     </div>
   </div>
 
-  <video id="video" autoplay playsinline muted class="hidden"></video>
-  <canvas id="compositeCanvas" class="hidden"></canvas>
+  <!-- ==================== معمل التجميع المخفي (Visual DOM) ==================== -->
+  <!-- النظام ده بيجمع الطبقات مرئياً بدل الرسم الأعمى عشان يضمن دقة 100% -->
+  <div style="width:0; height:0; overflow:hidden;">
+    <div id="collage-builder" style="width: 1080px; height: 1920px; position: relative; background: #ffffff;">
+      <!-- مساحة الصور -->
+      <div id="photos-container" style="position: absolute; inset: 0; z-index: 10;"></div>
+      <!-- الفريم المفرغ -->
+      <img id="frame-image" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 20;">
+      <!-- الاستيكر النهائي -->
+      <img id="final-sticker" style="position: absolute; z-index: 30; object-fit: contain;">
+    </div>
+  </div>
 
   <script>
     const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyJqgbbH2UBN-KzefwQspwHAU-iIx-W0gbcBGafuoFNNdzqT5lTlV3-C1lp8KCjuIhH/exec";
@@ -148,6 +154,7 @@
     const vSetup = document.getElementById('view-setup');
     const vCamera = document.getElementById('view-camera');
     const vResult = document.getElementById('view-result');
+    const video = document.getElementById('video');
 
     // --- Login ---
     document.getElementById('loginBtn').addEventListener('click', () => {
@@ -187,6 +194,7 @@
       sessionShots = [];
       document.getElementById('sessionCounter').textContent = `0/${targetShots}`;
       document.getElementById('snapBtn').disabled = false;
+      document.getElementById('snapInner').textContent = '';
       applyLiveSticker();
       if (!isCameraActive) await startCamera();
     });
@@ -196,30 +204,20 @@
       vSetup.classList.remove('hidden');
     });
 
-    // --- Camera & Stickers Config ---
-    const video = document.getElementById('video');
-    const liveCameraCanvas = document.getElementById('liveCameraCanvas');
-    const liveCamCtx = liveCameraCanvas.getContext('2d');
-    const liveSticker = document.getElementById('liveSticker');
-    
-    // تعديلات الاستيكرات زي ما طلبت بالظبط
+    // --- الاستيكرات (تم التعديل كما طلبت: logo2 يمين وحجم أصغر، logo3 نزل، logo5 عرض كامل) ---
     const STICKERS_CONFIG = [
-      { src: 'logo1.png', css: 'bottom: 5%; left: 50%; transform: translateX(-50%); width: 40%;' }, // The End
-      { src: 'logo2.png', css: 'right: 0; top: 50%; transform: translateY(-50%); height: 45%; width: auto;' }, // الحافة اليمين
-      { src: 'logo3.png', css: 'bottom: 5%; left: 5%; width: 40%;' }, // نزل لتحت
-      { src: 'logo4.png', css: 'top: 5%; left: 50%; transform: translateX(-50%); width: 60%;' }, // Top
-      { src: 'logo5.png', css: 'bottom: 0; left: 0; width: 100%; object-fit: cover;' } // بعرض الشاشة بالكامل من تحت
+      { src: 'logo1.png', css: 'bottom: 5%; left: 50%; transform: translateX(-50%); width: 40%;' }, 
+      { src: 'logo2.png', css: 'right: -3%; top: 50%; transform: translateY(-50%); height: 30%; width: auto;' }, // أصغر ويمين خالص
+      { src: 'logo3.png', css: 'bottom: 3%; left: 5%; width: 38%;' }, // نزل لتحت
+      { src: 'logo4.png', css: 'top: 5%; left: 50%; transform: translateX(-50%); width: 60%;' }, 
+      { src: 'logo5.png', css: 'bottom: 0; left: 0; width: 100%; height: 20%; object-fit: cover;' } // بعرض الشاشة بالكامل من تحت
     ];
-
-    const loadedStickers = [];
-    STICKERS_CONFIG.forEach(cfg => {
-      const img = new Image(); img.src = cfg.src; loadedStickers.push(img);
-    });
 
     function applyLiveSticker() {
       const cfg = STICKERS_CONFIG[activeStickerIdx];
-      liveSticker.src = cfg.src;
-      liveSticker.style.cssText = cfg.css;
+      const ls = document.getElementById('liveSticker');
+      ls.src = cfg.src;
+      ls.style.cssText = cfg.css;
     }
 
     async function startCamera() {
@@ -231,7 +229,11 @@
         video.srcObject = stream;
         await video.play();
         isCameraActive = true;
-        requestAnimationFrame(renderLiveView);
+        if (currentFacingMode === 'user') {
+          video.classList.add('-scale-x-100');
+        } else {
+          video.classList.remove('-scale-x-100');
+        }
       } catch (err) {
         alert('Camera permission is required.');
       }
@@ -242,144 +244,121 @@
       await startCamera();
     });
 
-    function drawLiveCamera(tCtx, source, dx, dy, dw, dh, isMirrored) {
-      const sw = source.videoWidth || source.width;
-      const sh = source.videoHeight || source.height;
-      if (!sw || !sh) return;
-      const sRatio = sw / sh; const dRatio = dw / dh;
-      let sx, sy, sCropW, sCropH;
-      if (sRatio > dRatio) { sCropH = sh; sCropW = sh * dRatio; sx = (sw - sCropW) / 2; sy = 0; } 
-      else { sCropW = sw; sCropH = sw / dRatio; sx = 0; sy = (sh - sCropH) / 2; }
-      tCtx.save();
-      if (isMirrored) { tCtx.translate(dx + dw, dy); tCtx.scale(-1, 1); tCtx.drawImage(source, sx, sy, sCropW, sCropH, 0, 0, dw, dh); } 
-      else { tCtx.drawImage(source, sx, sy, sCropW, sCropH, dx, dy, dw, dh); }
-      tCtx.restore();
-    }
-
-    function renderLiveView() {
-      if (video.readyState >= 2 && !vCamera.classList.contains('hidden')) {
-        liveCameraCanvas.width = liveCameraCanvas.clientWidth;
-        liveCameraCanvas.height = liveCameraCanvas.clientHeight;
-        drawLiveCamera(liveCamCtx, video, 0, 0, liveCameraCanvas.width, liveCameraCanvas.height, currentFacingMode === 'user');
-      }
-      if (isCameraActive) requestAnimationFrame(renderLiveView);
-    }
-
-    // --- مقاسات الشباك الدقيقة (بدون تكبير عشوائي عشان الصورة تبان كاملة) ---
+    // --- الإحداثيات (دقيقة لفتحة الشباك) ---
     const FRAMES_CONFIG = {
       1: [
-        { src: 'f1_1.png', slots: [{ cx: 540, cy: 960, w: 780, h: 860, rot: 0 }] },
-        { src: 'f1_2.png', slots: [{ cx: 540, cy: 960, w: 780, h: 860, rot: 0 }] },
-        { src: 'f1_3.png', slots: [{ cx: 540, cy: 960, w: 780, h: 860, rot: 0 }] }
+        { src: 'f1_1.png', slots: [{ cx: 540, cy: 960, w: 760, h: 860, rot: 0 }] },
+        { src: 'f1_2.png', slots: [{ cx: 540, cy: 960, w: 760, h: 860, rot: 0 }] },
+        { src: 'f1_3.png', slots: [{ cx: 540, cy: 960, w: 760, h: 860, rot: 0 }] }
       ],
       2: [
-        { src: 'f2_1.png', slots: [{ cx: 390, cy: 660, w: 560, h: 620, rot: -8 }, { cx: 690, cy: 1260, w: 560, h: 620, rot: 10 }] },
-        { src: 'f2_2.png', slots: [{ cx: 540, cy: 500, w: 750, h: 750, rot: 0 }, { cx: 540, cy: 1400, w: 750, h: 750, rot: 0 }] },
-        { src: 'f2_3.png', slots: [{ cx: 460, cy: 590, w: 600, h: 650, rot: -5 }, { cx: 620, cy: 1400, w: 600, h: 650, rot: 5 }] }
+        { src: 'f2_1.png', slots: [{ cx: 400, cy: 650, w: 560, h: 600, rot: -8 }, { cx: 680, cy: 1250, w: 560, h: 600, rot: 10 }] },
+        { src: 'f2_2.png', slots: [{ cx: 540, cy: 500, w: 780, h: 780, rot: 0 }, { cx: 540, cy: 1400, w: 780, h: 780, rot: 0 }] },
+        { src: 'f2_3.png', slots: [{ cx: 460, cy: 600, w: 640, h: 680, rot: -5 }, { cx: 620, cy: 1400, w: 640, h: 680, rot: 5 }] }
       ],
       3: [
-        { src: 'f3_1.png', slots: [{ cx: 540, cy: 350, w: 1000, h: 500, rot: 0 }, { cx: 540, cy: 960, w: 1000, h: 500, rot: 0 }, { cx: 540, cy: 1570, w: 1000, h: 500, rot: 0 }] },
-        { src: 'f3_2.png', slots: [{ cx: 720, cy: 380, w: 500, h: 550, rot: 8 }, { cx: 370, cy: 1010, w: 500, h: 550, rot: -15 }, { cx: 680, cy: 1600, w: 500, h: 550, rot: -5 }] }
+        { src: 'f3_1.png', slots: [{ cx: 540, cy: 350, w: 980, h: 500, rot: 0 }, { cx: 540, cy: 960, w: 980, h: 500, rot: 0 }, { cx: 540, cy: 1570, w: 980, h: 500, rot: 0 }] },
+        { src: 'f3_2.png', slots: [{ cx: 720, cy: 380, w: 500, h: 540, rot: 8 }, { cx: 370, cy: 1000, w: 500, h: 540, rot: -15 }, { cx: 680, cy: 1600, w: 500, h: 540, rot: -5 }] }
       ],
       4: [
-        { src: 'f4_1.png', slots: [{ cx: 450, cy: 400, w: 440, h: 480, rot: -5 }, { cx: 750, cy: 800, w: 440, h: 480, rot: 15 }, { cx: 350, cy: 1280, w: 440, h: 480, rot: -10 }, { cx: 750, cy: 1650, w: 440, h: 480, rot: 8 }] },
-        { src: 'f4_2.png', slots: [{ cx: 270, cy: 480, w: 480, h: 900, rot: 0 }, { cx: 810, cy: 480, w: 480, h: 900, rot: 0 }, { cx: 270, cy: 1440, w: 480, h: 900, rot: 0 }, { cx: 810, cy: 1440, w: 480, h: 900, rot: 0 }] }
+        { src: 'f4_1.png', slots: [{ cx: 430, cy: 400, w: 440, h: 480, rot: -6 }, { cx: 740, cy: 800, w: 440, h: 480, rot: 15 }, { cx: 350, cy: 1260, w: 440, h: 480, rot: -10 }, { cx: 720, cy: 1650, w: 440, h: 480, rot: 8 }] },
+        { src: 'f4_2.png', slots: [{ cx: 270, cy: 480, w: 500, h: 920, rot: 0 }, { cx: 810, cy: 480, w: 500, h: 920, rot: 0 }, { cx: 270, cy: 1440, w: 500, h: 920, rot: 0 }, { cx: 810, cy: 1440, w: 500, h: 920, rot: 0 }] }
       ]
     };
 
-    const loadedFrameImgs = {};
-    Object.keys(FRAMES_CONFIG).forEach(count => {
-      FRAMES_CONFIG[count].forEach(f => {
-        const img = new Image(); img.crossOrigin = "anonymous"; img.src = f.src; loadedFrameImgs[f.src] = img;
-      });
-    });
     let frameIndexCounters = { 1: 0, 2: 0, 3: 0, 4: 0 };
 
-    // --- 5. الالتقاط والتجميع ---
+    // --- 5. الالتقاط والتجميع بنظام الطبقات المرئية ---
     document.getElementById('snapBtn').addEventListener('click', () => {
       document.getElementById('flashEffect').style.opacity = '0.85';
       setTimeout(() => { document.getElementById('flashEffect').style.opacity = '0'; }, 120);
 
+      // التقاط الصورة الحالية كـ DataURL فقط بدون رسم استيكرات عليها
       const shotCanvas = document.createElement('canvas');
-      const w = 1080; const h = 1440; 
-      shotCanvas.width = w; shotCanvas.height = h;
+      shotCanvas.width = 1080; shotCanvas.height = 1440; 
       const sCtx = shotCanvas.getContext('2d');
+      
+      const sw = video.videoWidth; const sh = video.videoHeight;
+      const sRatio = sw / sh; const dRatio = 1080 / 1440;
+      let sx, sy, sCropW, sCropH;
+      if (sRatio > dRatio) { sCropH = sh; sCropW = sh * dRatio; sx = (sw - sCropW) / 2; sy = 0; } 
+      else { sCropW = sw; sCropH = sw / dRatio; sx = 0; sy = (sh - sCropH) / 2; }
+      
+      sCtx.save();
+      if (currentFacingMode === 'user') { sCtx.translate(1080, 0); sCtx.scale(-1, 1); }
+      sCtx.drawImage(video, sx, sy, sCropW, sCropH, 0, 0, 1080, 1440);
+      sCtx.restore();
 
-      drawLiveCamera(sCtx, video, 0, 0, w, h, currentFacingMode === 'user');
-
-      // طباعة الاستيكر على الصورة حسب التعديلات الجديدة
-      const sticker = loadedStickers[activeStickerIdx];
-      if (sticker && sticker.complete && sticker.naturalWidth > 0) {
-        const aspect = sticker.naturalWidth / sticker.naturalHeight;
-        let dw, dh, dx, dy;
-        switch(activeStickerIdx) {
-          case 0: dw = w * 0.40; dh = dw / aspect; dx = (w - dw) / 2; dy = h - dh - (h * 0.05); break;
-          case 1: dh = h * 0.45; dw = dh * aspect; dx = w - dw; dy = (h - dh) / 2; break; // حافة يمين
-          case 2: dw = w * 0.40; dh = dw / aspect; dx = w * 0.05; dy = h - dh - (h * 0.05); break; // نزل لتحت
-          case 3: dw = w * 0.60; dh = dw / aspect; dx = (w - dw) / 2; dy = h * 0.05; break;
-          case 4: dw = w; dh = dw / aspect; dx = 0; dy = h - dh; break; // عرض الشاشة بالكامل من تحت
-        }
-        sCtx.drawImage(sticker, dx, dy, dw, dh);
-      }
-
-      sessionShots.push(shotCanvas);
+      sessionShots.push(shotCanvas.toDataURL('image/jpeg', 0.9));
       document.getElementById('sessionCounter').textContent = `${sessionShots.length}/${targetShots}`;
 
       if (sessionShots.length === targetShots) {
         document.getElementById('snapBtn').disabled = true;
-        setTimeout(buildFinalCollage, 300);
+        document.getElementById('snapInner').textContent = 'Wait..';
+        setTimeout(buildFinalCollage, 500); // ننتظر نص ثانية
       }
     });
 
     function buildFinalCollage() {
-      const canvas = document.getElementById('compositeCanvas');
-      const ctx = canvas.getContext('2d');
-      
+      const builder = document.getElementById('collage-builder');
+      const photosContainer = document.getElementById('photos-container');
+      const frameImg = document.getElementById('frame-image');
+      const stickerImg = document.getElementById('final-sticker');
+
+      photosContainer.innerHTML = ''; // تنظيف القديم
+
       const pool = FRAMES_CONFIG[targetShots];
       const selectedFrame = pool[frameIndexCounters[targetShots] % pool.length];
       frameIndexCounters[targetShots]++;
 
-      canvas.width = 1080; canvas.height = 1920;
-      ctx.fillStyle = "#ffffff"; ctx.fillRect(0, 0, 1080, 1920);
+      // 1. وضع الفريم
+      frameImg.src = selectedFrame.src;
 
-      // هنا بناءً على طلبك: هنحط الصورة بالكامل من أولها لآخرها في الشباك (بدون ما تتقص)
+      // 2. وضع الصور كطبقات DOM حقيقية (عشان تفضل كاملة ومتناسقة)
       selectedFrame.slots.forEach((slot, i) => {
-        const shot = sessionShots[i];
-        if (shot) {
-          ctx.save();
-          ctx.translate(slot.cx, slot.cy); 
-          if (slot.rot) ctx.rotate((slot.rot * Math.PI) / 180); 
+        if (sessionShots[i]) {
+          const div = document.createElement('div');
+          // مركز ومقاس الشباك
+          div.style.cssText = `position: absolute; left: ${slot.cx}px; top: ${slot.cy}px; width: ${slot.w}px; height: ${slot.h}px; transform: translate(-50%, -50%) rotate(${slot.rot}deg); overflow: hidden; border-radius: 4px;`;
           
-          // رسم الصورة لتملا أبعاد الشباك بالظبط
-          ctx.drawImage(shot, -slot.w / 2, -slot.h / 2, slot.w, slot.h);
+          const img = document.createElement('img');
+          img.src = sessionShots[i];
+          // object-fit: cover بتخلي الصورة تملا المربع بدون تشويه ولا قص يدوي
+          img.style.cssText = `width: 100%; height: 100%; object-fit: cover;`;
           
-          ctx.restore();
+          div.appendChild(img);
+          photosContainer.appendChild(div);
         }
       });
 
-      const frameImg = loadedFrameImgs[selectedFrame.src];
-      if (frameImg && frameImg.complete) {
-        ctx.drawImage(frameImg, 0, 0, 1080, 1920);
-      }
+      // 3. وضع الاستيكر كطبقة أخيرة فوق خالص
+      const stickerCfg = STICKERS_CONFIG[activeStickerIdx];
+      stickerImg.src = stickerCfg.src;
+      stickerImg.style.cssText = `position: absolute; z-index: 30; ${stickerCfg.css}`;
 
-      const finalDataUrl = canvas.toDataURL('image/jpeg', 0.92);
-      
-      document.getElementById('galleryMainImg').src = finalDataUrl;
-      document.getElementById('downloadPhotoBtn').href = finalDataUrl;
-      vCamera.classList.add('hidden');
-      vResult.classList.remove('hidden');
+      // 4. التقاط الشاشة بالـ html2canvas بعد ما الـ DOM يترتب
+      setTimeout(() => {
+        html2canvas(builder, { scale: 1, backgroundColor: '#ffffff', useCORS: true }).then(canvas => {
+          const finalDataUrl = canvas.toDataURL('image/jpeg', 0.92);
+          
+          document.getElementById('galleryMainImg').src = finalDataUrl;
+          document.getElementById('downloadPhotoBtn').href = finalDataUrl;
+          vCamera.classList.add('hidden');
+          vResult.classList.remove('hidden');
 
-      const upStatus = document.getElementById('uploadStatus');
-      upStatus.style.opacity = '1';
-      
-      fetch(GOOGLE_SCRIPT_URL, {
-        method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          image: finalDataUrl, 
-          filename: `Booth_${targetShots}Shots_${Date.now()}.jpg`,
-          folderName: registeredUserName
-        })
-      }).finally(() => { setTimeout(() => { upStatus.style.opacity = '0'; }, 3000); });
+          const upStatus = document.getElementById('uploadStatus');
+          upStatus.style.opacity = '1';
+          
+          fetch(GOOGLE_SCRIPT_URL, {
+            method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+              image: finalDataUrl, 
+              filename: `Booth_${targetShots}Shots_${Date.now()}.jpg`,
+              folderName: registeredUserName
+            })
+          }).finally(() => { setTimeout(() => { upStatus.style.opacity = '0'; }, 3000); });
+        });
+      }, 500); // انتظار نص ثانية عشان الصور تلحق تحمل جوه الـ Div
     }
 
     document.getElementById('newSessionBtn').addEventListener('click', () => {
