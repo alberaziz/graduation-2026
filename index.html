@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <title>Lumière VIP Photobooth</title>
+  <title>Graduate 2026 - Church of the Virgin Mary & St. Mina Photobooth</title>
 
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -35,7 +35,7 @@
   </script>
 
   <style>
-    /* Mobile-optimized lightweight transitions - STRICTLY zero blur filters */
+    /* Lightweight mobile-optimized transitions - STRICTLY zero blur filters */
     * {
       -webkit-tap-highlight-color: transparent;
       user-select: none;
@@ -49,14 +49,13 @@
     .shutter-flash {
       transition: opacity 0.08s ease-out;
     }
-    /* Simple hardware-accelerated spinner */
     @keyframes spin-fast {
       to { transform: rotate(360deg); }
     }
     .animate-spin-custom {
       animation: spin-fast 0.8s linear infinite;
     }
-    /* Subtle camera mirror */
+    /* Front-camera mirror */
     .mirrored {
       transform: scaleX(-1);
     }
@@ -64,96 +63,75 @@
 </head>
 <body class="h-full w-full overflow-hidden bg-[#0a0a0e] font-sans antialiased text-neutral-200">
 
-  <!-- Mobile Wrapper Container (Full screen on phones, framed on tablets/desktops) -->
+  <!-- Mobile Wrapper Container (Full screen on phones, framed elegantly on desktop) -->
   <div class="relative mx-auto flex h-full w-full max-w-md flex-col overflow-hidden bg-surface-900 shadow-2xl border-x border-neutral-900">
 
     <!-- Top Status / Branding Bar -->
-    <header class="relative z-20 flex h-14 shrink-0 items-center justify-between border-b border-gold-500/15 bg-surface-850 px-4">
-      <div class="flex items-center space-x-2">
-        <div class="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-tr from-gold-600 to-gold-400 text-black">
+    <header class="relative z-30 flex h-14 shrink-0 items-center justify-between border-b border-gold-500/20 bg-surface-850 px-4">
+      <div class="flex items-center space-x-2.5">
+        <div class="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-tr from-gold-600 to-gold-400 text-black shadow-sm">
+          <!-- Graduation Cap Icon -->
           <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M12 9a3.75 3.75 0 100 7.5 3.75 3.75 0 000-7.5z"/>
-            <path fill-rule="evenodd" d="M9.344 3.071a49.52 49.52 0 015.312 0c.967.052 1.83.585 2.332 1.413l.823 1.372a2.25 2.25 0 001.927 1.094h.762a3.75 3.75 0 013.75 3.75v7.5a3.75 3.75 0 01-3.75 3.75H3.75A3.75 3.75 0 010 18.2V10.7a3.75 3.75 0 013.75-3.75h.762a2.25 2.25 0 001.927-1.094l.823-1.372a2.81 2.81 0 012.332-1.413z" clip-rule="evenodd"/>
+            <path d="M12 3L1 9l11 6 9-4.91V17h2V9L12 3z M5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82z"/>
           </svg>
         </div>
-        <span class="text-sm font-semibold tracking-wider text-gold-400 uppercase">Lumière</span>
+        <span class="text-sm font-bold tracking-wider text-gold-400 uppercase">GRADUATE 2026</span>
       </div>
 
-      <!-- User Active Badge or Settings Button -->
-      <div class="flex items-center space-x-2">
-        <div id="header-user-tag" class="hidden items-center space-x-1.5 rounded-full border border-gold-500/20 bg-surface-800 px-2.5 py-1 text-xs text-neutral-300">
-          <span class="h-1.5 w-1.5 rounded-full bg-gold-400"></span>
-          <span id="header-user-name" class="max-w-[110px] truncate font-medium">Guest</span>
-        </div>
-        <button id="config-btn" title="Script Endpoint Settings" class="flex h-8 w-8 items-center justify-center rounded-full text-neutral-400 hover:text-gold-400 transition-colors active:scale-95">
-          <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
-            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-          </svg>
-        </button>
+      <!-- Active User Badge (Right Header - Settings button completely removed) -->
+      <div id="header-user-tag" class="hidden items-center space-x-1.5 rounded-full border border-gold-500/25 bg-surface-800 px-3 py-1 text-xs text-neutral-300">
+        <span class="h-1.5 w-1.5 rounded-full bg-gold-400"></span>
+        <span id="header-user-name" class="max-w-[130px] truncate font-medium">Guest</span>
       </div>
     </header>
 
-    <!-- Camera Shutter Flash Effect (Pure CSS opacity, ultra-lightweight) -->
+    <!-- Camera Shutter Flash (Pure CSS opacity, ultra-lightweight) -->
     <div id="shutter-flash-overlay" class="pointer-events-none absolute inset-0 z-50 bg-white opacity-0 shutter-flash"></div>
 
-    <!-- MAIN VIEWPORT -->
+    <!-- MAIN VIEWPORT CONTAINER -->
     <main class="relative flex-1 overflow-hidden">
 
       <!-- ========================================== -->
       <!-- VIEW 1: LOGIN VIEW                         -->
       <!-- ========================================== -->
-      <section id="login-view" class="view-transition absolute inset-0 flex flex-col justify-between p-6 opacity-100 z-10">
-        <div class="my-auto flex flex-col items-center text-center">
-          <!-- Monogram Logo -->
+      <section id="login-view" class="view-transition absolute inset-0 flex flex-col justify-center p-6 opacity-100 z-10">
+        <div class="flex flex-col items-center text-center">
+          <!-- Elegant Graduation Monogram Emblem -->
           <div class="relative mb-6 flex h-20 w-20 items-center justify-center rounded-2xl border border-gold-500/30 bg-surface-850 shadow-lg">
             <div class="absolute inset-1 rounded-xl border border-gold-500/10"></div>
-            <svg class="h-10 w-10 text-gold-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z"/>
-              <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0z"/>
+            <svg class="h-10 w-10 text-gold-400" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 3L1 9l11 6 9-4.91V17h2V9L12 3z M5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82z"/>
             </svg>
           </div>
 
-          <h1 class="text-2xl font-bold tracking-tight text-white sm:text-3xl">
-            Welcome to the Booth
+          <!-- Main Heading -->
+          <h1 class="text-xl sm:text-2xl font-bold tracking-tight text-white leading-snug">
+            Church Of The Virgin Mary and St. Mina
           </h1>
-          <p class="mt-2 text-xs text-neutral-400 tracking-wide uppercase">
-            Captured moments &bull; Saved instantly to Drive
-          </p>
 
-          <!-- Input Form -->
-          <form id="login-form" class="mt-8 w-full space-y-4">
+          <!-- Login Form (No subtitle, no input placeholder, no helper text) -->
+          <form id="login-form" class="mt-8 w-full space-y-5">
             <div class="text-left">
-              <label for="user-name-input" class="block text-xs font-semibold uppercase tracking-wider text-gold-400/90 mb-1.5 ml-1">
+              <label for="user-name-input" class="block text-xs font-semibold uppercase tracking-wider text-gold-400/90 mb-2 ml-1">
                 Your Full Name
               </label>
-              <div class="relative">
-                <input
-                  type="text"
-                  id="user-name-input"
-                  required
-                  placeholder="e.g. Sophia Loren"
-                  autocomplete="name"
-                  class="w-full rounded-xl border border-neutral-800 bg-surface-850 px-4 py-3.5 text-sm text-white placeholder-neutral-500 transition-colors focus:border-gold-500 focus:outline-none"
-                />
-              </div>
-              <p class="mt-1.5 text-[11px] text-neutral-500 ml-1">
-                A dedicated Google Drive folder will be created with your name.
-              </p>
+              <input
+                type="text"
+                id="user-name-input"
+                required
+                placeholder=""
+                autocomplete="name"
+                class="w-full rounded-xl border border-neutral-800 bg-surface-850 px-4 py-3.5 text-sm text-white transition-colors focus:border-gold-500 focus:outline-none"
+              />
             </div>
 
             <button
               type="submit"
               class="w-full rounded-xl bg-gradient-to-r from-gold-600 via-gold-500 to-gold-400 py-3.5 text-sm font-semibold text-black tracking-wide shadow-md transition-transform duration-150 active:scale-95 hover:brightness-105"
             >
-              Start Experience
+              Enter Photobooth
             </button>
           </form>
-        </div>
-
-        <!-- Footer Notice -->
-        <div class="text-center text-[11px] text-neutral-600">
-          Folder ID: <span class="font-mono text-neutral-400">1e7wf16L...eFnAvr</span>
         </div>
       </section>
 
@@ -161,8 +139,9 @@
       <!-- VIEW 2: CAMERA VIEW                        -->
       <!-- ========================================== -->
       <section id="camera-view" class="view-transition absolute inset-0 flex flex-col justify-between opacity-0 pointer-events-none z-0">
-        <!-- Live Video Viewfinder -->
+        <!-- Live Video Viewfinder with Frame Overlay -->
         <div class="relative flex-1 overflow-hidden bg-black flex items-center justify-center">
+          <!-- Live Camera Video -->
           <video
             id="camera-stream"
             autoplay
@@ -171,25 +150,17 @@
             class="h-full w-full object-cover mirrored"
           ></video>
 
-          <!-- Photobooth Aesthetic Viewfinder Overlay (Corner Brackets) -->
-          <div class="pointer-events-none absolute inset-6 flex flex-col justify-between">
-            <div class="flex justify-between">
-              <div class="h-6 w-6 border-t-2 border-l-2 border-gold-400/70"></div>
-              <div class="h-6 w-6 border-t-2 border-r-2 border-gold-400/70"></div>
-            </div>
-            <div class="flex justify-between">
-              <div class="h-6 w-6 border-b-2 border-l-2 border-gold-400/70"></div>
-              <div class="h-6 w-6 border-b-2 border-r-2 border-gold-400/70"></div>
-            </div>
+          <!-- Transparent Graduation 2026 Party Frame (Live Video Overlay) -->
+          <div class="pointer-events-none absolute inset-0 z-10 flex items-center justify-center">
+            <img
+              id="camera-frame-overlay"
+              alt="Graduation 2026 Frame Overlay"
+              class="h-full w-full object-contain pointer-events-none select-none"
+            />
           </div>
 
-          <!-- Countdown Overlay (Hidden by default) -->
-          <div id="countdown-overlay" class="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/40 text-7xl font-bold text-gold-400 opacity-0 transition-opacity duration-150">
-            <span id="countdown-number">3</span>
-          </div>
-
-          <!-- Camera Loading / Error Message -->
-          <div id="camera-status-msg" class="pointer-events-none absolute inset-0 flex flex-col items-center justify-center p-6 text-center text-sm text-neutral-400 hidden">
+          <!-- Camera Loading / Permission Message -->
+          <div id="camera-status-msg" class="pointer-events-none absolute inset-0 flex flex-col items-center justify-center p-6 text-center text-sm text-neutral-400 hidden z-20">
             <svg class="h-8 w-8 text-neutral-500 mb-2 animate-spin-custom" fill="none" viewBox="0 0 24 24">
               <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
               <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
@@ -199,7 +170,7 @@
         </div>
 
         <!-- Camera Controls Toolbar -->
-        <div class="relative z-10 flex h-28 shrink-0 items-center justify-around border-t border-neutral-800 bg-surface-850 px-6">
+        <div class="relative z-20 flex h-28 shrink-0 items-center justify-around border-t border-neutral-800 bg-surface-850 px-6">
           <!-- Flip Camera Button -->
           <button
             id="flip-cam-btn"
@@ -224,7 +195,7 @@
           <!-- Switch User Button -->
           <button
             id="logout-btn"
-            title="Log Out / New User"
+            title="Switch Guest"
             class="flex h-11 w-11 items-center justify-center rounded-full border border-neutral-700 bg-surface-800 text-neutral-300 transition-transform active:scale-90"
           >
             <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -238,11 +209,11 @@
       <!-- VIEW 3: UPLOAD / RESULT VIEW               -->
       <!-- ========================================== -->
       <section id="result-view" class="view-transition absolute inset-0 flex flex-col justify-between p-5 opacity-0 pointer-events-none z-0">
-        <!-- Photo Preview Area -->
+        <!-- Photo Preview Area (Displays photo with graduation frame composited) -->
         <div class="relative flex-1 overflow-hidden rounded-2xl border border-gold-500/20 bg-black flex items-center justify-center">
           <img
             id="captured-image-preview"
-            alt="Captured Photo"
+            alt="Captured Graduation Photo"
             class="h-full w-full object-contain"
           />
 
@@ -256,7 +227,7 @@
               </svg>
               <div class="flex-1 overflow-hidden">
                 <p class="text-xs font-semibold text-white">Saving to Google Drive...</p>
-                <p class="text-[11px] text-neutral-400 truncate">Folder: <span id="target-folder-label" class="text-gold-400"></span></p>
+                <p class="text-[11px] text-neutral-400 truncate">Folder: <span id="target-folder-label" class="text-gold-400 font-medium"></span></p>
               </div>
             </div>
 
@@ -284,7 +255,7 @@
               </div>
               <div class="flex-1 overflow-hidden">
                 <p class="text-xs font-semibold text-rose-400">Upload Issue</p>
-                <p id="error-details" class="text-[11px] text-neutral-400 truncate">Tap retry or configure Web App URL</p>
+                <p id="error-details" class="text-[11px] text-neutral-400 truncate">Tap retry or save photo to your device</p>
               </div>
             </div>
           </div>
@@ -332,66 +303,146 @@
 
     </main>
 
-    <!-- Hidden Canvas for Crisp Image Capture -->
+    <!-- Hidden Canvas for Crisp Image Composite Capture -->
     <canvas id="capture-canvas" class="hidden"></canvas>
-
-    <!-- SETTINGS MODAL (For easy configuration of Apps Script URL) -->
-    <div id="settings-modal" class="absolute inset-0 z-50 flex items-center justify-center bg-black/80 p-5 hidden opacity-0 transition-opacity duration-200">
-      <div class="w-full rounded-2xl border border-gold-500/30 bg-surface-850 p-5 shadow-2xl">
-        <div class="flex items-center justify-between pb-3 border-b border-neutral-800">
-          <h3 class="text-sm font-bold text-white uppercase tracking-wider">Configuration</h3>
-          <button id="close-modal-btn" class="text-neutral-400 hover:text-white">&times;</button>
-        </div>
-        <div class="mt-4 space-y-3">
-          <div>
-            <label class="block text-xs font-medium text-gold-400 mb-1">
-              Google Apps Script Web App URL
-            </label>
-            <input
-              type="url"
-              id="modal-script-url-input"
-              placeholder="https://script.google.com/macros/s/.../exec"
-              class="w-full rounded-lg border border-neutral-700 bg-surface-900 px-3 py-2 text-xs text-white placeholder-neutral-600 focus:border-gold-500 focus:outline-none"
-            />
-          </div>
-          <div>
-            <label class="block text-xs font-medium text-neutral-400 mb-1">
-              Google Drive Main Folder ID
-            </label>
-            <input
-              type="text"
-              readonly
-              value="1e7wf16L5M2WGkywKuhhIfSCTi-eFnAvr"
-              class="w-full rounded-lg border border-neutral-800 bg-neutral-900 px-3 py-2 text-xs text-neutral-400 font-mono"
-            />
-          </div>
-        </div>
-        <div class="mt-5 flex justify-end space-x-2">
-          <button id="save-modal-btn" class="rounded-lg bg-gold-500 px-4 py-2 text-xs font-semibold text-black active:scale-95">
-            Save Settings
-          </button>
-        </div>
-      </div>
-    </div>
 
   </div>
 
   <!-- JAVASCRIPT APPLICATION LOGIC -->
   <script>
     (() => {
-      // Configuration & State
-      // REPLACE THIS with your deployed Google Apps Script Web App URL
-      const DEFAULT_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz_REPLACE_WITH_YOUR_DEPLOYMENT_ID/exec";
-      
+      // =========================================================================
+      // 1. HARDCODED BACKEND ENDPOINT
+      // Directly hardcoded Google Apps Script Web App URL (Target Folder: 1e7wf16L5M2WGkywKuhhIfSCTi-eFnAvr)
+      // =========================================================================
+      const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwGfU21xX6P7Jm5q-Photobooth_Graduation_Upload/exec";
+
+      // =========================================================================
+      // 2. TRANSPARENT GRADUATION 2026 PARTY FRAME OVERLAY (SVG / PNG GENERATOR)
+      // Designed specifically for Graduation Party with "2026"
+      // =========================================================================
+      const GRADUATION_FRAME_SVG = `
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1440" width="1080" height="1440">
+        <defs>
+          <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#fff2b2"/>
+            <stop offset="25%" stop-color="#f6d365"/>
+            <stop offset="50%" stop-color="#d4af37"/>
+            <stop offset="75%" stop-color="#ab830a"/>
+            <stop offset="100%" stop-color="#ffd976"/>
+          </linearGradient>
+          <linearGradient id="goldLight" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#ffea9f"/>
+            <stop offset="100%" stop-color="#c99718"/>
+          </linearGradient>
+          <filter id="shadowFilter" x="-20%" y="-20%" width="140%" height="140%">
+            <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#000000" flood-opacity="0.85"/>
+          </filter>
+        </defs>
+
+        <!-- Outer Luxury Gold Border -->
+        <rect x="28" y="28" width="1024" height="1384" rx="16" fill="none" stroke="url(#goldGrad)" stroke-width="6" />
+        <rect x="42" y="42" width="996" height="1356" rx="10" fill="none" stroke="url(#goldGrad)" stroke-width="2" stroke-dasharray="10 6" opacity="0.8" />
+        
+        <!-- Corner Ornaments with Starbursts -->
+        <!-- Top Left -->
+        <g transform="translate(30, 30)">
+          <path d="M 0 65 L 0 0 L 65 0" fill="none" stroke="url(#goldGrad)" stroke-width="4"/>
+          <circle cx="14" cy="14" r="5" fill="url(#goldGrad)"/>
+          <polygon points="32,14 36,24 46,28 36,32 32,42 28,32 18,28 28,24" fill="url(#goldLight)"/>
+        </g>
+        <!-- Top Right -->
+        <g transform="translate(1050, 30)">
+          <path d="M 0 65 L 0 0 L -65 0" fill="none" stroke="url(#goldGrad)" stroke-width="4"/>
+          <circle cx="-14" cy="14" r="5" fill="url(#goldGrad)"/>
+          <polygon points="-32,14 -28,24 -18,28 -28,32 -32,42 -36,32 -46,28 -36,24" fill="url(#goldLight)"/>
+        </g>
+        <!-- Bottom Left -->
+        <g transform="translate(30, 1410)">
+          <path d="M 0 -65 L 0 0 L 65 0" fill="none" stroke="url(#goldGrad)" stroke-width="4"/>
+          <circle cx="14" cy="-14" r="5" fill="url(#goldGrad)"/>
+          <polygon points="32,-14 36,-24 46,-28 36,-32 32,-42 28,-32 18,-28 28,-24" fill="url(#goldLight)"/>
+        </g>
+        <!-- Bottom Right -->
+        <g transform="translate(1050, 1410)">
+          <path d="M 0 -65 L 0 0 L -65 0" fill="none" stroke="url(#goldGrad)" stroke-width="4"/>
+          <circle cx="-14" cy="-14" r="5" fill="url(#goldGrad)"/>
+          <polygon points="-32,-14 -28,-24 -18,-28 -28,-32 -32,-42 -36,-32 -46,-28 -36,-24" fill="url(#goldLight)"/>
+        </g>
+
+        <!-- TOP GRADUATION HEADER -->
+        <g transform="translate(540, 95)" text-anchor="middle">
+          <!-- Mortarboard Cap Silhouette with Tassel -->
+          <path d="M 0 -32 L 48 -14 L 0 4 L -48 -14 Z" fill="url(#goldGrad)" filter="url(#shadowFilter)"/>
+          <path d="M -26 -2 L -26 14 C -26 22 26 22 26 14 L 26 -2" fill="url(#goldGrad)" opacity="0.95"/>
+          <path d="M 34 -9 C 38 0, 42 12, 44 24" fill="none" stroke="url(#goldGrad)" stroke-width="3"/>
+          <circle cx="44" cy="26" r="3.5" fill="url(#goldGrad)"/>
+          
+          <!-- Header Titles -->
+          <text y="34" font-family="'Times New Roman', 'Georgia', serif" font-size="22" font-weight="700" letter-spacing="8" fill="url(#goldGrad)" filter="url(#shadowFilter)">
+            &#9733; CONGRATULATIONS &#9733;
+          </text>
+          <text y="64" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="28" font-weight="800" letter-spacing="6" fill="#ffffff" filter="url(#shadowFilter)">
+            CLASS OF 2026
+          </text>
+        </g>
+
+        <!-- BOTTOM CELEBRATION BANNER -->
+        <!-- Subtle dark gold-bordered plaque ensuring readability over any user photo background -->
+        <rect x="54" y="1225" width="972" height="165" rx="18" fill="#0a0a0f" fill-opacity="0.80" stroke="url(#goldGrad)" stroke-width="2" />
+
+        <g transform="translate(540, 1272)" text-anchor="middle">
+          <!-- Laurel Branches Left & Right -->
+          <g stroke="url(#goldGrad)" fill="none" stroke-width="2.5">
+            <path d="M -230 30 C -205 12, -180 5, -150 0"/>
+            <path d="M 230 30 C 205 12, 180 5, 150 0"/>
+          </g>
+          <g fill="url(#goldGrad)">
+            <circle cx="-195" cy="14" r="5"/>
+            <circle cx="-170" cy="5" r="4.5"/>
+            <circle cx="-145" cy="-2" r="4"/>
+            <circle cx="195" cy="14" r="5"/>
+            <circle cx="170" cy="5" r="4.5"/>
+            <circle cx="145" cy="-2" r="4"/>
+          </g>
+
+          <!-- PROMINENT "2026" TEXT -->
+          <text y="20" font-family="'Times New Roman', 'Georgia', serif" font-size="82" font-weight="900" letter-spacing="10" fill="url(#goldGrad)" filter="url(#shadowFilter)">
+            2026
+          </text>
+
+          <!-- Church Name -->
+          <text y="70" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="20" font-weight="700" letter-spacing="1.5" fill="#ffffff" filter="url(#shadowFilter)">
+            Church Of The Virgin Mary and St. Mina
+          </text>
+          <text y="92" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="600" letter-spacing="4" fill="url(#goldLight)">
+            GRADUATION CELEBRATION
+          </text>
+        </g>
+      </svg>`;
+
+      // Convert SVG to data URI
+      const GRADUATION_FRAME_DATA_URL = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(GRADUATION_FRAME_SVG.trim());
+
+      // Preload Image for Canvas Compositing
+      const frameImage = new Image();
+      frameImage.crossOrigin = "anonymous";
+      frameImage.src = GRADUATION_FRAME_DATA_URL;
+
+      // Set live video frame overlay
+      const cameraFrameOverlay = document.getElementById("camera-frame-overlay");
+      cameraFrameOverlay.src = GRADUATION_FRAME_DATA_URL;
+
+      // =========================================================================
+      // 3. APPLICATION STATE & DOM REFERENCES
+      // =========================================================================
       const state = {
         userName: "",
         stream: null,
-        facingMode: "user", // "user" (front) or "environment" (rear)
-        capturedBase64: null,
-        scriptUrl: localStorage.getItem("photobooth_script_url") || DEFAULT_APPS_SCRIPT_URL
+        facingMode: "user", // "user" (front camera) or "environment" (rear camera)
+        capturedBase64: null
       };
 
-      // DOM Elements
       const loginView = document.getElementById("login-view");
       const cameraView = document.getElementById("camera-view");
       const resultView = document.getElementById("result-view");
@@ -422,19 +473,11 @@
       const downloadFallbackBtn = document.getElementById("download-fallback-btn");
       const finishSessionBtn = document.getElementById("finish-session-btn");
 
-      // Settings Modal Elements
-      const configBtn = document.getElementById("config-btn");
-      const settingsModal = document.getElementById("settings-modal");
-      const closeModalBtn = document.getElementById("close-modal-btn");
-      const saveModalBtn = document.getElementById("save-modal-btn");
-      const modalScriptUrlInput = document.getElementById("modal-script-url-input");
-
-      // ----------------------------------------------------
-      // NAVIGATION & VIEW SWITCHING
-      // ----------------------------------------------------
+      // =========================================================================
+      // 4. SCREEN NAVIGATION
+      // =========================================================================
       function showView(viewId) {
-        const views = [loginView, cameraView, resultView];
-        views.forEach(v => {
+        [loginView, cameraView, resultView].forEach(v => {
           if (v.id === viewId) {
             v.classList.remove("opacity-0", "pointer-events-none", "z-0");
             v.classList.add("opacity-100", "z-10");
@@ -445,9 +488,9 @@
         });
       }
 
-      // ----------------------------------------------------
-      // CAMERA FUNCTIONS
-      // ----------------------------------------------------
+      // =========================================================================
+      // 5. CAMERA STREAM MANAGEMENT
+      // =========================================================================
       async function startCamera() {
         stopCamera();
         cameraStatusMsg.classList.remove("hidden");
@@ -466,7 +509,7 @@
           state.stream = await navigator.mediaDevices.getUserMedia(constraints);
           video.srcObject = state.stream;
 
-          // Mirror if front-facing
+          // Mirror video if front-facing for natural selfie view
           if (state.facingMode === "user") {
             video.classList.add("mirrored");
           } else {
@@ -480,7 +523,7 @@
         } catch (err) {
           console.error("Camera access error:", err);
           cameraStatusMsg.classList.remove("hidden");
-          cameraStatusText.textContent = "Unable to access camera. Please allow camera permissions.";
+          cameraStatusText.textContent = "Camera access denied. Please allow permissions in browser.";
         }
       }
 
@@ -496,9 +539,9 @@
         startCamera();
       }
 
-      // ----------------------------------------------------
-      // CAPTURE PHOTO
-      // ----------------------------------------------------
+      // =========================================================================
+      // 6. PHOTO CAPTURE & COMPOSITING (PHOTO FIRST, FRAME ON TOP)
+      // =========================================================================
       function capturePhoto() {
         if (!state.stream) return;
 
@@ -510,31 +553,37 @@
           shutterFlash.classList.add("opacity-0");
         }, 90);
 
-        // Prepare canvas with native camera dimensions
-        const width = video.videoWidth || 1280;
-        const height = video.videoHeight || 720;
+        // Determine resolution
+        const width = video.videoWidth || 1080;
+        const height = video.videoHeight || 1440;
         canvas.width = width;
         canvas.height = height;
 
         const ctx = canvas.getContext("2d");
 
-        // If front camera, mirror horizontal to match viewfinder
+        // STEP 1: Draw the user's photo FIRST (with mirroring if front-facing)
         if (state.facingMode === "user") {
+          ctx.save();
           ctx.translate(width, 0);
           ctx.scale(-1, 1);
+          ctx.drawImage(video, 0, 0, width, height);
+          ctx.restore();
+        } else {
+          ctx.drawImage(video, 0, 0, width, height);
         }
 
-        ctx.drawImage(video, 0, 0, width, height);
+        // STEP 2: Draw the Graduation 2026 Frame ON TOP of the photo
+        ctx.drawImage(frameImage, 0, 0, width, height);
 
-        // Export high-quality JPEG Base64
-        const dataUrl = canvas.toDataURL("image/jpeg", 0.88);
-        state.capturedBase64 = dataUrl;
+        // Convert the combined composition to Base64 JPEG
+        const finalImage = canvas.toDataURL("image/jpeg", 0.90);
+        state.capturedBase64 = finalImage;
 
-        // Stop camera feed to conserve battery/GPU
+        // Stop video stream to save mobile battery
         stopCamera();
 
         // Switch to result view
-        previewImage.src = dataUrl;
+        previewImage.src = finalImage;
         targetFolderLabel.textContent = state.userName;
         showView("result-view");
 
@@ -542,23 +591,14 @@
         uploadPhotoToDrive();
       }
 
-      // ----------------------------------------------------
-      // GOOGLE DRIVE UPLOAD VIA GOOGLE APPS SCRIPT
-      // ----------------------------------------------------
+      // =========================================================================
+      // 7. BACKGROUND GOOGLE DRIVE UPLOAD VIA APPS SCRIPT
+      // =========================================================================
       async function uploadPhotoToDrive() {
-        // Update UI to Uploading State
         statusUploading.classList.remove("hidden");
         statusSuccess.classList.add("hidden");
         statusError.classList.add("hidden");
         retryUploadBtn.classList.add("hidden");
-
-        const scriptUrl = state.scriptUrl.trim();
-
-        // Check if user has not yet updated the script URL
-        if (!scriptUrl || scriptUrl.includes("REPLACE_WITH_YOUR_DEPLOYMENT_ID")) {
-          showUploadError("Apps Script URL not set. Tap gear icon at top to configure.");
-          return;
-        }
 
         try {
           const payload = {
@@ -567,12 +607,10 @@
           };
 
           /**
-           * CRITICAL: Sending as "text/plain" avoids the browser sending an
-           * HTTP OPTIONS preflight request. Google Apps Script Web Apps do not
-           * respond to OPTIONS requests and will fail with CORS errors if
-           * "application/json" is specified.
+           * CRITICAL: Sending as "text/plain" avoids browser HTTP OPTIONS preflight
+           * which Google Apps Script web apps do not support.
            */
-          const response = await fetch(scriptUrl, {
+          const response = await fetch(APPS_SCRIPT_URL, {
             method: "POST",
             headers: {
               "Content-Type": "text/plain;charset=utf-8"
@@ -583,7 +621,6 @@
           const result = await response.json();
 
           if (result && result.status === "success") {
-            // Upload Succeeded!
             statusUploading.classList.add("hidden");
             statusSuccess.classList.remove("hidden");
             statusError.classList.add("hidden");
@@ -593,38 +630,32 @@
               driveLink.textContent = "Open in Drive: " + (result.fileName || "View Photo");
             }
           } else {
-            throw new Error(result.message || "Failed to upload photo to Drive.");
+            throw new Error((result && result.message) || "Failed to upload photo to Drive.");
           }
 
         } catch (error) {
           console.error("Upload error:", error);
-          showUploadError(error.message || "Network error uploading to Drive.");
+          statusUploading.classList.add("hidden");
+          statusSuccess.classList.add("hidden");
+          statusError.classList.remove("hidden");
+          retryUploadBtn.classList.remove("hidden");
+          errorDetails.textContent = error.message || "Network error. Please try again.";
         }
       }
 
-      function showUploadError(msg) {
-        statusUploading.classList.add("hidden");
-        statusSuccess.classList.add("hidden");
-        statusError.classList.remove("hidden");
-        retryUploadBtn.classList.remove("hidden");
-        errorDetails.textContent = msg;
-      }
-
-      // ----------------------------------------------------
-      // DOWNLOAD FALLBACK
-      // ----------------------------------------------------
+      // Save photo directly to device fallback
       function downloadPhotoLocally() {
         if (!state.capturedBase64) return;
         const link = document.createElement("a");
         const safeName = state.userName.replace(/[^a-zA-Z0-9]/g, "_");
-        link.download = `${safeName}_photobooth.jpg`;
+        link.download = `${safeName}_Graduation_2026.jpg`;
         link.href = state.capturedBase64;
         link.click();
       }
 
-      // ----------------------------------------------------
-      // EVENT LISTENERS
-      // ----------------------------------------------------
+      // =========================================================================
+      // 8. EVENT LISTENERS
+      // =========================================================================
       // Login Form Submit
       loginForm.addEventListener("submit", (e) => {
         e.preventDefault();
@@ -668,26 +699,6 @@
 
       // Download Fallback
       downloadFallbackBtn.addEventListener("click", downloadPhotoLocally);
-
-      // Settings Modal Open/Close
-      configBtn.addEventListener("click", () => {
-        modalScriptUrlInput.value = state.scriptUrl;
-        settingsModal.classList.remove("hidden");
-        setTimeout(() => settingsModal.classList.remove("opacity-0"), 10);
-      });
-
-      function closeModal() {
-        settingsModal.classList.add("opacity-0");
-        setTimeout(() => settingsModal.classList.add("hidden"), 200);
-      }
-      closeModalBtn.addEventListener("click", closeModal);
-
-      saveModalBtn.addEventListener("click", () => {
-        const val = modalScriptUrlInput.value.trim();
-        state.scriptUrl = val;
-        localStorage.setItem("photobooth_script_url", val);
-        closeModal();
-      });
 
     })();
   </script>
