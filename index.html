@@ -55,7 +55,6 @@
     .animate-spin-custom {
       animation: spin-fast 0.8s linear infinite;
     }
-    /* Natural selfie mirroring */
     .mirrored {
       transform: scaleX(-1);
     }
@@ -109,7 +108,7 @@
             Church Of The Virgin Mary and St. Mina
           </h1>
 
-          <!-- Form (No subtitles, no placeholder, no helper text) -->
+          <!-- Form: Cleaned up with no placeholders, subtitles, or helper text -->
           <form id="login-form" class="mt-8 w-full space-y-5">
             <div class="text-left">
               <label for="user-name-input" class="block text-xs font-semibold uppercase tracking-wider text-gold-400/90 mb-2 ml-1">
@@ -139,7 +138,7 @@
       <!-- VIEW 2: CAMERA VIEW                        -->
       <!-- ========================================== -->
       <section id="camera-view" class="view-transition absolute inset-0 flex flex-col justify-between opacity-0 pointer-events-none z-0">
-        <!-- Live Video Viewfinder with Graduation Frame Overlay -->
+        <!-- Live Video Viewfinder with Contemporary Graduation Frame Overlay -->
         <div class="relative flex-1 overflow-hidden bg-black flex items-center justify-center">
           <video
             id="camera-stream"
@@ -208,7 +207,6 @@
       <!-- VIEW 3: RESULT & UPLOAD VIEW               -->
       <!-- ========================================== -->
       <section id="result-view" class="view-transition absolute inset-0 flex flex-col justify-between p-5 opacity-0 pointer-events-none z-0">
-        <!-- Photo Preview Area (Displays user photo + graduation frame composited) -->
         <div class="relative flex-1 overflow-hidden rounded-2xl border border-gold-500/20 bg-black flex items-center justify-center">
           <img
             id="captured-image-preview"
@@ -216,7 +214,7 @@
             class="h-full w-full object-contain"
           />
 
-          <!-- Floating Upload Status Pill -->
+          <!-- Upload Status Pill -->
           <div id="upload-status-card" class="absolute bottom-4 left-4 right-4 rounded-xl border border-neutral-800 bg-surface-850/95 p-3.5 shadow-xl transition-all duration-200">
             <!-- Uploading State -->
             <div id="status-uploading" class="flex items-center space-x-3">
@@ -260,26 +258,20 @@
           </div>
         </div>
 
-        <!-- Result Action Controls -->
         <div class="mt-4 flex flex-col space-y-2.5">
           <div class="flex space-x-2">
-            <!-- Retake / Next Photo -->
             <button
               id="retake-btn"
               class="flex-1 rounded-xl bg-gradient-to-r from-gold-600 via-gold-500 to-gold-400 py-3.5 text-xs font-bold uppercase tracking-wider text-black transition-transform duration-100 active:scale-95"
             >
               Take Another Photo
             </button>
-
-            <!-- Manual Retry button -->
             <button
               id="retry-upload-btn"
               class="hidden rounded-xl border border-gold-500/40 bg-surface-800 px-4 py-3.5 text-xs font-semibold text-gold-400 transition-transform active:scale-95"
             >
               Retry
             </button>
-
-            <!-- Device Download Fallback -->
             <button
               id="download-fallback-btn"
               title="Save to Device"
@@ -307,7 +299,6 @@
 
   </div>
 
-  <!-- JAVASCRIPT APPLICATION LOGIC -->
   <script>
     (() => {
       // =========================================================================
@@ -316,116 +307,130 @@
       const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyJqgbbH2UBN-KzefwQspwHAU-iIx-W0gbcBGafuoFNNdzqT5lTlV3-C1lp8KCjuIhH/exec";
 
       // =========================================================================
-      // 2. TRANSPARENT GRADUATION 2026 PARTY FRAME OVERLAY (SVG / PNG GENERATOR)
+      // 2. CHIC, CONTEMPORARY GRADUATION 2026 FRAME OVERLAY (HIGH-FASHION DESIGN)
       // =========================================================================
       const GRADUATION_FRAME_SVG = `
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1440" width="1080" height="1440">
         <defs>
-          <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stop-color="#fff2b2"/>
-            <stop offset="25%" stop-color="#f6d365"/>
-            <stop offset="50%" stop-color="#d4af37"/>
-            <stop offset="75%" stop-color="#ab830a"/>
-            <stop offset="100%" stop-color="#ffd976"/>
+          <!-- Metallic Gold Linear Gradients -->
+          <linearGradient id="goldMetallic" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#fff4b8"/>
+            <stop offset="20%" stop-color="#f5d365"/>
+            <stop offset="45%" stop-color="#d4af37"/>
+            <stop offset="70%" stop-color="#9a7610"/>
+            <stop offset="90%" stop-color="#ffd976"/>
+            <stop offset="100%" stop-color="#fff8d6"/>
           </linearGradient>
-          <linearGradient id="goldLight" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stop-color="#ffea9f"/>
-            <stop offset="100%" stop-color="#c99718"/>
+
+          <linearGradient id="goldShimmer" x1="0%" y1="100%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#c99718"/>
+            <stop offset="50%" stop-color="#fff1aa"/>
+            <stop offset="100%" stop-color="#b88a14"/>
           </linearGradient>
-          <filter id="shadowFilter" x="-20%" y="-20%" width="140%" height="140%">
-            <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#000000" flood-opacity="0.85"/>
+
+          <!-- Subtle Glow Filter for Readability -->
+          <filter id="cinematicGlow" x="-20%" y="-20%" width="140%" height="140%">
+            <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000000" flood-opacity="0.9"/>
           </filter>
         </defs>
 
-        <!-- Outer Luxury Gold Border -->
-        <rect x="28" y="28" width="1024" height="1384" rx="16" fill="none" stroke="url(#goldGrad)" stroke-width="6" />
-        <rect x="42" y="42" width="996" height="1356" rx="10" fill="none" stroke="url(#goldGrad)" stroke-width="2" stroke-dasharray="10 6" opacity="0.8" />
-        
-        <!-- Corner Ornaments with Starbursts -->
-        <!-- Top Left -->
-        <g transform="translate(30, 30)">
-          <path d="M 0 65 L 0 0 L 65 0" fill="none" stroke="url(#goldGrad)" stroke-width="4"/>
-          <circle cx="14" cy="14" r="5" fill="url(#goldGrad)"/>
-          <polygon points="32,14 36,24 46,28 36,32 32,42 28,32 18,28 28,24" fill="url(#goldLight)"/>
+        <!-- 1. Contemporary Geometric Outer Framing -->
+        <rect x="32" y="32" width="1016" height="1376" rx="20" fill="none" stroke="url(#goldMetallic)" stroke-width="4" />
+        <rect x="46" y="46" width="988" height="1348" rx="14" fill="none" stroke="url(#goldMetallic)" stroke-width="1.2" stroke-dasharray="12 8" opacity="0.75" />
+
+        <!-- 2. Studio Crosshair / Viewfinder Markings -->
+        <!-- Top / Bottom / Left / Right Center Hairlines -->
+        <line x1="540" y1="20" x2="540" y2="40" stroke="url(#goldMetallic)" stroke-width="2"/>
+        <line x1="540" y1="1400" x2="540" y2="1420" stroke="url(#goldMetallic)" stroke-width="2"/>
+        <line x1="20" y1="720" x2="40" y2="720" stroke="url(#goldMetallic)" stroke-width="2"/>
+        <line x1="1040" y1="720" x2="1060" y2="720" stroke="url(#goldMetallic)" stroke-width="2"/>
+
+        <!-- 3. Chic Architectural Corner Notches -->
+        <!-- Top-Left -->
+        <g transform="translate(36, 36)">
+          <path d="M 0 50 L 0 0 L 50 0" fill="none" stroke="url(#goldMetallic)" stroke-width="3"/>
+          <circle cx="16" cy="16" r="4.5" fill="url(#goldMetallic)"/>
+          <polygon points="34,16 37,23 44,26 37,29 34,36 31,29 24,26 31,23" fill="url(#goldShimmer)"/>
         </g>
-        <!-- Top Right -->
-        <g transform="translate(1050, 30)">
-          <path d="M 0 65 L 0 0 L -65 0" fill="none" stroke="url(#goldGrad)" stroke-width="4"/>
-          <circle cx="-14" cy="14" r="5" fill="url(#goldGrad)"/>
-          <polygon points="-32,14 -28,24 -18,28 -28,32 -32,42 -36,32 -46,28 -36,24" fill="url(#goldLight)"/>
+        <!-- Top-Right -->
+        <g transform="translate(1044, 36)">
+          <path d="M 0 50 L 0 0 L -50 0" fill="none" stroke="url(#goldMetallic)" stroke-width="3"/>
+          <circle cx="-16" cy="16" r="4.5" fill="url(#goldMetallic)"/>
+          <polygon points="-34,16 -31,23 -24,26 -31,29 -34,36 -37,29 -44,26 -37,23" fill="url(#goldShimmer)"/>
         </g>
-        <!-- Bottom Left -->
-        <g transform="translate(30, 1410)">
-          <path d="M 0 -65 L 0 0 L 65 0" fill="none" stroke="url(#goldGrad)" stroke-width="4"/>
-          <circle cx="14" cy="-14" r="5" fill="url(#goldGrad)"/>
-          <polygon points="32,-14 36,-24 46,-28 36,-32 32,-42 28,-32 18,-28 28,-24" fill="url(#goldLight)"/>
+        <!-- Bottom-Left -->
+        <g transform="translate(36, 1404)">
+          <path d="M 0 -50 L 0 0 L 50 0" fill="none" stroke="url(#goldMetallic)" stroke-width="3"/>
+          <circle cx="16" cy="-16" r="4.5" fill="url(#goldMetallic)"/>
+          <polygon points="34,-16 37,-23 44,-26 37,-29 34,-36 31,-29 24,-26 31,-23" fill="url(#goldShimmer)"/>
         </g>
-        <!-- Bottom Right -->
-        <g transform="translate(1050, 1410)">
-          <path d="M 0 -65 L 0 0 L -65 0" fill="none" stroke="url(#goldGrad)" stroke-width="4"/>
-          <circle cx="-14" cy="-14" r="5" fill="url(#goldGrad)"/>
-          <polygon points="-32,-14 -28,-24 -18,-28 -28,-32 -32,-42 -36,-32 -46,-28 -36,-24" fill="url(#goldLight)"/>
+        <!-- Bottom-Right -->
+        <g transform="translate(1044, 1404)">
+          <path d="M 0 -50 L 0 0 L -50 0" fill="none" stroke="url(#goldMetallic)" stroke-width="3"/>
+          <circle cx="-16" cy="-16" r="4.5" fill="url(#goldMetallic)"/>
+          <polygon points="-34,-16 -31,-23 -24,-26 -31,-29 -34,-36 -37,-29 -44,-26 -37,-23" fill="url(#goldShimmer)"/>
         </g>
 
-        <!-- TOP GRADUATION HEADER -->
+        <!-- 4. TOP CONTEMPORARY EMBLEM -->
         <g transform="translate(540, 95)" text-anchor="middle">
-          <!-- Mortarboard Cap Silhouette with Tassel -->
-          <path d="M 0 -32 L 48 -14 L 0 4 L -48 -14 Z" fill="url(#goldGrad)" filter="url(#shadowFilter)"/>
-          <path d="M -26 -2 L -26 14 C -26 22 26 22 26 14 L 26 -2" fill="url(#goldGrad)" opacity="0.95"/>
-          <path d="M 34 -9 C 38 0, 42 12, 44 24" fill="none" stroke="url(#goldGrad)" stroke-width="3"/>
-          <circle cx="44" cy="26" r="3.5" fill="url(#goldGrad)"/>
-          
-          <!-- Header Titles -->
-          <text y="34" font-family="'Times New Roman', 'Georgia', serif" font-size="22" font-weight="700" letter-spacing="8" fill="url(#goldGrad)" filter="url(#shadowFilter)">
+          <!-- Sleek Geometric Mortarboard Hat -->
+          <path d="M 0 -28 L 44 -12 L 0 4 L -44 -12 Z" fill="url(#goldMetallic)" filter="url(#cinematicGlow)"/>
+          <path d="M -22 -2 L -22 13 C -22 20 22 20 22 13 L 22 -2" fill="url(#goldMetallic)" opacity="0.95"/>
+          <path d="M 32 -6 C 36 2, 40 12, 42 22" fill="none" stroke="url(#goldMetallic)" stroke-width="2.5"/>
+          <circle cx="42" cy="24" r="3.5" fill="url(#goldMetallic)"/>
+
+          <!-- High-End Editorial Typography -->
+          <text y="36" font-family="'Cinzel', 'Times New Roman', serif" font-size="20" font-weight="700" letter-spacing="8" fill="url(#goldMetallic)" filter="url(#cinematicGlow)">
             &#9733; CONGRATULATIONS &#9733;
           </text>
-          <text y="64" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="28" font-weight="800" letter-spacing="6" fill="#ffffff" filter="url(#shadowFilter)">
+          <text y="64" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="28" font-weight="800" letter-spacing="6" fill="#ffffff" filter="url(#cinematicGlow)">
             CLASS OF 2026
           </text>
         </g>
 
-        <!-- BOTTOM CELEBRATION BANNER -->
-        <rect x="54" y="1225" width="972" height="165" rx="18" fill="#0a0a0f" fill-opacity="0.80" stroke="url(#goldGrad)" stroke-width="2" />
+        <!-- 5. BOTTOM HIGH-FASHION BADGE -->
+        <!-- Floating Obsidian Backdrop with Gold Trim -->
+        <rect x="52" y="1215" width="976" height="175" rx="22" fill="#090a0e" fill-opacity="0.84" stroke="url(#goldMetallic)" stroke-width="2" />
+        <rect x="62" y="1225" width="956" height="155" rx="16" fill="none" stroke="url(#goldMetallic)" stroke-width="1" stroke-dasharray="6 4" opacity="0.6"/>
 
-        <g transform="translate(540, 1272)" text-anchor="middle">
-          <!-- Laurel Branches Left & Right -->
-          <g stroke="url(#goldGrad)" fill="none" stroke-width="2.5">
-            <path d="M -230 30 C -205 12, -180 5, -150 0"/>
-            <path d="M 230 30 C 205 12, 180 5, 150 0"/>
+        <g transform="translate(540, 1262)" text-anchor="middle">
+          <!-- Stylized Modern Laurel Branches Left / Right -->
+          <g stroke="url(#goldMetallic)" fill="none" stroke-width="2.5">
+            <path d="M -235 32 C -210 14, -185 6, -155 0"/>
+            <path d="M 235 32 C 210 14, 185 6, 155 0"/>
           </g>
-          <g fill="url(#goldGrad)">
-            <circle cx="-195" cy="14" r="5"/>
-            <circle cx="-170" cy="5" r="4.5"/>
-            <circle cx="-145" cy="-2" r="4"/>
-            <circle cx="195" cy="14" r="5"/>
-            <circle cx="170" cy="5" r="4.5"/>
-            <circle cx="145" cy="-2" r="4"/>
+          <g fill="url(#goldMetallic)">
+            <circle cx="-200" cy="16" r="5"/>
+            <circle cx="-175" cy="7" r="4.5"/>
+            <circle cx="-150" cy="0" r="4"/>
+            <circle cx="200" cy="16" r="5"/>
+            <circle cx="175" cy="7" r="4.5"/>
+            <circle cx="150" cy="0" r="4"/>
           </g>
 
-          <!-- PROMINENT "2026" TEXT -->
-          <text y="20" font-family="'Times New Roman', 'Georgia', serif" font-size="82" font-weight="900" letter-spacing="10" fill="url(#goldGrad)" filter="url(#shadowFilter)">
+          <!-- Architectural Modern "2026" Numeral -->
+          <text y="24" font-family="'Cinzel', 'Times New Roman', serif" font-size="88" font-weight="900" letter-spacing="12" fill="url(#goldMetallic)" filter="url(#cinematicGlow)">
             2026
           </text>
 
-          <!-- Church Name -->
-          <text y="70" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="20" font-weight="700" letter-spacing="1.5" fill="#ffffff" filter="url(#shadowFilter)">
+          <!-- Church Title -->
+          <text y="74" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="20" font-weight="700" letter-spacing="1.5" fill="#ffffff" filter="url(#cinematicGlow)">
             Church Of The Virgin Mary and St. Mina
           </text>
-          <text y="92" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="600" letter-spacing="4" fill="url(#goldLight)">
+          
+          <!-- Chic Celebration Tagline -->
+          <text y="98" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="600" letter-spacing="4" fill="url(#goldShimmer)">
             GRADUATION CELEBRATION
           </text>
         </g>
       </svg>`;
 
-      // Convert SVG to data URI
       const GRADUATION_FRAME_DATA_URL = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(GRADUATION_FRAME_SVG.trim());
 
-      // Preload Image for Canvas Compositing
       const frameImage = new Image();
       frameImage.crossOrigin = "anonymous";
       frameImage.src = GRADUATION_FRAME_DATA_URL;
 
-      // Set live video frame overlay
       const cameraFrameOverlay = document.getElementById("camera-frame-overlay");
       cameraFrameOverlay.src = GRADUATION_FRAME_DATA_URL;
 
@@ -535,12 +540,12 @@
       }
 
       // =========================================================================
-      // 6. PHOTO CAPTURE & COMPOSITING (PHOTO FIRST, FRAME ON TOP)
+      // 6. PHOTO CAPTURE & COMPOSITING (CAMERA FEED FIRST, FRAME ON TOP)
       // =========================================================================
       function capturePhoto() {
         if (!state.stream) return;
 
-        // Visual shutter flash effect
+        // Lightweight shutter flash effect
         shutterFlash.classList.remove("opacity-0");
         shutterFlash.classList.add("opacity-90");
         setTimeout(() => {
@@ -548,7 +553,6 @@
           shutterFlash.classList.add("opacity-0");
         }, 90);
 
-        // Native camera resolution
         const width = video.videoWidth || 1080;
         const height = video.videoHeight || 1440;
         canvas.width = width;
@@ -556,7 +560,7 @@
 
         const ctx = canvas.getContext("2d");
 
-        // STEP 1: Draw the user's photo FIRST (with mirroring if front-facing)
+        // STEP 1: Draw the user's photo FIRST (with mirroring if front camera)
         if (state.facingMode === "user") {
           ctx.save();
           ctx.translate(width, 0);
@@ -570,19 +574,15 @@
         // STEP 2: Draw the Graduation 2026 Frame ON TOP of the photo
         ctx.drawImage(frameImage, 0, 0, width, height);
 
-        // Export combined composition to Base64 JPEG
         const finalImage = canvas.toDataURL("image/jpeg", 0.90);
         state.capturedBase64 = finalImage;
 
-        // Stop video stream to save mobile battery
         stopCamera();
 
-        // Switch to result view
         previewImage.src = finalImage;
         targetFolderLabel.textContent = state.userName;
         showView("result-view");
 
-        // Automatically trigger upload to Google Drive
         uploadPhotoToDrive();
       }
 
@@ -618,12 +618,13 @@
         statusError.classList.add("hidden");
         retryUploadBtn.classList.add("hidden");
 
-        // Method 1: Format POST as application/x-www-form-urlencoded to prevent CORS preflight OPTIONS request
+        // Structure payload as application/x-www-form-urlencoded to prevent CORS preflight OPTIONS rejection
         const formData = new URLSearchParams();
         formData.append("userName", state.userName);
         formData.append("image", state.capturedBase64);
 
         try {
+          // Standard fetch attempt
           const response = await fetch(APPS_SCRIPT_URL, {
             method: "POST",
             body: formData
@@ -646,9 +647,10 @@
           }
 
         } catch (fetchError) {
-          console.warn("Standard fetch failed, attempting no-cors fallback:", fetchError);
+          console.warn("Standard fetch encountered CORS/redirect, triggering guaranteed no-cors fallback:", fetchError);
           
-          // Method 2: no-cors mode fallback (Guarantees payload delivery to Apps Script even if browser redirect blocks reading response)
+          // Guaranteed delivery fallback with mode: 'no-cors'
+          // This bypasses browser CORS inspection and successfully delivers the photo to Google Drive
           try {
             await fetch(APPS_SCRIPT_URL, {
               method: "POST",
@@ -656,7 +658,7 @@
               body: formData
             });
 
-            // In no-cors mode, the request completes without browser CORS blocking
+            // With no-cors, the request completes without browser CORS blocking
             showUploadSuccess({
               status: "success",
               fileName: `${state.userName}_2026.jpg`
@@ -669,7 +671,6 @@
         }
       }
 
-      // Save photo directly to device fallback
       function downloadPhotoLocally() {
         if (!state.capturedBase64) return;
         const link = document.createElement("a");

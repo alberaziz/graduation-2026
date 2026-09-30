@@ -1,105 +1,117 @@
 /**
+ * ===================================================================
  * GOOGLE APPS SCRIPT - PHOTOBOOTH BACKEND
- * Target Folder ID: 1e7wf16L5M2WGkywKuhhIfSCTi-eFnAvr
+ * Folder Hierarchy:
+ * Graduation 2026 (Main Folder) -> [User Name] (Subfolder) -> captured_photo.jpg
  * 
- * Deployment Instructions:
- * 1. Open Google Apps Script (https://script.google.com).
- * 2. Create a new project named "Photobooth-Backend".
- * 3. Replace all code in Code.gs with this file.
- * 4. Click "Deploy" > "New deployment".
- * 5. Select type: "Web app".
- * 6. Set "Execute as": "Me".
- * 7. Set "Who has access": "Anyone" (CRITICAL for mobile browser uploads without login prompts).
- * 8. Click "Deploy", authorize the permissions, and copy the Web App URL.
- * 9. Paste the Web App URL into your frontend index.html (APPS_SCRIPT_URL variable).
+ * Main Google Drive Folder ID: 1e7wf16L5M2WGkywKuhhIfSCTi-eFnAvr
+ * ===================================================================
  */
 
 const MAIN_FOLDER_ID = "1e7wf16L5M2WGkywKuhhIfSCTi-eFnAvr";
 
 /**
- * Handles incoming POST requests containing the photo and user information.
+ * Handles incoming POST requests from the Photobooth frontend.
+ * Supports both application/x-www-form-urlencoded and raw JSON payloads.
  */
 function doPost(e) {
+  // Use script lock to prevent race conditions during subfolder creation
+  var lock = LockService.getScriptLock();
+  lock.tryLock(10000);
+
   try {
-    // Parse incoming payload
-    // Note: We accept text/plain to avoid CORS preflight OPTIONS rejection in modern browsers
-    if (!e || !e.postData || !e.postData.contents) {
-      return createJsonResponse({
-        status: "error",
-        message: "No payload received in request."
-      }, 400);
+    if (!e) {
+      return createJsonResponse({ status: "error", message: "No request data received." });
     }
 
-    const payload = JSON.parse(e.postData.contents);
-    const userName = (payload.userName || "Anonymous").trim();
-    const rawImage = payload.image;
+    var data = {};
+
+    // 1. Parse incoming payload (handles form-urlencoded parameter and raw JSON)
+    if (e.parameter && (e.parameter.image || e.parameter.userName)) {
+      data = e.parameter;
+    } else if (e.postData && e.postData.contents) {
+      try {
+        data = JSON.parse(e.postData.contents);
+      } catch (parseError) {
+        // Fallback: manually parse URL-encoded query string
+        var raw = e.postData.contents;
+        data = {};
+        var pairs = raw.split('&');
+        for (var i = 0; i < pairs.length; i++) {
+          var pair = pairs[i].split('=');
+          if (pair.length === 2) {
+            var key = decodeURIComponent(pair[0]);
+            var val = decodeURIComponent(pair[1].replace(/\+/g, ' '));
+            data[key] = val;
+          }
+        }
+      }
+    }
+
+    var userName = (data.userName || "Guest").trim();
+    var rawImage = data.image;
 
     if (!rawImage) {
-      return createJsonResponse({
-        status: "error",
-        message: "No image data provided."
-      }, 400);
+      return createJsonResponse({ status: "error", message: "No image data found in request." });
     }
 
-    // 1. Access the main Google Drive folder
-    const mainFolder = DriveApp.getFolderById(MAIN_FOLDER_ID);
+    // 2. Access the Main "Graduation 2026" Folder
+    var mainFolder = DriveApp.getFolderById(MAIN_FOLDER_ID);
     if (!mainFolder) {
-      return createJsonResponse({
-        status: "error",
-        message: "Main folder with ID " + MAIN_FOLDER_ID + " not found or inaccessible."
-      }, 500);
+      return createJsonResponse({ 
+        status: "error", 
+        message: "Main folder with ID " + MAIN_FOLDER_ID + " not found or inaccessible." 
+      });
     }
 
-    // 2. Check if a subfolder with the exact userName exists, or create it
-    const subfolderIterator = mainFolder.getFoldersByName(userName);
-    let targetFolder;
+    // 3. Search inside Main Folder for a subfolder matching exact userName
+    var subfolderIterator = mainFolder.getFoldersByName(userName);
+    var userFolder;
 
     if (subfolderIterator.hasNext()) {
-      targetFolder = subfolderIterator.next();
+      // Subfolder exists: select it
+      userFolder = subfolderIterator.next();
     } else {
-      targetFolder = mainFolder.createFolder(userName);
+      // Subfolder does NOT exist: dynamically create it
+      userFolder = mainFolder.createFolder(userName);
     }
 
-    // 3. Decode the Base64 image data
-    // Remove data URL scheme if present (e.g., "data:image/jpeg;base64,")
-    const base64Data = rawImage.replace(/^data:image\/\w+;base64,/, "");
-    const decodedBytes = Utilities.base64Decode(base64Data);
+    // 4. Decode the Base64 image
+    var base64Data = rawImage.replace(/^data:image\/\w+;base64,/, "");
+    var decodedBytes = Utilities.base64Decode(base64Data);
 
-    // 4. Generate a unique, clean filename with timestamp
-    const now = new Date();
-    const timeZone = Session.getScriptTimeZone() || "GMT";
-    const timestamp = Utilities.formatDate(now, timeZone, "yyyyMMdd_HHmmss");
-    const sanitizedUserName = userName.replace(/[^a-zA-Z0-9_-]/g, "_");
-    const fileName = `PHOTO_${sanitizedUserName}_${timestamp}.jpg`;
+    // 5. Generate formatted filename with timestamp
+    var timeZone = Session.getScriptTimeZone() || "GMT";
+    var timestamp = Utilities.formatDate(new Date(), timeZone, "yyyyMMdd_HHmmss");
+    var cleanUserName = userName.replace(/[^a-zA-Z0-9_-]/g, "_");
+    var fileName = "PHOTO_" + cleanUserName + "_" + timestamp + ".jpg";
 
-    // 5. Create the file blob and save it inside the user's subfolder
-    const blob = Utilities.newBlob(decodedBytes, MimeType.JPEG, fileName);
-    const savedFile = targetFolder.createFile(blob);
-
-    // Optional: Make file viewable by anyone with link if needed for preview
-    // savedFile.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+    // 6. Save image blob as a JPG file inside user's specific subfolder
+    var blob = Utilities.newBlob(decodedBytes, MimeType.JPEG, fileName);
+    var savedFile = userFolder.createFile(blob);
 
     return createJsonResponse({
       status: "success",
-      message: "Photo uploaded successfully.",
-      folderId: targetFolder.getId(),
-      folderName: targetFolder.getName(),
+      message: "Photo saved successfully in user folder.",
+      folderId: userFolder.getId(),
+      folderName: userFolder.getName(),
       fileId: savedFile.getId(),
       fileName: fileName,
-      fileUrl: savedFile.getUrl(),
-      downloadUrl: savedFile.getDownloadUrl()
+      fileUrl: savedFile.getUrl()
     });
 
   } catch (error) {
     return createJsonResponse({
       status: "error",
       message: error.toString()
-    }, 500);
+    });
+  } finally {
+    lock.releaseLock();
   }
 }
 
 /**
- * Health-check GET endpoint to verify web app deployment in browser.
+ * Health check endpoint for testing in browser
  */
 function doGet(e) {
   return createJsonResponse({
@@ -111,7 +123,7 @@ function doGet(e) {
 }
 
 /**
- * Helper to construct JSON responses with appropriate headers for Apps Script.
+ * Helper to construct JSON response with proper MIME type for CORS handling
  */
 function createJsonResponse(data) {
   return ContentService
