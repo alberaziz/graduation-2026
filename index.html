@@ -62,10 +62,10 @@
 </head>
 <body class="h-full w-full overflow-hidden bg-[#0a0a0e] font-sans antialiased text-neutral-200">
 
-  <!-- Mobile-First App Wrapper -->
+  <!-- Mobile-First Container -->
   <div class="relative mx-auto flex h-full w-full max-w-md flex-col overflow-hidden bg-surface-900 shadow-2xl border-x border-neutral-900">
 
-    <!-- Top Status / Branding Header -->
+    <!-- Top Status / Branding Bar -->
     <header class="relative z-30 flex h-14 shrink-0 items-center justify-between border-b border-gold-500/20 bg-surface-850 px-4">
       <div class="flex items-center space-x-2.5">
         <div class="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-tr from-gold-600 to-gold-400 text-black shadow-sm">
@@ -84,7 +84,7 @@
       </div>
     </header>
 
-    <!-- Shutter White Flash (Pure CSS opacity) -->
+    <!-- Camera Shutter White Flash (Pure CSS opacity) -->
     <div id="shutter-flash-overlay" class="pointer-events-none absolute inset-0 z-50 bg-white opacity-0 shutter-flash"></div>
 
     <!-- MAIN APP SCREENS -->
@@ -95,7 +95,7 @@
       <!-- ========================================== -->
       <section id="login-view" class="view-transition absolute inset-0 flex flex-col justify-center p-6 opacity-100 z-10">
         <div class="flex flex-col items-center text-center">
-          <!-- Graduation Emblem -->
+          <!-- Graduation Monogram Emblem -->
           <div class="relative mb-6 flex h-20 w-20 items-center justify-center rounded-2xl border border-gold-500/30 bg-surface-850 shadow-lg">
             <div class="absolute inset-1 rounded-xl border border-gold-500/10"></div>
             <svg class="h-10 w-10 text-gold-400" fill="currentColor" viewBox="0 0 24 24">
@@ -214,7 +214,7 @@
             class="h-full w-full object-contain"
           />
 
-          <!-- Upload Status Pill -->
+          <!-- Upload Status Notification -->
           <div id="upload-status-card" class="absolute bottom-4 left-4 right-4 rounded-xl border border-neutral-800 bg-surface-850/95 p-3.5 shadow-xl transition-all duration-200">
             <!-- Uploading State -->
             <div id="status-uploading" class="flex items-center space-x-3">
@@ -312,7 +312,6 @@
       const GRADUATION_FRAME_SVG = `
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1440" width="1080" height="1440">
         <defs>
-          <!-- Metallic Gold Linear Gradients -->
           <linearGradient id="goldMetallic" x1="0%" y1="0%" x2="100%" y2="100%">
             <stop offset="0%" stop-color="#fff4b8"/>
             <stop offset="20%" stop-color="#f5d365"/>
@@ -328,7 +327,6 @@
             <stop offset="100%" stop-color="#b88a14"/>
           </linearGradient>
 
-          <!-- Subtle Glow Filter for Readability -->
           <filter id="cinematicGlow" x="-20%" y="-20%" width="140%" height="140%">
             <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000000" flood-opacity="0.9"/>
           </filter>
@@ -339,47 +337,40 @@
         <rect x="46" y="46" width="988" height="1348" rx="14" fill="none" stroke="url(#goldMetallic)" stroke-width="1.2" stroke-dasharray="12 8" opacity="0.75" />
 
         <!-- 2. Studio Crosshair / Viewfinder Markings -->
-        <!-- Top / Bottom / Left / Right Center Hairlines -->
         <line x1="540" y1="20" x2="540" y2="40" stroke="url(#goldMetallic)" stroke-width="2"/>
         <line x1="540" y1="1400" x2="540" y2="1420" stroke="url(#goldMetallic)" stroke-width="2"/>
         <line x1="20" y1="720" x2="40" y2="720" stroke="url(#goldMetallic)" stroke-width="2"/>
         <line x1="1040" y1="720" x2="1060" y2="720" stroke="url(#goldMetallic)" stroke-width="2"/>
 
         <!-- 3. Chic Architectural Corner Notches -->
-        <!-- Top-Left -->
         <g transform="translate(36, 36)">
           <path d="M 0 50 L 0 0 L 50 0" fill="none" stroke="url(#goldMetallic)" stroke-width="3"/>
           <circle cx="16" cy="16" r="4.5" fill="url(#goldMetallic)"/>
           <polygon points="34,16 37,23 44,26 37,29 34,36 31,29 24,26 31,23" fill="url(#goldShimmer)"/>
         </g>
-        <!-- Top-Right -->
         <g transform="translate(1044, 36)">
           <path d="M 0 50 L 0 0 L -50 0" fill="none" stroke="url(#goldMetallic)" stroke-width="3"/>
           <circle cx="-16" cy="16" r="4.5" fill="url(#goldMetallic)"/>
           <polygon points="-34,16 -31,23 -24,26 -31,29 -34,36 -37,29 -44,26 -37,23" fill="url(#goldShimmer)"/>
         </g>
-        <!-- Bottom-Left -->
         <g transform="translate(36, 1404)">
           <path d="M 0 -50 L 0 0 L 50 0" fill="none" stroke="url(#goldMetallic)" stroke-width="3"/>
           <circle cx="16" cy="-16" r="4.5" fill="url(#goldMetallic)"/>
           <polygon points="34,-16 37,-23 44,-26 37,-29 34,-36 31,-29 24,-26 31,-23" fill="url(#goldShimmer)"/>
         </g>
-        <!-- Bottom-Right -->
         <g transform="translate(1044, 1404)">
           <path d="M 0 -50 L 0 0 L -50 0" fill="none" stroke="url(#goldMetallic)" stroke-width="3"/>
           <circle cx="-16" cy="-16" r="4.5" fill="url(#goldMetallic)"/>
           <polygon points="-34,-16 -31,-23 -24,-26 -31,-29 -34,-36 -37,-29 -44,-26 -37,-23" fill="url(#goldShimmer)"/>
         </g>
 
-        <!-- 4. TOP CONTEMPORARY EMBLEM -->
+        <!-- 4. Top Contemporary Header -->
         <g transform="translate(540, 95)" text-anchor="middle">
-          <!-- Sleek Geometric Mortarboard Hat -->
           <path d="M 0 -28 L 44 -12 L 0 4 L -44 -12 Z" fill="url(#goldMetallic)" filter="url(#cinematicGlow)"/>
           <path d="M -22 -2 L -22 13 C -22 20 22 20 22 13 L 22 -2" fill="url(#goldMetallic)" opacity="0.95"/>
           <path d="M 32 -6 C 36 2, 40 12, 42 22" fill="none" stroke="url(#goldMetallic)" stroke-width="2.5"/>
           <circle cx="42" cy="24" r="3.5" fill="url(#goldMetallic)"/>
 
-          <!-- High-End Editorial Typography -->
           <text y="36" font-family="'Cinzel', 'Times New Roman', serif" font-size="20" font-weight="700" letter-spacing="8" fill="url(#goldMetallic)" filter="url(#cinematicGlow)">
             &#9733; CONGRATULATIONS &#9733;
           </text>
@@ -388,13 +379,11 @@
           </text>
         </g>
 
-        <!-- 5. BOTTOM HIGH-FASHION BADGE -->
-        <!-- Floating Obsidian Backdrop with Gold Trim -->
+        <!-- 5. Bottom High-Fashion Badge -->
         <rect x="52" y="1215" width="976" height="175" rx="22" fill="#090a0e" fill-opacity="0.84" stroke="url(#goldMetallic)" stroke-width="2" />
         <rect x="62" y="1225" width="956" height="155" rx="16" fill="none" stroke="url(#goldMetallic)" stroke-width="1" stroke-dasharray="6 4" opacity="0.6"/>
 
         <g transform="translate(540, 1262)" text-anchor="middle">
-          <!-- Stylized Modern Laurel Branches Left / Right -->
           <g stroke="url(#goldMetallic)" fill="none" stroke-width="2.5">
             <path d="M -235 32 C -210 14, -185 6, -155 0"/>
             <path d="M 235 32 C 210 14, 185 6, 155 0"/>
@@ -408,17 +397,14 @@
             <circle cx="150" cy="0" r="4"/>
           </g>
 
-          <!-- Architectural Modern "2026" Numeral -->
           <text y="24" font-family="'Cinzel', 'Times New Roman', serif" font-size="88" font-weight="900" letter-spacing="12" fill="url(#goldMetallic)" filter="url(#cinematicGlow)">
             2026
           </text>
 
-          <!-- Church Title -->
           <text y="74" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="20" font-weight="700" letter-spacing="1.5" fill="#ffffff" filter="url(#cinematicGlow)">
             Church Of The Virgin Mary and St. Mina
           </text>
           
-          <!-- Chic Celebration Tagline -->
           <text y="98" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="600" letter-spacing="4" fill="url(#goldShimmer)">
             GRADUATION CELEBRATION
           </text>
@@ -587,7 +573,7 @@
       }
 
       // =========================================================================
-      // 7. ROBUST CORS-BYPASS GOOGLE DRIVE UPLOAD LOGIC
+      // 7. ROBUST PLAIN-TEXT CORS-BYPASS GOOGLE DRIVE UPLOAD LOGIC
       // =========================================================================
       function showUploadSuccess(result) {
         statusUploading.classList.add("hidden");
@@ -595,9 +581,9 @@
         statusError.classList.add("hidden");
         retryUploadBtn.classList.add("hidden");
 
-        if (result && result.fileUrl) {
-          driveLink.href = result.fileUrl;
-          driveLink.textContent = "Open in Drive: " + (result.fileName || "View Photo");
+        if (result && result.url) {
+          driveLink.href = result.url;
+          driveLink.textContent = "Open in Drive: " + (result.filename || "View Photo");
         } else {
           driveLink.href = "https://drive.google.com/drive/folders/1e7wf16L5M2WGkywKuhhIfSCTi-eFnAvr";
           driveLink.textContent = "Open in Google Drive folder";
@@ -618,16 +604,27 @@
         statusError.classList.add("hidden");
         retryUploadBtn.classList.add("hidden");
 
-        // Structure payload as application/x-www-form-urlencoded to prevent CORS preflight OPTIONS rejection
-        const formData = new URLSearchParams();
-        formData.append("userName", state.userName);
-        formData.append("image", state.capturedBase64);
+        // Payload fields matching the exact Google Apps Script backend:
+        // folderName, image, filename
+        const cleanName = state.userName.replace(/[^a-zA-Z0-9_-]/g, "_");
+        const filename = `photo_${cleanName}_${Date.now()}.jpg`;
+
+        const payload = {
+          folderName: state.userName,
+          image: state.capturedBase64,
+          filename: filename
+        };
+
+        const serializedPayload = JSON.stringify(payload);
 
         try {
-          // Standard fetch attempt
+          // Send as plain text to bypass CORS preflight OPTIONS request
           const response = await fetch(APPS_SCRIPT_URL, {
             method: "POST",
-            body: formData
+            headers: {
+              "Content-Type": "text/plain;charset=utf-8"
+            },
+            body: serializedPayload
           });
 
           let result = null;
@@ -635,7 +632,7 @@
             result = await response.json();
           } catch (jsonErr) {
             if (response.ok) {
-              result = { status: "success" };
+              result = { status: "success", filename: filename };
             }
           }
 
@@ -648,20 +645,23 @@
 
         } catch (fetchError) {
           console.warn("Standard fetch encountered CORS/redirect, triggering guaranteed no-cors fallback:", fetchError);
-          
+
           // Guaranteed delivery fallback with mode: 'no-cors'
-          // This bypasses browser CORS inspection and successfully delivers the photo to Google Drive
+          // Delivers plain text payload directly to Apps Script without browser CORS blocking
           try {
             await fetch(APPS_SCRIPT_URL, {
               method: "POST",
               mode: "no-cors",
-              body: formData
+              headers: {
+                "Content-Type": "text/plain;charset=utf-8"
+              },
+              body: serializedPayload
             });
 
-            // With no-cors, the request completes without browser CORS blocking
+            // With no-cors, the request completes and creates the folder + file in Google Drive
             showUploadSuccess({
               status: "success",
-              fileName: `${state.userName}_2026.jpg`
+              filename: filename
             });
 
           } catch (noCorsError) {
