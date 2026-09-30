@@ -1,411 +1,695 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="en" class="h-full bg-[#0a0a0e] text-[#f3f4f6]">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Class of 2026 - Graduation Booth</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>Lumière VIP Photobooth</title>
+
+  <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            gold: {
+              300: '#fde68a',
+              400: '#f6d365',
+              500: '#d4af37',
+              600: '#b89228',
+              700: '#8c6d1a',
+            },
+            surface: {
+              900: '#0a0a0e',
+              850: '#101117',
+              800: '#161821',
+              700: '#222533',
+            }
+          },
+          fontFamily: {
+            sans: ['-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', 'Helvetica', 'Arial', 'sans-serif'],
+          }
+        }
+      }
+    };
+  </script>
+
   <style>
-    /* تحسينات بروفيشنال للأداء والبساطة */
-    body { background-color: #050505; }
-    
-    /* إخفاء شريط التمرير الافتراضي */
-    .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-    .hide-scrollbar::-webkit-scrollbar { display: none; }
-
-    /* شكل الزرار لما تختاره (بدون أنيميشن، مجرد تغيير لون وحافة) */
-    .selected-ring { 
-      outline: 4px solid #f59e0b; 
-      outline-offset: 3px; 
-      background-color: #f59e0b;
-      color: #000;
+    /* Mobile-optimized lightweight transitions - STRICTLY zero blur filters */
+    * {
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
     }
-
-    /* زرار الاستيكر النشط في الشريط (بسيط ومباشر) */
-    .sticker-active {
-      background-color: #f59e0b !important;
-      border-color: #000000 !important;
-      z-index: 10;
+    input {
+      user-select: text;
+    }
+    .view-transition {
+      transition: opacity 0.25s ease, transform 0.25s ease;
+    }
+    .shutter-flash {
+      transition: opacity 0.08s ease-out;
+    }
+    /* Simple hardware-accelerated spinner */
+    @keyframes spin-fast {
+      to { transform: rotate(360deg); }
+    }
+    .animate-spin-custom {
+      animation: spin-fast 0.8s linear infinite;
+    }
+    /* Subtle camera mirror */
+    .mirrored {
+      transform: scaleX(-1);
     }
   </style>
 </head>
-<body class="text-white h-[100dvh] w-full overflow-hidden select-none font-sans relative">
+<body class="h-full w-full overflow-hidden bg-[#0a0a0e] font-sans antialiased text-neutral-200">
 
-  <!-- ==================== 1. شاشة تسجيل الدخول ==================== -->
-  <div id="view-login" class="absolute inset-0 z-50 flex flex-col items-center justify-center p-6 bg-black">
-    <div class="w-full max-w-sm bg-neutral-900 border border-white/10 p-8 rounded-[2rem] shadow-2xl relative z-10">
-      <div class="text-center mb-10">
-        <h1 class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-300 to-amber-500 mb-2">Class of '26</h1>
-        <p class="text-xs font-bold text-neutral-400 tracking-[0.2em] uppercase">Photobooth Experience</p>
-      </div>
-      
-      <div class="space-y-5">
-        <div>
-          <label class="text-[11px] font-bold text-neutral-500 uppercase tracking-widest mb-2 block ml-1">Your Name</label>
-          <input type="text" id="userName" placeholder="Enter your full name..." class="w-full bg-neutral-800 border border-neutral-700/50 rounded-2xl px-5 py-4 text-sm text-white placeholder-neutral-600 focus:outline-none focus:border-amber-500">
+  <!-- Mobile Wrapper Container (Full screen on phones, framed on tablets/desktops) -->
+  <div class="relative mx-auto flex h-full w-full max-w-md flex-col overflow-hidden bg-surface-900 shadow-2xl border-x border-neutral-900">
+
+    <!-- Top Status / Branding Bar -->
+    <header class="relative z-20 flex h-14 shrink-0 items-center justify-between border-b border-gold-500/15 bg-surface-850 px-4">
+      <div class="flex items-center space-x-2">
+        <div class="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-tr from-gold-600 to-gold-400 text-black">
+          <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 9a3.75 3.75 0 100 7.5 3.75 3.75 0 000-7.5z"/>
+            <path fill-rule="evenodd" d="M9.344 3.071a49.52 49.52 0 015.312 0c.967.052 1.83.585 2.332 1.413l.823 1.372a2.25 2.25 0 001.927 1.094h.762a3.75 3.75 0 013.75 3.75v7.5a3.75 3.75 0 01-3.75 3.75H3.75A3.75 3.75 0 010 18.2V10.7a3.75 3.75 0 013.75-3.75h.762a2.25 2.25 0 001.927-1.094l.823-1.372a2.81 2.81 0 012.332-1.413z" clip-rule="evenodd"/>
+          </svg>
         </div>
-        
-        <div id="loginError" class="hidden text-xs text-red-400 text-center font-bold bg-red-900/30 py-2.5 rounded-xl">Please enter your name!</div>
-        
-        <button id="loginBtn" class="w-full mt-2 bg-gradient-to-r from-amber-400 to-amber-500 text-black font-black uppercase tracking-widest py-4 rounded-2xl active:scale-95 transition-transform shadow-[0_10px_30px_rgba(245,158,11,0.3)]">
-          Enter Booth
+        <span class="text-sm font-semibold tracking-wider text-gold-400 uppercase">Lumière</span>
+      </div>
+
+      <!-- User Active Badge or Settings Button -->
+      <div class="flex items-center space-x-2">
+        <div id="header-user-tag" class="hidden items-center space-x-1.5 rounded-full border border-gold-500/20 bg-surface-800 px-2.5 py-1 text-xs text-neutral-300">
+          <span class="h-1.5 w-1.5 rounded-full bg-gold-400"></span>
+          <span id="header-user-name" class="max-w-[110px] truncate font-medium">Guest</span>
+        </div>
+        <button id="config-btn" title="Script Endpoint Settings" class="flex h-8 w-8 items-center justify-center rounded-full text-neutral-400 hover:text-gold-400 transition-colors active:scale-95">
+          <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+          </svg>
         </button>
       </div>
-    </div>
-  </div>
+    </header>
 
-  <!-- ==================== 2. شاشة الإعدادات ==================== -->
-  <div id="view-setup" class="hidden absolute inset-0 z-40 flex flex-col bg-black p-6 overflow-y-auto">
-    <div class="w-full max-w-sm mx-auto pt-10 pb-32">
-      <h2 class="text-3xl font-black mb-1">Hey, <span id="displayName" class="text-amber-400"></span>! 👋</h2>
-      <p class="text-xs font-semibold text-neutral-400 mb-10 tracking-wider">Ready to make some memories?</p>
+    <!-- Camera Shutter Flash Effect (Pure CSS opacity, ultra-lightweight) -->
+    <div id="shutter-flash-overlay" class="pointer-events-none absolute inset-0 z-50 bg-white opacity-0 shutter-flash"></div>
 
-      <div class="bg-neutral-900 border border-white/5 p-6 rounded-[2rem] shadow-xl">
-        <h3 class="text-sm font-bold text-white mb-5 uppercase tracking-widest flex items-center gap-2">
-          <span class="w-6 h-6 rounded-full bg-amber-500 text-black flex items-center justify-center text-xs">1</span> 
-          Number of Shots
-        </h3>
-        <div class="grid grid-cols-2 gap-4">
-          <button class="shot-btn bg-neutral-800 border border-neutral-700 py-6 rounded-2xl font-black text-xl text-neutral-300 selected-ring" data-shots="1">1 Shot</button>
-          <button class="shot-btn bg-neutral-800 border border-neutral-700 py-6 rounded-2xl font-black text-xl text-neutral-300" data-shots="2">2 Shots</button>
-          <button class="shot-btn bg-neutral-800 border border-neutral-700 py-6 rounded-2xl font-black text-xl text-neutral-300" data-shots="3">3 Shots</button>
-          <button class="shot-btn bg-neutral-800 border border-neutral-700 py-6 rounded-2xl font-black text-xl text-neutral-300" data-shots="4">4 Shots</button>
+    <!-- MAIN VIEWPORT -->
+    <main class="relative flex-1 overflow-hidden">
+
+      <!-- ========================================== -->
+      <!-- VIEW 1: LOGIN VIEW                         -->
+      <!-- ========================================== -->
+      <section id="login-view" class="view-transition absolute inset-0 flex flex-col justify-between p-6 opacity-100 z-10">
+        <div class="my-auto flex flex-col items-center text-center">
+          <!-- Monogram Logo -->
+          <div class="relative mb-6 flex h-20 w-20 items-center justify-center rounded-2xl border border-gold-500/30 bg-surface-850 shadow-lg">
+            <div class="absolute inset-1 rounded-xl border border-gold-500/10"></div>
+            <svg class="h-10 w-10 text-gold-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z"/>
+              <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0z"/>
+            </svg>
+          </div>
+
+          <h1 class="text-2xl font-bold tracking-tight text-white sm:text-3xl">
+            Welcome to the Booth
+          </h1>
+          <p class="mt-2 text-xs text-neutral-400 tracking-wide uppercase">
+            Captured moments &bull; Saved instantly to Drive
+          </p>
+
+          <!-- Input Form -->
+          <form id="login-form" class="mt-8 w-full space-y-4">
+            <div class="text-left">
+              <label for="user-name-input" class="block text-xs font-semibold uppercase tracking-wider text-gold-400/90 mb-1.5 ml-1">
+                Your Full Name
+              </label>
+              <div class="relative">
+                <input
+                  type="text"
+                  id="user-name-input"
+                  required
+                  placeholder="e.g. Sophia Loren"
+                  autocomplete="name"
+                  class="w-full rounded-xl border border-neutral-800 bg-surface-850 px-4 py-3.5 text-sm text-white placeholder-neutral-500 transition-colors focus:border-gold-500 focus:outline-none"
+                />
+              </div>
+              <p class="mt-1.5 text-[11px] text-neutral-500 ml-1">
+                A dedicated Google Drive folder will be created with your name.
+              </p>
+            </div>
+
+            <button
+              type="submit"
+              class="w-full rounded-xl bg-gradient-to-r from-gold-600 via-gold-500 to-gold-400 py-3.5 text-sm font-semibold text-black tracking-wide shadow-md transition-transform duration-150 active:scale-95 hover:brightness-105"
+            >
+              Start Experience
+            </button>
+          </form>
+        </div>
+
+        <!-- Footer Notice -->
+        <div class="text-center text-[11px] text-neutral-600">
+          Folder ID: <span class="font-mono text-neutral-400">1e7wf16L...eFnAvr</span>
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- VIEW 2: CAMERA VIEW                        -->
+      <!-- ========================================== -->
+      <section id="camera-view" class="view-transition absolute inset-0 flex flex-col justify-between opacity-0 pointer-events-none z-0">
+        <!-- Live Video Viewfinder -->
+        <div class="relative flex-1 overflow-hidden bg-black flex items-center justify-center">
+          <video
+            id="camera-stream"
+            autoplay
+            playsinline
+            muted
+            class="h-full w-full object-cover mirrored"
+          ></video>
+
+          <!-- Photobooth Aesthetic Viewfinder Overlay (Corner Brackets) -->
+          <div class="pointer-events-none absolute inset-6 flex flex-col justify-between">
+            <div class="flex justify-between">
+              <div class="h-6 w-6 border-t-2 border-l-2 border-gold-400/70"></div>
+              <div class="h-6 w-6 border-t-2 border-r-2 border-gold-400/70"></div>
+            </div>
+            <div class="flex justify-between">
+              <div class="h-6 w-6 border-b-2 border-l-2 border-gold-400/70"></div>
+              <div class="h-6 w-6 border-b-2 border-r-2 border-gold-400/70"></div>
+            </div>
+          </div>
+
+          <!-- Countdown Overlay (Hidden by default) -->
+          <div id="countdown-overlay" class="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/40 text-7xl font-bold text-gold-400 opacity-0 transition-opacity duration-150">
+            <span id="countdown-number">3</span>
+          </div>
+
+          <!-- Camera Loading / Error Message -->
+          <div id="camera-status-msg" class="pointer-events-none absolute inset-0 flex flex-col items-center justify-center p-6 text-center text-sm text-neutral-400 hidden">
+            <svg class="h-8 w-8 text-neutral-500 mb-2 animate-spin-custom" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <p id="camera-status-text">Accessing camera...</p>
+          </div>
+        </div>
+
+        <!-- Camera Controls Toolbar -->
+        <div class="relative z-10 flex h-28 shrink-0 items-center justify-around border-t border-neutral-800 bg-surface-850 px-6">
+          <!-- Flip Camera Button -->
+          <button
+            id="flip-cam-btn"
+            title="Switch Camera"
+            class="flex h-11 w-11 items-center justify-center rounded-full border border-neutral-700 bg-surface-800 text-neutral-300 transition-transform active:scale-90"
+          >
+            <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"/>
+            </svg>
+          </button>
+
+          <!-- Main Shutter Button -->
+          <div class="relative flex items-center justify-center">
+            <button
+              id="shutter-btn"
+              class="group relative flex h-20 w-20 items-center justify-center rounded-full border-2 border-gold-500 p-1.5 transition-transform duration-100 active:scale-90"
+            >
+              <div class="h-full w-full rounded-full bg-gradient-to-tr from-gold-500 to-gold-300 shadow-md group-hover:brightness-110"></div>
+            </button>
+          </div>
+
+          <!-- Switch User Button -->
+          <button
+            id="logout-btn"
+            title="Log Out / New User"
+            class="flex h-11 w-11 items-center justify-center rounded-full border border-neutral-700 bg-surface-800 text-neutral-300 transition-transform active:scale-90"
+          >
+            <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9"/>
+            </svg>
+          </button>
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- VIEW 3: UPLOAD / RESULT VIEW               -->
+      <!-- ========================================== -->
+      <section id="result-view" class="view-transition absolute inset-0 flex flex-col justify-between p-5 opacity-0 pointer-events-none z-0">
+        <!-- Photo Preview Area -->
+        <div class="relative flex-1 overflow-hidden rounded-2xl border border-gold-500/20 bg-black flex items-center justify-center">
+          <img
+            id="captured-image-preview"
+            alt="Captured Photo"
+            class="h-full w-full object-contain"
+          />
+
+          <!-- Upload Status Pill (Floating over image) -->
+          <div id="upload-status-card" class="absolute bottom-4 left-4 right-4 rounded-xl border border-neutral-800 bg-surface-850/95 p-3.5 shadow-xl transition-all duration-200">
+            <!-- State 1: Uploading -->
+            <div id="status-uploading" class="flex items-center space-x-3">
+              <svg class="h-5 w-5 text-gold-400 animate-spin-custom shrink-0" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              <div class="flex-1 overflow-hidden">
+                <p class="text-xs font-semibold text-white">Saving to Google Drive...</p>
+                <p class="text-[11px] text-neutral-400 truncate">Folder: <span id="target-folder-label" class="text-gold-400"></span></p>
+              </div>
+            </div>
+
+            <!-- State 2: Success -->
+            <div id="status-success" class="hidden items-center space-x-3">
+              <div class="flex h-6 w-6 items-center justify-center rounded-full bg-emerald-500/20 text-emerald-400 shrink-0">
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/>
+                </svg>
+              </div>
+              <div class="flex-1 overflow-hidden">
+                <p class="text-xs font-semibold text-emerald-400">Uploaded Successfully!</p>
+                <a id="drive-link" href="#" target="_blank" class="text-[11px] text-gold-400 underline truncate block">
+                  Open photo in Google Drive
+                </a>
+              </div>
+            </div>
+
+            <!-- State 3: Error / Fallback -->
+            <div id="status-error" class="hidden items-center space-x-3">
+              <div class="flex h-6 w-6 items-center justify-center rounded-full bg-rose-500/20 text-rose-400 shrink-0">
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+              </div>
+              <div class="flex-1 overflow-hidden">
+                <p class="text-xs font-semibold text-rose-400">Upload Issue</p>
+                <p id="error-details" class="text-[11px] text-neutral-400 truncate">Tap retry or configure Web App URL</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Result Action Buttons -->
+        <div class="mt-4 flex flex-col space-y-2.5">
+          <div class="flex space-x-2">
+            <!-- Retake / Next Photo -->
+            <button
+              id="retake-btn"
+              class="flex-1 rounded-xl bg-gradient-to-r from-gold-600 via-gold-500 to-gold-400 py-3.5 text-xs font-bold uppercase tracking-wider text-black transition-transform duration-100 active:scale-95"
+            >
+              Take Another Photo
+            </button>
+
+            <!-- Manual Retry button (shown on error) -->
+            <button
+              id="retry-upload-btn"
+              class="hidden rounded-xl border border-gold-500/40 bg-surface-800 px-4 py-3.5 text-xs font-semibold text-gold-400 transition-transform active:scale-95"
+            >
+              Retry
+            </button>
+
+            <!-- Direct Download Fallback -->
+            <button
+              id="download-fallback-btn"
+              title="Save to Device"
+              class="flex items-center justify-center rounded-xl border border-neutral-700 bg-surface-800 px-3.5 py-3.5 text-neutral-300 transition-transform active:scale-95"
+            >
+              <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/>
+              </svg>
+            </button>
+          </div>
+
+          <button
+            id="finish-session-btn"
+            class="w-full py-2 text-center text-xs text-neutral-400 hover:text-white transition-colors"
+          >
+            End Session &amp; Switch Guest
+          </button>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Hidden Canvas for Crisp Image Capture -->
+    <canvas id="capture-canvas" class="hidden"></canvas>
+
+    <!-- SETTINGS MODAL (For easy configuration of Apps Script URL) -->
+    <div id="settings-modal" class="absolute inset-0 z-50 flex items-center justify-center bg-black/80 p-5 hidden opacity-0 transition-opacity duration-200">
+      <div class="w-full rounded-2xl border border-gold-500/30 bg-surface-850 p-5 shadow-2xl">
+        <div class="flex items-center justify-between pb-3 border-b border-neutral-800">
+          <h3 class="text-sm font-bold text-white uppercase tracking-wider">Configuration</h3>
+          <button id="close-modal-btn" class="text-neutral-400 hover:text-white">&times;</button>
+        </div>
+        <div class="mt-4 space-y-3">
+          <div>
+            <label class="block text-xs font-medium text-gold-400 mb-1">
+              Google Apps Script Web App URL
+            </label>
+            <input
+              type="url"
+              id="modal-script-url-input"
+              placeholder="https://script.google.com/macros/s/.../exec"
+              class="w-full rounded-lg border border-neutral-700 bg-surface-900 px-3 py-2 text-xs text-white placeholder-neutral-600 focus:border-gold-500 focus:outline-none"
+            />
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-neutral-400 mb-1">
+              Google Drive Main Folder ID
+            </label>
+            <input
+              type="text"
+              readonly
+              value="1e7wf16L5M2WGkywKuhhIfSCTi-eFnAvr"
+              class="w-full rounded-lg border border-neutral-800 bg-neutral-900 px-3 py-2 text-xs text-neutral-400 font-mono"
+            />
+          </div>
+        </div>
+        <div class="mt-5 flex justify-end space-x-2">
+          <button id="save-modal-btn" class="rounded-lg bg-gold-500 px-4 py-2 text-xs font-semibold text-black active:scale-95">
+            Save Settings
+          </button>
         </div>
       </div>
     </div>
 
-    <!-- زرار فتح الكاميرا -->
-    <div class="fixed bottom-0 inset-x-0 p-6 bg-gradient-to-t from-black via-black/90 to-transparent flex justify-center z-50">
-      <button id="openCameraBtn" class="w-full max-w-sm bg-amber-500 text-black font-black uppercase tracking-widest py-4 rounded-2xl active:scale-95 shadow-[0_0_30px_rgba(245,158,11,0.4)]">
-        Open Camera
-      </button>
-    </div>
   </div>
 
-  <!-- ==================== 3. شاشة الكاميرا وشريط الاستيكرات ==================== -->
-  <div id="view-camera" class="hidden absolute inset-0 z-30 flex flex-col justify-between bg-black">
-    
-    <div class="absolute top-0 inset-x-0 z-40 flex items-center justify-between px-5 pt-6 pb-10 bg-gradient-to-b from-black/90 via-black/70 to-transparent">
-      <button id="backToSetupBtn" class="text-xs font-bold text-white bg-white/10 px-4 py-2 rounded-full border border-white/20 flex items-center gap-2 active:scale-90">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" /></svg> Back
-      </button>
-      <span class="text-[10px] tracking-[0.3em] font-black text-amber-400 bg-amber-500/10 px-3 py-1.5 rounded-full border border-amber-500/20">CLASS OF '26</span>
-    </div>
-
-    <div class="relative w-full h-full overflow-hidden bg-neutral-950 flex items-center justify-center">
-      <video id="video" autoplay playsinline muted class="w-full h-full object-cover transform -scale-x-100 opacity-0"></video>
-      
-      <!-- الاستيكر الحي (مباشر وبدون أنيميشن) -->
-      <img id="liveSticker" src="" alt="Sticker" class="absolute pointer-events-none z-20 object-contain drop-shadow-2xl opacity-100 scale-100">
-      
-      <div id="flashEffect" class="absolute inset-0 bg-white pointer-events-none opacity-0 z-30"></div>
-    </div>
-
-    <!-- شريط الاستيكرات المتحرك -->
-    <div class="absolute bottom-[110px] inset-x-0 z-40 bg-gradient-to-t from-black/70 via-black/50 to-transparent pt-6 pb-4">
-      <p class="text-center text-[10px] text-white font-black tracking-[0.2em] uppercase mb-4 drop-shadow-md">Swipe to select a sticker</p>
-      <div id="sticker-carousel" class="flex items-center gap-3.5 overflow-x-auto px-6 snap-x hide-scrollbar">
-        <!-- هيتملي أوتوماتيك من الـ JS -->
-      </div>
-    </div>
-
-    <div class="absolute bottom-0 inset-x-0 z-40 flex items-center justify-around px-6 pt-12 pb-8 bg-gradient-to-t from-black/95 via-black/90 to-transparent">
-      <div class="w-14 h-14"></div> 
-      
-      <div class="relative flex items-center justify-center">
-        <!-- شلت أنيميشن النبض من الزرار -->
-        <button id="snapBtn" class="w-20 h-20 rounded-full border-4 border-amber-400 flex items-center justify-center bg-black active:scale-95 shadow-[0_0_30px_rgba(251,191,36,0.6)]">
-          <div id="snapInner" class="w-[52px] h-[52px] rounded-full bg-amber-400 flex items-center justify-center text-black font-bold text-xs"></div>
-        </button>
-        <span id="sessionCounter" class="absolute -top-4 bg-white text-black text-[11px] font-black px-2.5 py-1 rounded-full shadow-lg border-2 border-black transform -rotate-12">0/1</span>
-      </div>
-
-      <div class="w-14 h-14 flex items-center justify-center">
-        <button id="flipBtn" class="w-12 h-12 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white active:scale-90">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ==================== 4. شاشة النتيجة النهائية ==================== -->
-  <div id="view-result" class="hidden absolute inset-0 z-50 flex flex-col justify-between bg-neutral-950 p-6 bg-black">
-    <div class="w-full flex items-center justify-between pt-4 pb-6">
-      <button id="newSessionBtn" class="px-5 py-2.5 bg-neutral-800 rounded-full text-xs text-amber-400 font-bold border border-neutral-700 active:scale-90">
-        + New Session
-      </button>
-      <span id="uploadStatus" class="text-emerald-400 text-xs font-bold opacity-0 bg-emerald-400/10 px-3 py-1 rounded-full flex items-center gap-2">
-        Saved
-      </span>
-      <a id="downloadPhotoBtn" download="graduation-photobooth.jpg" class="px-5 py-2.5 bg-amber-500 text-black rounded-full text-xs font-black uppercase tracking-wider active:scale-95 shadow-lg shadow-amber-500/20">
-        Download
-      </a>
-    </div>
-
-    <div class="relative flex-1 flex items-center justify-center p-2">
-      <!-- شريط الصور النهائي (بسيط وبخلفية بيضا) -->
-      <img id="galleryMainImg" class="max-w-full max-h-[75vh] object-contain rounded-lg shadow-2xl bg-white p-3 rotate-[-1.5deg]" alt="Final Shot">
-    </div>
-    
-    <p class="text-center text-[10px] text-neutral-500 font-bold tracking-[0.2em] uppercase pb-4">Thank you for celebrating with us</p>
-  </div>
-
-  <canvas id="compositeCanvas" class="hidden"></canvas>
-
+  <!-- JAVASCRIPT APPLICATION LOGIC -->
   <script>
-    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyJqgbbH2UBN-KzefwQspwHAU-iIx-W0gbcBGafuoFNNdzqT5lTlV3-C1lp8KCjuIhH/exec";
+    (() => {
+      // Configuration & State
+      // REPLACE THIS with your deployed Google Apps Script Web App URL
+      const DEFAULT_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz_REPLACE_WITH_YOUR_DEPLOYMENT_ID/exec";
+      
+      const state = {
+        userName: "",
+        stream: null,
+        facingMode: "user", // "user" (front) or "environment" (rear)
+        capturedBase64: null,
+        scriptUrl: localStorage.getItem("photobooth_script_url") || DEFAULT_APPS_SCRIPT_URL
+      };
 
-    let targetShots = 1;
-    let activeStickerIdx = 0;
-    let sessionShots = []; 
-    let currentFacingMode = 'user';
-    let registeredUserName = "Guest";
+      // DOM Elements
+      const loginView = document.getElementById("login-view");
+      const cameraView = document.getElementById("camera-view");
+      const resultView = document.getElementById("result-view");
 
-    const vLogin = document.getElementById('view-login');
-    const vSetup = document.getElementById('view-setup');
-    const vCamera = document.getElementById('view-camera');
-    const vResult = document.getElementById('view-result');
-    const video = document.getElementById('video');
-    const liveSticker = document.getElementById('liveSticker');
+      const loginForm = document.getElementById("login-form");
+      const userNameInput = document.getElementById("user-name-input");
+      const headerUserTag = document.getElementById("header-user-tag");
+      const headerUserName = document.getElementById("header-user-name");
 
-    // --- 1. Login (فوري) ---
-    document.getElementById('loginBtn').addEventListener('click', () => {
-      const nameInput = document.getElementById('userName').value.trim();
-      if (nameInput !== '') {
-        registeredUserName = nameInput;
-        document.getElementById('displayName').textContent = registeredUserName;
-        // تبديل فوري للشاشات
-        vLogin.classList.add('hidden');
-        vSetup.classList.remove('hidden');
-      } else {
-        document.getElementById('loginError').classList.remove('hidden');
+      const video = document.getElementById("camera-stream");
+      const shutterBtn = document.getElementById("shutter-btn");
+      const flipCamBtn = document.getElementById("flip-cam-btn");
+      const logoutBtn = document.getElementById("logout-btn");
+      const shutterFlash = document.getElementById("shutter-flash-overlay");
+      const canvas = document.getElementById("capture-canvas");
+      const cameraStatusMsg = document.getElementById("camera-status-msg");
+      const cameraStatusText = document.getElementById("camera-status-text");
+
+      const previewImage = document.getElementById("captured-image-preview");
+      const targetFolderLabel = document.getElementById("target-folder-label");
+      const statusUploading = document.getElementById("status-uploading");
+      const statusSuccess = document.getElementById("status-success");
+      const statusError = document.getElementById("status-error");
+      const errorDetails = document.getElementById("error-details");
+      const driveLink = document.getElementById("drive-link");
+      const retakeBtn = document.getElementById("retake-btn");
+      const retryUploadBtn = document.getElementById("retry-upload-btn");
+      const downloadFallbackBtn = document.getElementById("download-fallback-btn");
+      const finishSessionBtn = document.getElementById("finish-session-btn");
+
+      // Settings Modal Elements
+      const configBtn = document.getElementById("config-btn");
+      const settingsModal = document.getElementById("settings-modal");
+      const closeModalBtn = document.getElementById("close-modal-btn");
+      const saveModalBtn = document.getElementById("save-modal-btn");
+      const modalScriptUrlInput = document.getElementById("modal-script-url-input");
+
+      // ----------------------------------------------------
+      // NAVIGATION & VIEW SWITCHING
+      // ----------------------------------------------------
+      function showView(viewId) {
+        const views = [loginView, cameraView, resultView];
+        views.forEach(v => {
+          if (v.id === viewId) {
+            v.classList.remove("opacity-0", "pointer-events-none", "z-0");
+            v.classList.add("opacity-100", "z-10");
+          } else {
+            v.classList.remove("opacity-100", "z-10");
+            v.classList.add("opacity-0", "pointer-events-none", "z-0");
+          }
+        });
       }
-    });
 
-    // --- 2. Setup (تحديد فوري) ---
-    const modeBtns = document.querySelectorAll('.shot-btn');
-    modeBtns.forEach(btn => {
-      btn.addEventListener('click', () => {
-        modeBtns.forEach(b => {
-          b.classList.remove('selected-ring');
-          b.classList.add('bg-neutral-800/80', 'text-neutral-300');
-        });
-        btn.classList.remove('bg-neutral-800/80', 'text-neutral-300');
-        btn.classList.add('selected-ring');
-        targetShots = parseInt(btn.dataset.shots);
-      });
-    });
+      // ----------------------------------------------------
+      // CAMERA FUNCTIONS
+      // ----------------------------------------------------
+      async function startCamera() {
+        stopCamera();
+        cameraStatusMsg.classList.remove("hidden");
+        cameraStatusText.textContent = "Opening camera...";
 
-    document.getElementById('openCameraBtn').addEventListener('click', async () => {
-      vSetup.classList.add('hidden');
-      vCamera.classList.remove('hidden');
-      sessionShots = [];
-      document.getElementById('sessionCounter').textContent = `0/${targetShots}`;
-      document.getElementById('snapBtn').disabled = false;
-      document.getElementById('snapInner').textContent = '';
-      document.getElementById('snapInner').classList.replace('bg-neutral-500', 'bg-amber-400');
-      
-      applyLiveSticker(); 
-      await startCamera();
-    });
-
-    document.getElementById('backToSetupBtn').addEventListener('click', () => {
-      vCamera.classList.add('hidden');
-      vSetup.classList.remove('hidden');
-      video.classList.add('opacity-0');
-      if (video.srcObject) { video.srcObject.getTracks().forEach(t => t.stop()); }
-    });
-
-
-    // =========================================================================
-    // إعدادات الاستيكرات (ضفتلك لحد 9 أماكن، تقدر ترفع الصور على طول)
-    // =========================================================================
-    const STICKERS_CONFIG = [
-      { src: 'logo1.png', css: 'bottom: 8%; left: 50%; transform: translateX(-50%); width: 40%;' }, 
-      { src: 'logo2.png', css: 'right: -2%; top: 50%; transform: translateY(-50%); width: 30%;' }, 
-      { src: 'logo3.png', css: 'bottom: 5%; left: 5%; width: 40%;' }, 
-      { src: 'logo4.png', css: 'top: 6%; left: 50%; transform: translateX(-50%); width: 60%;' }, 
-      { src: 'logo5.png', css: 'bottom: -2%; left: 0; width: 100%; object-fit: contain;' },
-      { src: 'logo6.png', css: 'top: 8%; right: 5%; width: 35%;' }, 
-      { src: 'logo7.png', css: 'bottom: 10%; right: 5%; width: 35%;' }, 
-      { src: 'logo8.png', css: 'top: 50%; left: 5%; transform: translateY(-50%); width: 35%;' },
-      { src: 'logo9.png', css: 'top: 8%; left: 5%; width: 35%;' }
-    ];
-
-    const loadedStickers = [];
-    const carousel = document.getElementById('sticker-carousel');
-
-    // بناء شريط الاستيكرات ديناميكياً
-    STICKERS_CONFIG.forEach((cfg, idx) => {
-      const img = new Image(); 
-      img.src = cfg.src; 
-      loadedStickers.push(img);
-
-      const btn = document.createElement('div');
-      // شلت التغبيش والأنيميشن، التبديل فوري وبسيط
-      btn.className = `flex-shrink-0 w-[60px] h-[60px] bg-white rounded-2xl p-2 flex items-center justify-center cursor-pointer snap-center border-4 border-black shadow-md ${idx === 0 ? 'sticker-active' : ''}`;
-      
-      const thumbImg = document.createElement('img');
-      thumbImg.src = cfg.src;
-      thumbImg.onerror = () => btn.style.display = 'none'; 
-      thumbImg.className = "max-w-full max-h-full object-contain";
-      btn.appendChild(thumbImg);
-
-      // التبديل فوري
-      btn.addEventListener('click', () => {
-        if (activeStickerIdx === idx) return; 
-        
-        Array.from(carousel.children).forEach(c => c.classList.remove('sticker-active'));
-        btn.classList.add('sticker-active');
-        
-        activeStickerIdx = idx;
-        applyLiveSticker(); // تبديل فوري على الشاشة
-      });
-
-      carousel.appendChild(btn);
-    });
-
-    // دالة تبديل الاستيكر لايف على الشاشة (فورية)
-    function applyLiveSticker() {
-      const cfg = STICKERS_CONFIG[activeStickerIdx];
-      // مفيش Pop-in أو Pop-out، مجرد تغيير للـ src فوراً
-      liveSticker.src = cfg.src;
-      liveSticker.style.cssText = cfg.css;
-    }
-
-    // --- 3. تشغيل الكاميرا (ظهور فوري) ---
-    async function startCamera() {
-      if (video.srcObject) video.srcObject.getTracks().forEach(t => t.stop());
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: currentFacingMode, width: { ideal: 1920 }, height: { ideal: 1080 } }, audio: false
-        });
-        video.srcObject = stream;
-        video.onloadedmetadata = () => { 
-          video.play(); 
-          video.classList.remove('opacity-0'); // ظهور سلس للكاميرا (فوري)
+        const constraints = {
+          audio: false,
+          video: {
+            facingMode: state.facingMode,
+            width: { ideal: 1920 },
+            height: { ideal: 1080 }
+          }
         };
-        if (currentFacingMode === 'user') video.classList.add('-scale-x-100');
-        else video.classList.remove('-scale-x-100');
-      } catch (err) {
-        alert('Please allow camera access to use the photobooth!');
-      }
-    }
 
-    document.getElementById('flipBtn').addEventListener('click', async () => {
-      currentFacingMode = (currentFacingMode === 'user') ? 'environment' : 'user';
-      video.classList.add('opacity-0');
-      await startCamera();
-    });
+        try {
+          state.stream = await navigator.mediaDevices.getUserMedia(constraints);
+          video.srcObject = state.stream;
 
-    function drawCoverImage(tCtx, source, dx, dy, dw, dh, isMirrored) {
-      const sw = source.videoWidth || source.width;
-      const sh = source.videoHeight || source.height;
-      if (!sw || !sh) return;
-      const sRatio = sw / sh; const dRatio = dw / dh;
-      let sx, sy, sCropW, sCropH;
-      if (sRatio > dRatio) { sCropH = sh; sCropW = sh * dRatio; sx = (sw - sCropW) / 2; sy = 0; } 
-      else { sCropW = sw; sCropH = sw / dRatio; sx = 0; sy = (sh - sCropH) / 2; }
-      tCtx.save();
-      if (isMirrored) { tCtx.translate(dx + dw, dy); tCtx.scale(-1, 1); tCtx.drawImage(source, sx, sy, sCropW, sCropH, 0, 0, dw, dh); } 
-      else { tCtx.drawImage(source, sx, sy, sCropW, sCropH, dx, dy, dw, dh); }
-      tCtx.restore();
-    }
+          // Mirror if front-facing
+          if (state.facingMode === "user") {
+            video.classList.add("mirrored");
+          } else {
+            video.classList.remove("mirrored");
+          }
 
-    // --- 4. الالتقاط والتجميع (فوري بعد الفلاش) ---
-    document.getElementById('snapBtn').addEventListener('click', () => {
-      document.getElementById('flashEffect').style.opacity = '1';
-      // فلاش سريع جداً
-      setTimeout(() => { document.getElementById('flashEffect').style.opacity = '0'; }, 100);
-
-      const cvs = document.createElement('canvas');
-      const w = 1080; const h = 1440; 
-      cvs.width = w; cvs.height = h;
-      const ctx = cvs.getContext('2d');
-
-      drawCoverImage(ctx, video, 0, 0, w, h, currentFacingMode === 'user');
-
-      const sticker = loadedStickers[activeStickerIdx];
-      if (sticker && sticker.complete && sticker.naturalWidth > 0) {
-        const aspect = sticker.naturalWidth / sticker.naturalHeight;
-        let dw, dh, dx, dy;
-        switch(activeStickerIdx) {
-          case 0: dw = w * 0.40; dh = dw / aspect; dx = (w - dw) / 2; dy = h - dh - (h * 0.08); break; 
-          case 1: dw = w * 0.30; dh = dw / aspect; dx = w - dw; dy = (h - dh) / 2; break; 
-          case 2: dw = w * 0.40; dh = dw / aspect; dx = w * 0.05; dy = h - dh - (h * 0.05); break; 
-          case 3: dw = w * 0.60; dh = dw / aspect; dx = (w - dw) / 2; dy = h * 0.06; break; 
-          case 4: dw = w; dh = dw / aspect; dx = 0; dy = h - dh; break; 
-          case 5: dw = w * 0.35; dh = dw / aspect; dx = w - dw - (w * 0.05); dy = h * 0.08; break;
-          case 6: dw = w * 0.35; dh = dw / aspect; dx = w - dw - (w * 0.05); dy = h - dh - (h * 0.1); break;
-          case 7: dw = w * 0.35; dh = dw / aspect; dx = w * 0.05; dy = (h - dh) / 2; break;
-          case 8: dw = w * 0.35; dh = dw / aspect; dx = w * 0.05; dy = h * 0.08; break;
+          video.onloadedmetadata = () => {
+            cameraStatusMsg.classList.add("hidden");
+            video.play();
+          };
+        } catch (err) {
+          console.error("Camera access error:", err);
+          cameraStatusMsg.classList.remove("hidden");
+          cameraStatusText.textContent = "Unable to access camera. Please allow camera permissions.";
         }
-        ctx.drawImage(sticker, dx, dy, dw, dh);
       }
 
-      sessionShots.push(cvs);
-      document.getElementById('sessionCounter').textContent = `${sessionShots.length}/${targetShots}`;
-
-      if (sessionShots.length === targetShots) {
-        document.getElementById('snapBtn').disabled = true;
-        document.getElementById('snapInner').classList.replace('bg-amber-400', 'bg-neutral-500');
-        // تجميع فوري
-        setTimeout(buildPhotoboothStrip, 300);
+      function stopCamera() {
+        if (state.stream) {
+          state.stream.getTracks().forEach(track => track.stop());
+          state.stream = null;
+        }
       }
-    });
 
-    function buildPhotoboothStrip() {
-      const canvas = document.getElementById('compositeCanvas');
-      const ctx = canvas.getContext('2d');
-      
-      const photoW = 1080; const photoH = 1440;
-      const padding = 60; 
+      function flipCamera() {
+        state.facingMode = state.facingMode === "user" ? "environment" : "user";
+        startCamera();
+      }
 
-      let cols, rows;
-      if (targetShots === 1) { cols = 1; rows = 1; }
-      else if (targetShots === 2) { cols = 1; rows = 2; }
-      else if (targetShots === 3) { cols = 1; rows = 3; }
-      else if (targetShots === 4) { cols = 2; rows = 2; }
+      // ----------------------------------------------------
+      // CAPTURE PHOTO
+      // ----------------------------------------------------
+      function capturePhoto() {
+        if (!state.stream) return;
 
-      canvas.width = (photoW * cols) + (padding * (cols + 1));
-      canvas.height = (photoH * rows) + (padding * (rows + 1));
+        // Visual shutter flash effect
+        shutterFlash.classList.remove("opacity-0");
+        shutterFlash.classList.add("opacity-90");
+        setTimeout(() => {
+          shutterFlash.classList.remove("opacity-90");
+          shutterFlash.classList.add("opacity-0");
+        }, 90);
 
-      ctx.fillStyle = "#ffffff";
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
+        // Prepare canvas with native camera dimensions
+        const width = video.videoWidth || 1280;
+        const height = video.videoHeight || 720;
+        canvas.width = width;
+        canvas.height = height;
 
-      sessionShots.forEach((shotCanvas, i) => {
-        let col = i % cols;
-        let row = Math.floor(i / cols);
-        let dx = padding + (col * (photoW + padding));
-        let dy = padding + (row * (photoH + padding));
-        ctx.drawImage(shotCanvas, dx, dy, photoW, photoH);
+        const ctx = canvas.getContext("2d");
+
+        // If front camera, mirror horizontal to match viewfinder
+        if (state.facingMode === "user") {
+          ctx.translate(width, 0);
+          ctx.scale(-1, 1);
+        }
+
+        ctx.drawImage(video, 0, 0, width, height);
+
+        // Export high-quality JPEG Base64
+        const dataUrl = canvas.toDataURL("image/jpeg", 0.88);
+        state.capturedBase64 = dataUrl;
+
+        // Stop camera feed to conserve battery/GPU
+        stopCamera();
+
+        // Switch to result view
+        previewImage.src = dataUrl;
+        targetFolderLabel.textContent = state.userName;
+        showView("result-view");
+
+        // Automatically trigger upload to Google Drive
+        uploadPhotoToDrive();
+      }
+
+      // ----------------------------------------------------
+      // GOOGLE DRIVE UPLOAD VIA GOOGLE APPS SCRIPT
+      // ----------------------------------------------------
+      async function uploadPhotoToDrive() {
+        // Update UI to Uploading State
+        statusUploading.classList.remove("hidden");
+        statusSuccess.classList.add("hidden");
+        statusError.classList.add("hidden");
+        retryUploadBtn.classList.add("hidden");
+
+        const scriptUrl = state.scriptUrl.trim();
+
+        // Check if user has not yet updated the script URL
+        if (!scriptUrl || scriptUrl.includes("REPLACE_WITH_YOUR_DEPLOYMENT_ID")) {
+          showUploadError("Apps Script URL not set. Tap gear icon at top to configure.");
+          return;
+        }
+
+        try {
+          const payload = {
+            userName: state.userName,
+            image: state.capturedBase64
+          };
+
+          /**
+           * CRITICAL: Sending as "text/plain" avoids the browser sending an
+           * HTTP OPTIONS preflight request. Google Apps Script Web Apps do not
+           * respond to OPTIONS requests and will fail with CORS errors if
+           * "application/json" is specified.
+           */
+          const response = await fetch(scriptUrl, {
+            method: "POST",
+            headers: {
+              "Content-Type": "text/plain;charset=utf-8"
+            },
+            body: JSON.stringify(payload)
+          });
+
+          const result = await response.json();
+
+          if (result && result.status === "success") {
+            // Upload Succeeded!
+            statusUploading.classList.add("hidden");
+            statusSuccess.classList.remove("hidden");
+            statusError.classList.add("hidden");
+
+            if (result.fileUrl) {
+              driveLink.href = result.fileUrl;
+              driveLink.textContent = "Open in Drive: " + (result.fileName || "View Photo");
+            }
+          } else {
+            throw new Error(result.message || "Failed to upload photo to Drive.");
+          }
+
+        } catch (error) {
+          console.error("Upload error:", error);
+          showUploadError(error.message || "Network error uploading to Drive.");
+        }
+      }
+
+      function showUploadError(msg) {
+        statusUploading.classList.add("hidden");
+        statusSuccess.classList.add("hidden");
+        statusError.classList.remove("hidden");
+        retryUploadBtn.classList.remove("hidden");
+        errorDetails.textContent = msg;
+      }
+
+      // ----------------------------------------------------
+      // DOWNLOAD FALLBACK
+      // ----------------------------------------------------
+      function downloadPhotoLocally() {
+        if (!state.capturedBase64) return;
+        const link = document.createElement("a");
+        const safeName = state.userName.replace(/[^a-zA-Z0-9]/g, "_");
+        link.download = `${safeName}_photobooth.jpg`;
+        link.href = state.capturedBase64;
+        link.click();
+      }
+
+      // ----------------------------------------------------
+      // EVENT LISTENERS
+      // ----------------------------------------------------
+      // Login Form Submit
+      loginForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const name = userNameInput.value.trim();
+        if (!name) return;
+
+        state.userName = name;
+        headerUserName.textContent = name;
+        headerUserTag.classList.remove("hidden");
+        headerUserTag.classList.add("flex");
+
+        showView("camera-view");
+        startCamera();
       });
 
-      const finalDataUrl = canvas.toDataURL('image/jpeg', 0.92);
-      
-      document.getElementById('galleryMainImg').src = finalDataUrl;
-      document.getElementById('downloadPhotoBtn').href = finalDataUrl;
-      // تبديل شاشات فوري
-      vCamera.classList.add('hidden');
-      vResult.classList.remove('hidden');
+      // Shutter Click
+      shutterBtn.addEventListener("click", capturePhoto);
 
-      const upStatus = document.getElementById('uploadStatus');
-      upStatus.style.opacity = '1';
-      
-      fetch(GOOGLE_SCRIPT_URL, {
-        method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          image: finalDataUrl, 
-          filename: `Photobooth_${targetShots}Shots_${Date.now()}.jpg`,
-          folderName: registeredUserName
-        })
-      }).finally(() => { setTimeout(() => { upStatus.style.opacity = '0'; }, 3000); });
-    }
+      // Flip Camera
+      flipCamBtn.addEventListener("click", flipCamera);
 
-    document.getElementById('newSessionBtn').addEventListener('click', () => {
-      vResult.classList.add('hidden');
-      vSetup.classList.remove('hidden');
-    });
+      // Logout / Change User
+      function logout() {
+        stopCamera();
+        state.userName = "";
+        headerUserTag.classList.add("hidden");
+        userNameInput.value = "";
+        showView("login-view");
+      }
+      logoutBtn.addEventListener("click", logout);
+      finishSessionBtn.addEventListener("click", logout);
+
+      // Retake Photo
+      retakeBtn.addEventListener("click", () => {
+        showView("camera-view");
+        startCamera();
+      });
+
+      // Retry Upload
+      retryUploadBtn.addEventListener("click", uploadPhotoToDrive);
+
+      // Download Fallback
+      downloadFallbackBtn.addEventListener("click", downloadPhotoLocally);
+
+      // Settings Modal Open/Close
+      configBtn.addEventListener("click", () => {
+        modalScriptUrlInput.value = state.scriptUrl;
+        settingsModal.classList.remove("hidden");
+        setTimeout(() => settingsModal.classList.remove("opacity-0"), 10);
+      });
+
+      function closeModal() {
+        settingsModal.classList.add("opacity-0");
+        setTimeout(() => settingsModal.classList.add("hidden"), 200);
+      }
+      closeModalBtn.addEventListener("click", closeModal);
+
+      saveModalBtn.addEventListener("click", () => {
+        const val = modalScriptUrlInput.value.trim();
+        state.scriptUrl = val;
+        localStorage.setItem("photobooth_script_url", val);
+        closeModal();
+      });
+
+    })();
   </script>
 </body>
 </html>
