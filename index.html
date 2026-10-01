@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" class="h-full bg-[#0a0a0e] text-[#f3f4f6]">
+<html lang="en" class="h-full bg-[#07070a] text-[#f3f4f6]">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
@@ -20,11 +20,12 @@
               700: '#8c6d1a',
             },
             surface: {
-              900: '#0a0a0e',
-              850: '#101117',
-              800: '#161821',
-              750: '#1e212d',
-              700: '#222533',
+              950: '#07070a',
+              900: '#0b0c10',
+              850: '#111319',
+              800: '#171922',
+              750: '#1f222e',
+              700: '#262a38',
             }
           },
           fontFamily: {
@@ -36,7 +37,7 @@
   </script>
 
   <style>
-    /* Ultra-lightweight animations - Zero lag on mobile devices (STRICTLY NO BLUR FILTERS) */
+    /* Hardware-Accelerated 60fps Mobile Animations (Zero Blur Filters) */
     * {
       -webkit-tap-highlight-color: transparent;
       user-select: none;
@@ -44,28 +45,40 @@
     input {
       user-select: text;
     }
-    .view-transition {
-      transition: opacity 0.25s ease, transform 0.25s ease;
+
+    /* Fast, silky view transitions using GPU transforms */
+    .view-fade {
+      transition: opacity 0.22s ease, transform 0.22s ease;
+      will-change: opacity, transform;
+    }
+    .slide-panel {
+      transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+      will-change: transform;
+    }
+    .lightbox-fade {
+      transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1), transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      will-change: opacity, transform;
     }
     .shutter-flash {
-      transition: opacity 0.09s ease-out;
+      transition: opacity 0.08s ease-out;
+      will-change: opacity;
     }
+    .btn-bounce:active {
+      transform: scale(0.92);
+    }
+
     /* Natural selfie mirroring */
     .mirrored {
       transform: scaleX(-1);
     }
-    /* Snappy tap feedback */
-    .btn-press:active {
-      transform: scale(0.92);
-    }
   </style>
 </head>
-<body class="h-full w-full overflow-hidden bg-[#0a0a0e] font-sans antialiased text-neutral-200">
+<body class="h-full w-full overflow-hidden bg-[#07070a] font-sans antialiased text-neutral-200">
 
-  <!-- Mobile-First Container -->
+  <!-- Mobile-First Container (Full screen on phones, sleek frame on desktop) -->
   <div class="relative mx-auto flex h-full w-full max-w-md flex-col overflow-hidden bg-surface-900 shadow-2xl border-x border-neutral-900">
 
-    <!-- Top Status / Branding Bar -->
+    <!-- Top Status / Branding Header -->
     <header class="relative z-30 flex h-14 shrink-0 items-center justify-between border-b border-gold-500/20 bg-surface-850 px-4">
       <div class="flex items-center space-x-2.5">
         <div class="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-tr from-gold-600 to-gold-400 text-black shadow-sm">
@@ -77,7 +90,7 @@
         <span class="text-sm font-bold tracking-wider text-gold-400 uppercase">GRADUATE 2026</span>
       </div>
 
-      <!-- User Badge & Switch Guest Action -->
+      <!-- User Active Tag & Exit Button (Settings gear completely removed) -->
       <div class="flex items-center space-x-2">
         <div id="header-user-tag" class="hidden items-center space-x-1.5 rounded-full border border-gold-500/25 bg-surface-800 px-3 py-1 text-xs text-neutral-300">
           <span class="h-1.5 w-1.5 rounded-full bg-gold-400"></span>
@@ -98,7 +111,7 @@
       <!-- ========================================== -->
       <!-- VIEW 1: LOGIN VIEW                         -->
       <!-- ========================================== -->
-      <section id="login-view" class="view-transition absolute inset-0 flex flex-col justify-center p-6 opacity-100 z-10">
+      <section id="login-view" class="view-fade absolute inset-0 flex flex-col justify-center p-6 opacity-100 z-10">
         <div class="flex flex-col items-center text-center">
           <!-- Graduation Monogram Emblem -->
           <div class="relative mb-6 flex h-20 w-20 items-center justify-center rounded-2xl border border-gold-500/30 bg-surface-850 shadow-lg">
@@ -131,7 +144,7 @@
 
             <button
               type="submit"
-              class="w-full rounded-xl bg-gradient-to-r from-gold-600 via-gold-500 to-gold-400 py-3.5 text-sm font-semibold text-black tracking-wide shadow-md transition-transform duration-150 active:scale-95 hover:brightness-105"
+              class="btn-bounce w-full rounded-xl bg-gradient-to-r from-gold-600 via-gold-500 to-gold-400 py-3.5 text-sm font-semibold text-black tracking-wide shadow-md transition-transform duration-150 active:scale-95 hover:brightness-105"
             >
               Enter Photobooth
             </button>
@@ -142,7 +155,7 @@
       <!-- ========================================== -->
       <!-- VIEW 2: CONTINUOUS CAMERA VIEW             -->
       <!-- ========================================== -->
-      <section id="camera-view" class="view-transition absolute inset-0 flex flex-col justify-between opacity-0 pointer-events-none z-0">
+      <section id="camera-view" class="view-fade absolute inset-0 flex flex-col justify-between opacity-0 pointer-events-none z-0">
         <!-- Live Video Viewfinder with Contemporary Graduation Frame Overlay -->
         <div class="relative flex-1 overflow-hidden bg-black flex items-center justify-center">
           <video
@@ -172,17 +185,17 @@
         <!-- Camera Controls Toolbar -->
         <div class="relative z-20 flex h-28 shrink-0 items-center justify-between border-t border-neutral-800 bg-surface-850 px-8">
           
-          <!-- ALBUM / GALLERY BUTTON (Shows thumbnail of last shot & badge count) -->
+          <!-- CIRCULAR ALBUM / GALLERY BUTTON (Shows thumbnail of last shot & badge count) -->
           <button
             id="gallery-open-btn"
             title="Open Session Album"
-            class="group relative flex h-14 w-14 items-center justify-center rounded-2xl border-2 border-gold-500/40 bg-surface-800 p-0.5 shadow-md transition-transform duration-150 active:scale-90"
+            class="btn-bounce relative flex h-14 w-14 items-center justify-center rounded-full border-2 border-gold-500 bg-surface-800 p-0.5 shadow-lg transition-transform duration-150 active:scale-90"
           >
             <!-- Thumbnail Image (shown when at least 1 photo exists) -->
             <img
               id="gallery-thumb-preview"
               alt="Latest Photo Thumbnail"
-              class="hidden h-full w-full rounded-xl object-cover"
+              class="hidden h-full w-full rounded-full object-cover"
             />
 
             <!-- Placeholder Icon (shown before any photo is captured) -->
@@ -195,18 +208,18 @@
             <!-- Photos Count Badge -->
             <span
               id="gallery-count-badge"
-              class="absolute -top-1.5 -right-1.5 hidden h-5 min-w-[20px] items-center justify-center rounded-full bg-gold-400 px-1 text-[11px] font-bold text-black shadow"
+              class="absolute -top-1 -right-1 hidden h-5 min-w-[20px] items-center justify-center rounded-full bg-gold-400 px-1 text-[11px] font-bold text-black shadow-md"
             >
               0
             </span>
           </button>
 
-          <!-- MAIN SHUTTER BUTTON (Continuous Capture) -->
+          <!-- MAIN SHUTTER BUTTON (Continuous Back-to-Back Capture) -->
           <div class="relative flex items-center justify-center">
             <button
               id="shutter-btn"
               title="Take Photo"
-              class="group relative flex h-20 w-20 items-center justify-center rounded-full border-2 border-gold-500 p-1.5 transition-transform duration-100 active:scale-90"
+              class="btn-bounce group relative flex h-20 w-20 items-center justify-center rounded-full border-2 border-gold-500 p-1.5 transition-transform duration-100 active:scale-90"
             >
               <div class="h-full w-full rounded-full bg-gradient-to-tr from-gold-500 to-gold-300 shadow-md group-hover:brightness-110"></div>
             </button>
@@ -216,7 +229,7 @@
           <button
             id="flip-cam-btn"
             title="Switch Camera"
-            class="flex h-14 w-14 items-center justify-center rounded-2xl border border-neutral-700 bg-surface-800 text-neutral-300 transition-transform duration-150 active:scale-90 shadow-md"
+            class="btn-bounce flex h-14 w-14 items-center justify-center rounded-full border border-neutral-700 bg-surface-800 text-neutral-300 transition-transform duration-150 active:scale-90 shadow-md"
           >
             <svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"/>
@@ -226,14 +239,17 @@
       </section>
 
       <!-- ========================================== -->
-      <!-- VIEW 3: IN-APP GALLERY / ALBUM VIEW        -->
+      <!-- VIEW 3: IN-APP GALLERY (SLIDE-UP PANEL)    -->
       <!-- ========================================== -->
-      <section id="gallery-view" class="view-transition absolute inset-0 flex flex-col bg-surface-900 opacity-0 pointer-events-none z-30">
+      <section
+        id="gallery-view"
+        class="slide-panel absolute inset-0 z-40 flex flex-col bg-surface-900 translate-y-full"
+      >
         <!-- Gallery Top Navigation Bar -->
         <div class="flex h-14 shrink-0 items-center justify-between border-b border-neutral-800 bg-surface-850 px-4">
           <button
             id="gallery-back-btn"
-            class="flex items-center space-x-1.5 text-xs font-semibold text-gold-400 active:scale-95 transition-transform py-1 px-2.5 rounded-lg border border-gold-500/25 bg-surface-800"
+            class="btn-bounce flex items-center space-x-1.5 text-xs font-semibold text-gold-400 py-1.5 px-3 rounded-lg border border-gold-500/25 bg-surface-800 transition-transform"
           >
             <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
@@ -242,7 +258,7 @@
           </button>
 
           <div class="flex items-center space-x-2">
-            <span class="text-xs font-semibold uppercase tracking-wider text-neutral-300">My Photos</span>
+            <span class="text-xs font-semibold uppercase tracking-wider text-neutral-300">Session Album</span>
             <span id="gallery-header-count" class="rounded-full bg-gold-500/20 px-2 py-0.5 text-[11px] font-bold text-gold-400">0</span>
           </div>
         </div>
@@ -252,18 +268,64 @@
           
           <!-- Empty State (when 0 photos) -->
           <div id="gallery-empty-state" class="flex h-full flex-col items-center justify-center text-center p-6">
-            <div class="flex h-16 w-16 items-center justify-center rounded-2xl border border-gold-500/30 bg-surface-850 text-gold-400 mb-3">
+            <div class="flex h-16 w-16 items-center justify-center rounded-2xl border border-gold-500/30 bg-surface-850 text-gold-400 mb-3 shadow-md">
               <svg class="h-8 w-8" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z"/>
                 <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0z"/>
               </svg>
             </div>
-            <h3 class="text-sm font-semibold text-white">No Photos Taken Yet</h3>
-            <p class="mt-1 text-xs text-neutral-500">Tap the shutter button on the camera screen to capture your memories!</p>
+            <h3 class="text-sm font-semibold text-white">No Photos Captured Yet</h3>
+            <p class="mt-1 text-xs text-neutral-500">Tap the shutter button on the camera screen to take your first photo!</p>
           </div>
 
           <!-- Active Photo Grid -->
           <div id="gallery-grid" class="hidden grid grid-cols-2 gap-3.5 pb-8"></div>
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- VIEW 4: FULLSCREEN LIGHTBOX OVERLAY (NEW)  -->
+      <!-- ========================================== -->
+      <section
+        id="view-lightbox"
+        class="lightbox-fade absolute inset-0 z-50 flex flex-col justify-between bg-surface-950/98 p-4 opacity-0 pointer-events-none scale-95"
+      >
+        <!-- Lightbox Top Bar -->
+        <div class="flex h-12 shrink-0 items-center justify-between px-2">
+          <span id="lightbox-counter" class="text-xs font-semibold uppercase tracking-wider text-gold-400">
+            Photo 1 of 1
+          </span>
+          <button
+            id="lightbox-close-btn"
+            title="Close Preview"
+            class="btn-bounce flex h-9 w-9 items-center justify-center rounded-full border border-neutral-700 bg-surface-850 text-neutral-300 transition-colors hover:text-white"
+          >
+            <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Lightbox Fullscreen Photo Preview -->
+        <div class="relative flex flex-1 items-center justify-center overflow-hidden my-2">
+          <img
+            id="lightbox-photo-img"
+            alt="Fullscreen Graduation Preview"
+            class="max-h-[72vh] w-auto max-w-full rounded-2xl border border-gold-500/25 object-contain shadow-2xl"
+          />
+        </div>
+
+        <!-- Lightbox Bottom Actions -->
+        <div class="shrink-0 pt-2 pb-1">
+          <button
+            id="lightbox-download-btn"
+            class="btn-bounce flex w-full items-center justify-center space-x-2 rounded-xl bg-gradient-to-r from-gold-600 via-gold-500 to-gold-400 py-3.5 text-xs font-bold uppercase tracking-wider text-black shadow-lg transition-transform duration-100"
+          >
+            <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/>
+            </svg>
+            <span>Download Photo</span>
+          </button>
         </div>
       </section>
 
@@ -399,6 +461,7 @@
       // 3. APPLICATION STATE & GLOBAL SESSION PHOTOS ARRAY
       // =========================================================================
       const sessionPhotos = []; // Stores Base64 data URLs for in-app album
+      let currentLightboxIndex = 0;
 
       const state = {
         userName: "",
@@ -410,6 +473,7 @@
       const loginView = document.getElementById("login-view");
       const cameraView = document.getElementById("camera-view");
       const galleryView = document.getElementById("gallery-view");
+      const lightboxView = document.getElementById("view-lightbox");
 
       const loginForm = document.getElementById("login-form");
       const userNameInput = document.getElementById("user-name-input");
@@ -435,11 +499,17 @@
       const galleryEmptyState = document.getElementById("gallery-empty-state");
       const galleryGrid = document.getElementById("gallery-grid");
 
+      // Lightbox Elements
+      const lightboxPhotoImg = document.getElementById("lightbox-photo-img");
+      const lightboxCounter = document.getElementById("lightbox-counter");
+      const lightboxCloseBtn = document.getElementById("lightbox-close-btn");
+      const lightboxDownloadBtn = document.getElementById("lightbox-download-btn");
+
       // =========================================================================
       // 4. SCREEN NAVIGATION
       // =========================================================================
       function showView(viewId) {
-        [loginView, cameraView, galleryView].forEach(v => {
+        [loginView, cameraView].forEach(v => {
           if (v.id === viewId) {
             v.classList.remove("opacity-0", "pointer-events-none", "z-0");
             v.classList.add("opacity-100", "z-10");
@@ -448,6 +518,17 @@
             v.classList.add("opacity-0", "pointer-events-none", "z-0");
           }
         });
+      }
+
+      function openGalleryPanel() {
+        renderGalleryGrid();
+        galleryView.classList.remove("translate-y-full");
+        galleryView.classList.add("translate-y-0");
+      }
+
+      function closeGalleryPanel() {
+        galleryView.classList.remove("translate-y-0");
+        galleryView.classList.add("translate-y-full");
       }
 
       // =========================================================================
@@ -512,7 +593,7 @@
         setTimeout(() => {
           shutterFlash.classList.remove("opacity-90");
           shutterFlash.classList.add("opacity-0");
-        }, 90);
+        }, 80);
 
         const width = video.videoWidth || 1080;
         const height = video.videoHeight || 1440;
@@ -545,7 +626,7 @@
           timestamp: new Date()
         });
 
-        // STEP 4: Update Album/Gallery button thumbnail in the camera view
+        // STEP 4: Update circular Album/Gallery button thumbnail in the camera view
         updateGalleryButton();
 
         // STEP 5: SILENT BACKGROUND UPLOAD TO GOOGLE DRIVE (User stays on camera!)
@@ -559,7 +640,7 @@
         const cleanName = (userName || "Guest").replace(/[^a-zA-Z0-9_-]/g, "_");
         const filename = `photo_${cleanName}_${Date.now()}.jpg`;
 
-        // Payload matching your exact Google Apps Script doPost() fields:
+        // Payload matching Google Apps Script doPost() fields:
         // folderName, image, filename
         const payload = {
           folderName: userName || "Guest",
@@ -604,7 +685,7 @@
       }
 
       // =========================================================================
-      // 8. IN-APP GALLERY / ALBUM UI LOGIC
+      // 8. IN-APP GALLERY & FULLSCREEN LIGHTBOX PREVIEW LOGIC
       // =========================================================================
       function updateGalleryButton() {
         const total = sessionPhotos.length;
@@ -623,7 +704,7 @@
         }
       }
 
-      function renderGalleryView() {
+      function renderGalleryGrid() {
         const total = sessionPhotos.length;
         galleryHeaderCount.textContent = total;
 
@@ -638,10 +719,10 @@
         galleryGrid.classList.remove("hidden");
         galleryGrid.innerHTML = "";
 
-        // Build individual photo cards with direct Download buttons
+        // Build individual photo cards (clicking ANY photo opens Lightbox)
         sessionPhotos.forEach((photo, idx) => {
           const card = document.createElement("div");
-          card.className = "flex flex-col rounded-2xl border border-gold-500/25 bg-surface-850 p-2 shadow-lg";
+          card.className = "btn-bounce group relative flex flex-col rounded-2xl border border-gold-500/25 bg-surface-850 p-2 shadow-lg cursor-pointer transition-transform";
 
           const imgContainer = document.createElement("div");
           imgContainer.className = "relative aspect-[3/4] w-full overflow-hidden rounded-xl bg-black";
@@ -649,34 +730,54 @@
           const img = document.createElement("img");
           img.src = photo.dataUrl;
           img.alt = `Graduation Shot ${total - idx}`;
-          img.className = "h-full w-full object-cover";
+          img.className = "h-full w-full object-cover transition-transform duration-200 group-hover:scale-105";
+
+          // Expand badge overlay on card
+          const viewBadge = document.createElement("div");
+          viewBadge.className = "absolute bottom-2 right-2 flex h-7 w-7 items-center justify-center rounded-full bg-black/75 text-gold-400 border border-gold-500/40 shadow";
+          viewBadge.innerHTML = `
+            <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15"/>
+            </svg>
+          `;
 
           imgContainer.appendChild(img);
+          imgContainer.appendChild(viewBadge);
+          card.appendChild(imgContainer);
 
-          // Download action button
-          const downloadBtn = document.createElement("button");
-          downloadBtn.className = "mt-2.5 flex items-center justify-center space-x-1.5 w-full rounded-xl bg-gradient-to-r from-gold-600 via-gold-500 to-gold-400 py-2.5 text-xs font-bold text-black uppercase tracking-wider transition-transform active:scale-95 shadow";
-          downloadBtn.innerHTML = `
-            <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/>
-            </svg>
-            <span>Download</span>
-          `;
-          downloadBtn.addEventListener("click", () => {
-            downloadSinglePhoto(photo.dataUrl, idx + 1);
+          // Clicking photo card opens Fullscreen Lightbox
+          card.addEventListener("click", () => {
+            openLightbox(idx);
           });
 
-          card.appendChild(imgContainer);
-          card.appendChild(downloadBtn);
           galleryGrid.appendChild(card);
         });
       }
 
-      function downloadSinglePhoto(dataUrl, photoNumber) {
+      // LIGHTBOX CONTROLS
+      function openLightbox(index) {
+        if (!sessionPhotos[index]) return;
+        currentLightboxIndex = index;
+
+        lightboxPhotoImg.src = sessionPhotos[index].dataUrl;
+        lightboxCounter.textContent = `Photo ${index + 1} of ${sessionPhotos.length}`;
+
+        lightboxView.classList.remove("opacity-0", "pointer-events-none", "scale-95");
+        lightboxView.classList.add("opacity-100", "scale-100");
+      }
+
+      function closeLightbox() {
+        lightboxView.classList.remove("opacity-100", "scale-100");
+        lightboxView.classList.add("opacity-0", "pointer-events-none", "scale-95");
+      }
+
+      function downloadCurrentLightboxPhoto() {
+        if (!sessionPhotos[currentLightboxIndex]) return;
+        const photo = sessionPhotos[currentLightboxIndex];
         const link = document.createElement("a");
         const safeName = (state.userName || "Guest").replace(/[^a-zA-Z0-9_-]/g, "_");
-        link.download = `${safeName}_Graduation_2026_shot${photoNumber}.jpg`;
-        link.href = dataUrl;
+        link.download = `${safeName}_Graduation_2026_shot${currentLightboxIndex + 1}.jpg`;
+        link.href = photo.dataUrl;
         link.click();
       }
 
@@ -705,16 +806,15 @@
       // Flip Camera
       flipCamBtn.addEventListener("click", flipCamera);
 
-      // Open Album / Gallery View
-      galleryOpenBtn.addEventListener("click", () => {
-        renderGalleryView();
-        showView("gallery-view");
-      });
+      // Open Album / Gallery Slide-up View
+      galleryOpenBtn.addEventListener("click", openGalleryPanel);
 
       // Back to Camera from Gallery
-      galleryBackBtn.addEventListener("click", () => {
-        showView("camera-view");
-      });
+      galleryBackBtn.addEventListener("click", closeGalleryPanel);
+
+      // Lightbox Close & Download Events
+      lightboxCloseBtn.addEventListener("click", closeLightbox);
+      lightboxDownloadBtn.addEventListener("click", downloadCurrentLightboxPhoto);
 
       // Exit / Switch Guest
       logoutBtn.addEventListener("click", () => {
@@ -722,6 +822,8 @@
         state.userName = "";
         sessionPhotos.length = 0; // Clear session album for next guest
         updateGalleryButton();
+        closeGalleryPanel();
+        closeLightbox();
         headerUserTag.classList.add("hidden");
         logoutBtn.classList.add("hidden");
         userNameInput.value = "";
