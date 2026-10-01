@@ -92,7 +92,7 @@
             Church Of The Virgin Mary and St. Mina
           </h1>
 
-          <!-- Form: Strict retention with no placeholder, subtitles, or helper text -->
+          <!-- Form: Cleaned up with no placeholders, subtitles, or helper text -->
           <form id="login-form" class="mt-8 w-full space-y-5">
             <div class="text-left">
               <label for="user-name-input" class="block text-xs font-semibold uppercase tracking-wider text-gold-400/90 mb-2 ml-1">
@@ -122,8 +122,11 @@
       <!-- VIEW 2: CONTINUOUS CAMERA VIEW             -->
       <!-- ========================================== -->
       <section id="camera-view" class="view-fade absolute inset-0 flex flex-col justify-between opacity-0 pointer-events-none z-0">
-        <!-- Live Video Viewfinder with Contemporary Graduation Frame Overlay -->
-        <div class="relative flex-1 overflow-hidden bg-black flex items-center justify-center">
+        
+        <!-- Live Video Viewfinder with Touch Swipe Support -->
+        <div id="camera-viewfinder" class="relative flex-1 overflow-hidden bg-black flex items-center justify-center">
+          
+          <!-- Live Camera Video Feed with dynamic CSS filter -->
           <video
             id="camera-stream"
             autoplay
@@ -132,13 +135,33 @@
             class="h-full w-full object-cover mirrored"
           ></video>
 
-          <!-- Transparent Graduation 2026 Party Frame -->
+          <!-- Transparent Native SVG Frame Overlay -->
           <div class="pointer-events-none absolute inset-0 z-10 flex items-center justify-center">
             <img
               id="camera-frame-overlay"
               alt="Graduation 2026 Frame Overlay"
-              class="h-full w-full object-contain pointer-events-none select-none"
+              class="h-full w-full object-contain pointer-events-none select-none frame-slide-in"
             />
+          </div>
+
+          <!-- Top Floating Theme & Filter Swipe Indicator Pill -->
+          <div class="pointer-events-auto absolute top-4 z-20 flex items-center space-x-1.5 rounded-full border border-gold-500/30 bg-black/75 px-3 py-1.5 text-xs text-white theme-pill">
+            <button id="prev-frame-btn" title="Previous Frame" class="text-gold-400 hover:text-white p-1 active:scale-90 transition-transform">
+              <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+              </svg>
+            </button>
+            <span id="theme-name-label" class="font-semibold tracking-wide text-gold-300 select-none min-w-[95px] text-center">
+              Classic Gold
+            </span>
+            <span id="theme-step-badge" class="text-[10px] text-neutral-400 font-mono select-none">
+              1/4
+            </span>
+            <button id="next-frame-btn" title="Next Frame" class="text-gold-400 hover:text-white p-1 active:scale-90 transition-transform">
+              <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+              </svg>
+            </button>
           </div>
 
           <!-- Camera Loading / Status Message -->
