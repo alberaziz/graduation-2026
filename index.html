@@ -37,7 +37,6 @@
   </script>
 
   <style>
-    /* Hardware-Accelerated 60fps Mobile Animations (Zero Blur Filters) */
     * {
       -webkit-tap-highlight-color: transparent;
       user-select: none;
@@ -55,10 +54,6 @@
       transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1);
       will-change: transform;
     }
-    .lightbox-fade {
-      transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1), transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-      will-change: opacity, transform;
-    }
     .shutter-flash {
       transition: opacity 0.08s ease-out;
       will-change: opacity;
@@ -70,6 +65,33 @@
     /* Natural selfie mirroring */
     .mirrored {
       transform: scaleX(-1);
+    }
+
+    /* ======================================================== */
+    /* MASTER LIGHTBOX (Zoom & Fade In Animation)               */
+    /* ======================================================== */
+    #view-lightbox {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.3s ease;
+      will-change: opacity, visibility;
+    }
+    #view-lightbox.lightbox-active {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+    }
+
+    #lightbox-photo-container {
+      transform: scale(0.80);
+      opacity: 0;
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      will-change: transform, opacity;
+    }
+    #view-lightbox.lightbox-active #lightbox-photo-container {
+      transform: scale(1);
+      opacity: 1;
     }
   </style>
 </head>
@@ -90,7 +112,7 @@
         <span class="text-sm font-bold tracking-wider text-gold-400 uppercase">GRADUATE 2026</span>
       </div>
 
-      <!-- User Active Tag & Exit Button (Settings gear completely removed) -->
+      <!-- User Active Tag & Exit Button -->
       <div class="flex items-center space-x-2">
         <div id="header-user-tag" class="hidden items-center space-x-1.5 rounded-full border border-gold-500/25 bg-surface-800 px-3 py-1 text-xs text-neutral-300">
           <span class="h-1.5 w-1.5 rounded-full bg-gold-400"></span>
@@ -185,20 +207,20 @@
         <!-- Camera Controls Toolbar -->
         <div class="relative z-20 flex h-28 shrink-0 items-center justify-between border-t border-neutral-800 bg-surface-850 px-8">
           
-          <!-- CIRCULAR ALBUM / GALLERY BUTTON (Shows thumbnail of last shot & badge count) -->
+          <!-- CIRCULAR ALBUM / GALLERY BUTTON -->
           <button
             id="gallery-open-btn"
             title="Open Session Album"
             class="btn-bounce relative flex h-14 w-14 items-center justify-center rounded-full border-2 border-gold-500 bg-surface-800 p-0.5 shadow-lg transition-transform duration-150 active:scale-90"
           >
-            <!-- Thumbnail Image (shown when at least 1 photo exists) -->
+            <!-- Thumbnail Image -->
             <img
               id="gallery-thumb-preview"
               alt="Latest Photo Thumbnail"
               class="hidden h-full w-full rounded-full object-cover"
             />
 
-            <!-- Placeholder Icon (shown before any photo is captured) -->
+            <!-- Placeholder Icon -->
             <div id="gallery-thumb-placeholder" class="flex flex-col items-center justify-center text-gold-400">
               <svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
@@ -283,57 +305,55 @@
         </div>
       </section>
 
-      <!-- ========================================== -->
-      <!-- VIEW 4: FULLSCREEN LIGHTBOX OVERLAY (NEW)  -->
-      <!-- ========================================== -->
-      <section
-        id="view-lightbox"
-        class="lightbox-fade absolute inset-0 z-50 flex flex-col justify-between bg-surface-950/98 p-4 opacity-0 pointer-events-none scale-95"
-      >
-        <!-- Lightbox Top Bar -->
-        <div class="flex h-12 shrink-0 items-center justify-between px-2">
-          <span id="lightbox-counter" class="text-xs font-semibold uppercase tracking-wider text-gold-400">
-            Photo 1 of 1
-          </span>
-          <button
-            id="lightbox-close-btn"
-            title="Close Preview"
-            class="btn-bounce flex h-9 w-9 items-center justify-center rounded-full border border-neutral-700 bg-surface-850 text-neutral-300 transition-colors hover:text-white"
-          >
-            <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
-            </svg>
-          </button>
-        </div>
-
-        <!-- Lightbox Fullscreen Photo Preview -->
-        <div class="relative flex flex-1 items-center justify-center overflow-hidden my-2">
-          <img
-            id="lightbox-photo-img"
-            alt="Fullscreen Graduation Preview"
-            class="max-h-[72vh] w-auto max-w-full rounded-2xl border border-gold-500/25 object-contain shadow-2xl"
-          />
-        </div>
-
-        <!-- Lightbox Bottom Actions -->
-        <div class="shrink-0 pt-2 pb-1">
-          <button
-            id="lightbox-download-btn"
-            class="btn-bounce flex w-full items-center justify-center space-x-2 rounded-xl bg-gradient-to-r from-gold-600 via-gold-500 to-gold-400 py-3.5 text-xs font-bold uppercase tracking-wider text-black shadow-lg transition-transform duration-100"
-          >
-            <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/>
-            </svg>
-            <span>Download Photo</span>
-          </button>
-        </div>
-      </section>
-
     </main>
 
     <!-- Off-screen Canvas for Photo Compositing -->
     <canvas id="capture-canvas" class="hidden"></canvas>
 
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- VIEW 4: MASTER FULLSCREEN LIGHTBOX OVERLAY (COMPLETE BACKGROUND BLOCK)    -->
+  <!-- Placed directly in body at z-[100] with backdrop-blur-xl for 100% isolation -->
+  <!-- ========================================================================= -->
+  <div
+    id="view-lightbox"
+    class="fixed inset-0 z-[100] flex flex-col justify-between p-4 sm:p-6 bg-black/85 backdrop-blur-xl"
+  >
+    <!-- 1. Floating Circular Close (X) Button (Top Right) -->
+    <div class="w-full flex justify-end shrink-0 pt-1 pr-1">
+      <button
+        id="lightbox-close-btn"
+        title="Close Preview"
+        class="btn-bounce flex h-11 w-11 items-center justify-center rounded-full bg-white/10 hover:bg-white/20 active:scale-90 border border-white/20 text-white shadow-xl transition-all"
+      >
+        <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- 2. Perfectly Centered, Proportional Photograph (Zoom Animation) -->
+    <div id="lightbox-photo-container" class="relative flex flex-1 items-center justify-center my-auto w-full overflow-hidden">
+      <img
+        id="lightbox-photo-img"
+        alt="Graduation Photograph"
+        class="max-w-[90%] max-h-[75vh] w-auto h-auto object-contain mx-auto rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.7)] border border-gold-500/30"
+      />
+    </div>
+
+    <!-- 3. Prominent Amber/Gold Download Button (Bottom Center) -->
+    <div class="w-full flex justify-center shrink-0 pb-3 sm:pb-5">
+      <button
+        id="lightbox-download-btn"
+        class="btn-bounce flex items-center justify-center space-x-2.5 rounded-2xl bg-gradient-to-r from-gold-600 via-gold-500 to-gold-400 py-3.5 px-8 text-xs sm:text-sm font-bold uppercase tracking-wider text-black shadow-[0_12px_30px_rgba(212,175,55,0.35)] transition-transform duration-100 hover:brightness-105 active:scale-95"
+      >
+        <svg class="h-4 w-4 sm:h-5 sm:w-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/>
+        </svg>
+        <span>Download Photo</span>
+      </button>
+    </div>
   </div>
 
   <script>
@@ -501,7 +521,6 @@
 
       // Lightbox Elements
       const lightboxPhotoImg = document.getElementById("lightbox-photo-img");
-      const lightboxCounter = document.getElementById("lightbox-counter");
       const lightboxCloseBtn = document.getElementById("lightbox-close-btn");
       const lightboxDownloadBtn = document.getElementById("lightbox-download-btn");
 
@@ -754,21 +773,22 @@
         });
       }
 
-      // LIGHTBOX CONTROLS
+      // =========================================================================
+      // 9. MASTER LIGHTBOX CONTROLS (ISOLATED FULLSCREEN OVERLAY)
+      // =========================================================================
       function openLightbox(index) {
         if (!sessionPhotos[index]) return;
         currentLightboxIndex = index;
 
+        // Set image source
         lightboxPhotoImg.src = sessionPhotos[index].dataUrl;
-        lightboxCounter.textContent = `Photo ${index + 1} of ${sessionPhotos.length}`;
 
-        lightboxView.classList.remove("opacity-0", "pointer-events-none", "scale-95");
-        lightboxView.classList.add("opacity-100", "scale-100");
+        // Activate fullscreen lightbox overlay with smooth Zoom & Fade In
+        lightboxView.classList.add("lightbox-active");
       }
 
       function closeLightbox() {
-        lightboxView.classList.remove("opacity-100", "scale-100");
-        lightboxView.classList.add("opacity-0", "pointer-events-none", "scale-95");
+        lightboxView.classList.remove("lightbox-active");
       }
 
       function downloadCurrentLightboxPhoto() {
@@ -781,8 +801,15 @@
         link.click();
       }
 
+      // Close when clicking outside photograph
+      lightboxView.addEventListener("click", (e) => {
+        if (e.target === lightboxView || e.target.id === "lightbox-photo-container") {
+          closeLightbox();
+        }
+      });
+
       // =========================================================================
-      // 9. EVENT LISTENERS
+      // 10. EVENT LISTENERS
       // =========================================================================
       // Login Form Submit
       loginForm.addEventListener("submit", (e) => {
@@ -812,9 +839,17 @@
       // Back to Camera from Gallery
       galleryBackBtn.addEventListener("click", closeGalleryPanel);
 
-      // Lightbox Close & Download Events
-      lightboxCloseBtn.addEventListener("click", closeLightbox);
-      lightboxDownloadBtn.addEventListener("click", downloadCurrentLightboxPhoto);
+      // Lightbox Close Button
+      lightboxCloseBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        closeLightbox();
+      });
+
+      // Lightbox Download Button
+      lightboxDownloadBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        downloadCurrentLightboxPhoto();
+      });
 
       // Exit / Switch Guest
       logoutBtn.addEventListener("click", () => {
