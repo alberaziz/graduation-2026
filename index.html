@@ -36,68 +36,12 @@
     };
   </script>
 
-  <style>
-    * {
-      -webkit-tap-highlight-color: transparent;
-      user-select: none;
-    }
-    input {
-      user-select: text;
-    }
-
-    /* Fast, silky view transitions using GPU transforms */
-    .view-fade {
-      transition: opacity 0.22s ease, transform 0.22s ease;
-      will-change: opacity, transform;
-    }
-    .slide-panel {
-      transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1);
-      will-change: transform;
-    }
-    .shutter-flash {
-      transition: opacity 0.08s ease-out;
-      will-change: opacity;
-    }
-    .btn-bounce:active {
-      transform: scale(0.92);
-    }
-
-    /* Natural selfie mirroring */
-    .mirrored {
-      transform: scaleX(-1);
-    }
-
-    /* ======================================================== */
-    /* MASTER LIGHTBOX (Zoom & Fade In Animation)               */
-    /* ======================================================== */
-    #view-lightbox {
-      opacity: 0;
-      visibility: hidden;
-      pointer-events: none;
-      transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.3s ease;
-      will-change: opacity, visibility;
-    }
-    #view-lightbox.lightbox-active {
-      opacity: 1;
-      visibility: visible;
-      pointer-events: auto;
-    }
-
-    #lightbox-photo-container {
-      transform: scale(0.80);
-      opacity: 0;
-      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-      will-change: transform, opacity;
-    }
-    #view-lightbox.lightbox-active #lightbox-photo-container {
-      transform: scale(1);
-      opacity: 1;
-    }
-  </style>
+  <!-- Custom Hardware-Accelerated Stylesheet -->
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body class="h-full w-full overflow-hidden bg-[#07070a] font-sans antialiased text-neutral-200">
 
-  <!-- Mobile-First Container (Full screen on phones, sleek frame on desktop) -->
+  <!-- Mobile-First App Shell -->
   <div class="relative mx-auto flex h-full w-full max-w-md flex-col overflow-hidden bg-surface-900 shadow-2xl border-x border-neutral-900">
 
     <!-- Top Status / Branding Header -->
@@ -112,7 +56,7 @@
         <span class="text-sm font-bold tracking-wider text-gold-400 uppercase">GRADUATE 2026</span>
       </div>
 
-      <!-- User Active Tag & Exit Button -->
+      <!-- Active User Tag & Exit Button -->
       <div class="flex items-center space-x-2">
         <div id="header-user-tag" class="hidden items-center space-x-1.5 rounded-full border border-gold-500/25 bg-surface-800 px-3 py-1 text-xs text-neutral-300">
           <span class="h-1.5 w-1.5 rounded-full bg-gold-400"></span>
@@ -148,7 +92,7 @@
             Church Of The Virgin Mary and St. Mina
           </h1>
 
-          <!-- Form: Cleaned up with no placeholders, subtitles, or helper text -->
+          <!-- Form: Strict retention with no placeholder, subtitles, or helper text -->
           <form id="login-form" class="mt-8 w-full space-y-5">
             <div class="text-left">
               <label for="user-name-input" class="block text-xs font-semibold uppercase tracking-wider text-gold-400/90 mb-2 ml-1">
@@ -188,7 +132,7 @@
             class="h-full w-full object-cover mirrored"
           ></video>
 
-          <!-- Transparent Graduation 2026 Party Frame (Overlay positioned on top of live feed) -->
+          <!-- Transparent Graduation 2026 Party Frame -->
           <div class="pointer-events-none absolute inset-0 z-10 flex items-center justify-center">
             <img
               id="camera-frame-overlay"
@@ -241,7 +185,7 @@
             <button
               id="shutter-btn"
               title="Take Photo"
-              class="btn-bounce group relative flex h-20 w-20 items-center justify-center rounded-full border-2 border-gold-500 p-1.5 transition-transform duration-100 active:scale-90"
+              class="btn-bounce group relative flex h-20 w-20 items-center justify-center rounded-full border-2 border-gold-500 p-1.5 shutter-ring transition-transform duration-100 active:scale-90"
             >
               <div class="h-full w-full rounded-full bg-gradient-to-tr from-gold-500 to-gold-300 shadow-md group-hover:brightness-110"></div>
             </button>
@@ -288,7 +232,7 @@
         <!-- Scrollable Photo Grid -->
         <div id="gallery-scroll-container" class="flex-1 overflow-y-auto p-4">
           
-          <!-- Empty State (when 0 photos) -->
+          <!-- Empty State -->
           <div id="gallery-empty-state" class="flex h-full flex-col items-center justify-center text-center p-6">
             <div class="flex h-16 w-16 items-center justify-center rounded-2xl border border-gold-500/30 bg-surface-850 text-gold-400 mb-3 shadow-md">
               <svg class="h-8 w-8" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
@@ -313,13 +257,10 @@
   </div>
 
   <!-- ========================================================================= -->
-  <!-- VIEW 4: MASTER FULLSCREEN LIGHTBOX OVERLAY (COMPLETE BACKGROUND BLOCK)    -->
-  <!-- Placed directly in body at z-[100] with backdrop-blur-xl for 100% isolation -->
+  <!-- VIEW 4: MASTER FULLSCREEN LIGHTBOX OVERLAY (COMPLETE ISOLATION & SWIPE)  -->
+  <!-- Placed directly in body at z-[100] with pure black 90% + backdrop blur    -->
   <!-- ========================================================================= -->
-  <div
-    id="view-lightbox"
-    class="fixed inset-0 z-[100] flex flex-col justify-between p-4 sm:p-6 bg-black/85 backdrop-blur-xl"
-  >
+  <div id="view-lightbox">
     <!-- 1. Floating Circular Close (X) Button (Top Right) -->
     <div class="w-full flex justify-end shrink-0 pt-1 pr-1">
       <button
@@ -333,12 +274,12 @@
       </button>
     </div>
 
-    <!-- 2. Perfectly Centered, Proportional Photograph (Zoom Animation) -->
-    <div id="lightbox-photo-container" class="relative flex flex-1 items-center justify-center my-auto w-full overflow-hidden">
+    <!-- 2. Centered, Un-stretched Photograph with Touch Swipe Support -->
+    <div id="lightbox-photo-container">
       <img
         id="lightbox-photo-img"
         alt="Graduation Photograph"
-        class="max-w-[90%] max-h-[75vh] w-auto h-auto object-contain mx-auto rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.7)] border border-gold-500/30"
+        draggable="false"
       />
     </div>
 
@@ -356,516 +297,7 @@
     </div>
   </div>
 
-  <script>
-    (() => {
-      // =========================================================================
-      // 1. HARDCODED GOOGLE APPS SCRIPT WEB APP URL
-      // =========================================================================
-      const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyJqgbbH2UBN-KzefwQspwHAU-iIx-W0gbcBGafuoFNNdzqT5lTlV3-C1lp8KCjuIhH/exec";
-
-      // =========================================================================
-      // 2. CHIC, CONTEMPORARY GRADUATION 2026 FRAME OVERLAY (HIGH-FASHION DESIGN)
-      // =========================================================================
-      const GRADUATION_FRAME_SVG = `
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1440" width="1080" height="1440">
-        <defs>
-          <linearGradient id="goldMetallic" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stop-color="#fff4b8"/>
-            <stop offset="20%" stop-color="#f5d365"/>
-            <stop offset="45%" stop-color="#d4af37"/>
-            <stop offset="70%" stop-color="#9a7610"/>
-            <stop offset="90%" stop-color="#ffd976"/>
-            <stop offset="100%" stop-color="#fff8d6"/>
-          </linearGradient>
-
-          <linearGradient id="goldShimmer" x1="0%" y1="100%" x2="100%" y2="0%">
-            <stop offset="0%" stop-color="#c99718"/>
-            <stop offset="50%" stop-color="#fff1aa"/>
-            <stop offset="100%" stop-color="#b88a14"/>
-          </linearGradient>
-
-          <filter id="cinematicGlow" x="-20%" y="-20%" width="140%" height="140%">
-            <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000000" flood-opacity="0.9"/>
-          </filter>
-        </defs>
-
-        <!-- 1. Contemporary Geometric Outer Framing -->
-        <rect x="32" y="32" width="1016" height="1376" rx="20" fill="none" stroke="url(#goldMetallic)" stroke-width="4" />
-        <rect x="46" y="46" width="988" height="1348" rx="14" fill="none" stroke="url(#goldMetallic)" stroke-width="1.2" stroke-dasharray="12 8" opacity="0.75" />
-
-        <!-- 2. Studio Crosshair / Viewfinder Markings -->
-        <line x1="540" y1="20" x2="540" y2="40" stroke="url(#goldMetallic)" stroke-width="2"/>
-        <line x1="540" y1="1400" x2="540" y2="1420" stroke="url(#goldMetallic)" stroke-width="2"/>
-        <line x1="20" y1="720" x2="40" y2="720" stroke="url(#goldMetallic)" stroke-width="2"/>
-        <line x1="1040" y1="720" x2="1060" y2="720" stroke="url(#goldMetallic)" stroke-width="2"/>
-
-        <!-- 3. Chic Architectural Corner Notches -->
-        <g transform="translate(36, 36)">
-          <path d="M 0 50 L 0 0 L 50 0" fill="none" stroke="url(#goldMetallic)" stroke-width="3"/>
-          <circle cx="16" cy="16" r="4.5" fill="url(#goldMetallic)"/>
-          <polygon points="34,16 37,23 44,26 37,29 34,36 31,29 24,26 31,23" fill="url(#goldShimmer)"/>
-        </g>
-        <g transform="translate(1044, 36)">
-          <path d="M 0 50 L 0 0 L -50 0" fill="none" stroke="url(#goldMetallic)" stroke-width="3"/>
-          <circle cx="-16" cy="16" r="4.5" fill="url(#goldMetallic)"/>
-          <polygon points="-34,16 -31,23 -24,26 -31,29 -34,36 -37,29 -44,26 -37,23" fill="url(#goldShimmer)"/>
-        </g>
-        <g transform="translate(36, 1404)">
-          <path d="M 0 -50 L 0 0 L 50 0" fill="none" stroke="url(#goldMetallic)" stroke-width="3"/>
-          <circle cx="16" cy="-16" r="4.5" fill="url(#goldMetallic)"/>
-          <polygon points="34,-16 37,-23 44,-26 37,-29 34,-36 31,-29 24,-26 31,-23" fill="url(#goldShimmer)"/>
-        </g>
-        <g transform="translate(1044, 1404)">
-          <path d="M 0 -50 L 0 0 L -50 0" fill="none" stroke="url(#goldMetallic)" stroke-width="3"/>
-          <circle cx="-16" cy="-16" r="4.5" fill="url(#goldMetallic)"/>
-          <polygon points="-34,-16 -31,-23 -24,-26 -31,-29 -34,-36 -37,-29 -44,-26 -37,-23" fill="url(#goldShimmer)"/>
-        </g>
-
-        <!-- 4. Top Contemporary Header -->
-        <g transform="translate(540, 95)" text-anchor="middle">
-          <path d="M 0 -28 L 44 -12 L 0 4 L -44 -12 Z" fill="url(#goldMetallic)" filter="url(#cinematicGlow)"/>
-          <path d="M -22 -2 L -22 13 C -22 20 22 20 22 13 L 22 -2" fill="url(#goldMetallic)" opacity="0.95"/>
-          <path d="M 32 -6 C 36 2, 40 12, 42 22" fill="none" stroke="url(#goldMetallic)" stroke-width="2.5"/>
-          <circle cx="42" cy="24" r="3.5" fill="url(#goldMetallic)"/>
-
-          <text y="36" font-family="'Cinzel', 'Times New Roman', serif" font-size="20" font-weight="700" letter-spacing="8" fill="url(#goldMetallic)" filter="url(#cinematicGlow)">
-            &#9733; CONGRATULATIONS &#9733;
-          </text>
-          <text y="64" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="28" font-weight="800" letter-spacing="6" fill="#ffffff" filter="url(#cinematicGlow)">
-            CLASS OF 2026
-          </text>
-        </g>
-
-        <!-- 5. Bottom High-Fashion Badge -->
-        <rect x="52" y="1215" width="976" height="175" rx="22" fill="#090a0e" fill-opacity="0.84" stroke="url(#goldMetallic)" stroke-width="2" />
-        <rect x="62" y="1225" width="956" height="155" rx="16" fill="none" stroke="url(#goldMetallic)" stroke-width="1" stroke-dasharray="6 4" opacity="0.6"/>
-
-        <g transform="translate(540, 1262)" text-anchor="middle">
-          <g stroke="url(#goldMetallic)" fill="none" stroke-width="2.5">
-            <path d="M -235 32 C -210 14, -185 6, -155 0"/>
-            <path d="M 235 32 C 210 14, 185 6, 155 0"/>
-          </g>
-          <g fill="url(#goldMetallic)">
-            <circle cx="-200" cy="16" r="5"/>
-            <circle cx="-175" cy="7" r="4.5"/>
-            <circle cx="-150" cy="0" r="4"/>
-            <circle cx="200" cy="16" r="5"/>
-            <circle cx="175" cy="7" r="4.5"/>
-            <circle cx="150" cy="0" r="4"/>
-          </g>
-
-          <text y="24" font-family="'Cinzel', 'Times New Roman', serif" font-size="88" font-weight="900" letter-spacing="12" fill="url(#goldMetallic)" filter="url(#cinematicGlow)">
-            2026
-          </text>
-
-          <text y="74" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="20" font-weight="700" letter-spacing="1.5" fill="#ffffff" filter="url(#cinematicGlow)">
-            Church Of The Virgin Mary and St. Mina
-          </text>
-          
-          <text y="98" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="600" letter-spacing="4" fill="url(#goldShimmer)">
-            GRADUATION CELEBRATION
-          </text>
-        </g>
-      </svg>`;
-
-      const GRADUATION_FRAME_DATA_URL = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(GRADUATION_FRAME_SVG.trim());
-
-      const frameImage = new Image();
-      frameImage.crossOrigin = "anonymous";
-      frameImage.src = GRADUATION_FRAME_DATA_URL;
-
-      const cameraFrameOverlay = document.getElementById("camera-frame-overlay");
-      cameraFrameOverlay.src = GRADUATION_FRAME_DATA_URL;
-
-      // =========================================================================
-      // 3. APPLICATION STATE & GLOBAL SESSION PHOTOS ARRAY
-      // =========================================================================
-      const sessionPhotos = []; // Stores Base64 data URLs for in-app album
-      let currentLightboxIndex = 0;
-
-      const state = {
-        userName: "",
-        stream: null,
-        facingMode: "user"
-      };
-
-      // DOM Elements
-      const loginView = document.getElementById("login-view");
-      const cameraView = document.getElementById("camera-view");
-      const galleryView = document.getElementById("gallery-view");
-      const lightboxView = document.getElementById("view-lightbox");
-
-      const loginForm = document.getElementById("login-form");
-      const userNameInput = document.getElementById("user-name-input");
-      const headerUserTag = document.getElementById("header-user-tag");
-      const headerUserName = document.getElementById("header-user-name");
-      const logoutBtn = document.getElementById("logout-btn");
-
-      const video = document.getElementById("camera-stream");
-      const shutterBtn = document.getElementById("shutter-btn");
-      const flipCamBtn = document.getElementById("flip-cam-btn");
-      const shutterFlash = document.getElementById("shutter-flash-overlay");
-      const canvas = document.getElementById("capture-canvas");
-      const cameraStatusMsg = document.getElementById("camera-status-msg");
-      const cameraStatusText = document.getElementById("camera-status-text");
-
-      // Gallery Elements
-      const galleryOpenBtn = document.getElementById("gallery-open-btn");
-      const galleryBackBtn = document.getElementById("gallery-back-btn");
-      const galleryThumbPreview = document.getElementById("gallery-thumb-preview");
-      const galleryThumbPlaceholder = document.getElementById("gallery-thumb-placeholder");
-      const galleryCountBadge = document.getElementById("gallery-count-badge");
-      const galleryHeaderCount = document.getElementById("gallery-header-count");
-      const galleryEmptyState = document.getElementById("gallery-empty-state");
-      const galleryGrid = document.getElementById("gallery-grid");
-
-      // Lightbox Elements
-      const lightboxPhotoImg = document.getElementById("lightbox-photo-img");
-      const lightboxCloseBtn = document.getElementById("lightbox-close-btn");
-      const lightboxDownloadBtn = document.getElementById("lightbox-download-btn");
-
-      // =========================================================================
-      // 4. SCREEN NAVIGATION
-      // =========================================================================
-      function showView(viewId) {
-        [loginView, cameraView].forEach(v => {
-          if (v.id === viewId) {
-            v.classList.remove("opacity-0", "pointer-events-none", "z-0");
-            v.classList.add("opacity-100", "z-10");
-          } else {
-            v.classList.remove("opacity-100", "z-10");
-            v.classList.add("opacity-0", "pointer-events-none", "z-0");
-          }
-        });
-      }
-
-      function openGalleryPanel() {
-        renderGalleryGrid();
-        galleryView.classList.remove("translate-y-full");
-        galleryView.classList.add("translate-y-0");
-      }
-
-      function closeGalleryPanel() {
-        galleryView.classList.remove("translate-y-0");
-        galleryView.classList.add("translate-y-full");
-      }
-
-      // =========================================================================
-      // 5. CAMERA STREAM MANAGEMENT
-      // =========================================================================
-      async function startCamera() {
-        stopCamera();
-        cameraStatusMsg.classList.remove("hidden");
-        cameraStatusText.textContent = "Opening camera...";
-
-        const constraints = {
-          audio: false,
-          video: {
-            facingMode: state.facingMode,
-            width: { ideal: 1920 },
-            height: { ideal: 1080 }
-          }
-        };
-
-        try {
-          state.stream = await navigator.mediaDevices.getUserMedia(constraints);
-          video.srcObject = state.stream;
-
-          if (state.facingMode === "user") {
-            video.classList.add("mirrored");
-          } else {
-            video.classList.remove("mirrored");
-          }
-
-          video.onloadedmetadata = () => {
-            cameraStatusMsg.classList.add("hidden");
-            video.play();
-          };
-        } catch (err) {
-          console.error("Camera access error:", err);
-          cameraStatusMsg.classList.remove("hidden");
-          cameraStatusText.textContent = "Camera access denied. Please grant permissions.";
-        }
-      }
-
-      function stopCamera() {
-        if (state.stream) {
-          state.stream.getTracks().forEach(track => track.stop());
-          state.stream = null;
-        }
-      }
-
-      function flipCamera() {
-        state.facingMode = state.facingMode === "user" ? "environment" : "user";
-        startCamera();
-      }
-
-      // =========================================================================
-      // 6. CONTINUOUS PHOTO CAPTURE & COMPOSITING (CAMERA REMAINS OPEN)
-      // =========================================================================
-      function capturePhoto() {
-        if (!state.stream) return;
-
-        // Visual shutter flash effect
-        shutterFlash.classList.remove("opacity-0");
-        shutterFlash.classList.add("opacity-90");
-        setTimeout(() => {
-          shutterFlash.classList.remove("opacity-90");
-          shutterFlash.classList.add("opacity-0");
-        }, 80);
-
-        const width = video.videoWidth || 1080;
-        const height = video.videoHeight || 1440;
-        canvas.width = width;
-        canvas.height = height;
-
-        const ctx = canvas.getContext("2d");
-
-        // STEP 1: Draw the user's photo FIRST (with horizontal mirroring if front camera)
-        if (state.facingMode === "user") {
-          ctx.save();
-          ctx.translate(width, 0);
-          ctx.scale(-1, 1);
-          ctx.drawImage(video, 0, 0, width, height);
-          ctx.restore();
-        } else {
-          ctx.drawImage(video, 0, 0, width, height);
-        }
-
-        // STEP 2: Draw the Graduation 2026 Frame ON TOP of the photo
-        ctx.drawImage(frameImage, 0, 0, width, height);
-
-        // Export high-quality Base64 JPEG
-        const finalImage = canvas.toDataURL("image/jpeg", 0.90);
-
-        // STEP 3: Store into global sessionPhotos array (newest first)
-        sessionPhotos.unshift({
-          id: Date.now(),
-          dataUrl: finalImage,
-          timestamp: new Date()
-        });
-
-        // STEP 4: Update circular Album/Gallery button thumbnail in the camera view
-        updateGalleryButton();
-
-        // STEP 5: SILENT BACKGROUND UPLOAD TO GOOGLE DRIVE (User stays on camera!)
-        silentUploadToDrive(finalImage, state.userName);
-      }
-
-      // =========================================================================
-      // 7. 100% SILENT BACKGROUND UPLOAD (NO POPUPS, NO DRIVE LINKS SHOWN)
-      // =========================================================================
-      async function silentUploadToDrive(imageBase64, userName) {
-        const cleanName = (userName || "Guest").replace(/[^a-zA-Z0-9_-]/g, "_");
-        const filename = `photo_${cleanName}_${Date.now()}.jpg`;
-
-        // Payload matching Google Apps Script doPost() fields:
-        // folderName, image, filename
-        const payload = {
-          folderName: userName || "Guest",
-          image: imageBase64,
-          filename: filename
-        };
-
-        const serializedPayload = JSON.stringify(payload);
-
-        try {
-          // Standard fetch sent as plain text to bypass CORS preflight
-          const response = await fetch(APPS_SCRIPT_URL, {
-            method: "POST",
-            headers: {
-              "Content-Type": "text/plain;charset=utf-8"
-            },
-            body: serializedPayload
-          });
-
-          // Silent check (never interrupt or alert user)
-          if (!response.ok) {
-            throw new Error("HTTP Status " + response.status);
-          }
-          console.log("[Photobooth] Photo silently uploaded to Google Drive folder:", userName);
-
-        } catch (fetchError) {
-          // Fallback with mode: 'no-cors' to guarantee delivery without browser CORS blocking
-          try {
-            await fetch(APPS_SCRIPT_URL, {
-              method: "POST",
-              mode: "no-cors",
-              headers: {
-                "Content-Type": "text/plain;charset=utf-8"
-              },
-              body: serializedPayload
-            });
-            console.log("[Photobooth] Photo delivered silently via no-cors fallback.");
-          } catch (err) {
-            console.warn("[Photobooth] Silent background upload encountered an issue:", err);
-          }
-        }
-      }
-
-      // =========================================================================
-      // 8. IN-APP GALLERY & FULLSCREEN LIGHTBOX PREVIEW LOGIC
-      // =========================================================================
-      function updateGalleryButton() {
-        const total = sessionPhotos.length;
-        if (total > 0) {
-          galleryThumbPreview.src = sessionPhotos[0].dataUrl;
-          galleryThumbPreview.classList.remove("hidden");
-          galleryThumbPlaceholder.classList.add("hidden");
-
-          galleryCountBadge.textContent = total;
-          galleryCountBadge.classList.remove("hidden");
-          galleryCountBadge.classList.add("flex");
-        } else {
-          galleryThumbPreview.classList.add("hidden");
-          galleryThumbPlaceholder.classList.remove("hidden");
-          galleryCountBadge.classList.add("hidden");
-        }
-      }
-
-      function renderGalleryGrid() {
-        const total = sessionPhotos.length;
-        galleryHeaderCount.textContent = total;
-
-        if (total === 0) {
-          galleryEmptyState.classList.remove("hidden");
-          galleryGrid.classList.add("hidden");
-          galleryGrid.innerHTML = "";
-          return;
-        }
-
-        galleryEmptyState.classList.add("hidden");
-        galleryGrid.classList.remove("hidden");
-        galleryGrid.innerHTML = "";
-
-        // Build individual photo cards (clicking ANY photo opens Lightbox)
-        sessionPhotos.forEach((photo, idx) => {
-          const card = document.createElement("div");
-          card.className = "btn-bounce group relative flex flex-col rounded-2xl border border-gold-500/25 bg-surface-850 p-2 shadow-lg cursor-pointer transition-transform";
-
-          const imgContainer = document.createElement("div");
-          imgContainer.className = "relative aspect-[3/4] w-full overflow-hidden rounded-xl bg-black";
-
-          const img = document.createElement("img");
-          img.src = photo.dataUrl;
-          img.alt = `Graduation Shot ${total - idx}`;
-          img.className = "h-full w-full object-cover transition-transform duration-200 group-hover:scale-105";
-
-          // Expand badge overlay on card
-          const viewBadge = document.createElement("div");
-          viewBadge.className = "absolute bottom-2 right-2 flex h-7 w-7 items-center justify-center rounded-full bg-black/75 text-gold-400 border border-gold-500/40 shadow";
-          viewBadge.innerHTML = `
-            <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15"/>
-            </svg>
-          `;
-
-          imgContainer.appendChild(img);
-          imgContainer.appendChild(viewBadge);
-          card.appendChild(imgContainer);
-
-          // Clicking photo card opens Fullscreen Lightbox
-          card.addEventListener("click", () => {
-            openLightbox(idx);
-          });
-
-          galleryGrid.appendChild(card);
-        });
-      }
-
-      // =========================================================================
-      // 9. MASTER LIGHTBOX CONTROLS (ISOLATED FULLSCREEN OVERLAY)
-      // =========================================================================
-      function openLightbox(index) {
-        if (!sessionPhotos[index]) return;
-        currentLightboxIndex = index;
-
-        // Set image source
-        lightboxPhotoImg.src = sessionPhotos[index].dataUrl;
-
-        // Activate fullscreen lightbox overlay with smooth Zoom & Fade In
-        lightboxView.classList.add("lightbox-active");
-      }
-
-      function closeLightbox() {
-        lightboxView.classList.remove("lightbox-active");
-      }
-
-      function downloadCurrentLightboxPhoto() {
-        if (!sessionPhotos[currentLightboxIndex]) return;
-        const photo = sessionPhotos[currentLightboxIndex];
-        const link = document.createElement("a");
-        const safeName = (state.userName || "Guest").replace(/[^a-zA-Z0-9_-]/g, "_");
-        link.download = `${safeName}_Graduation_2026_shot${currentLightboxIndex + 1}.jpg`;
-        link.href = photo.dataUrl;
-        link.click();
-      }
-
-      // Close when clicking outside photograph
-      lightboxView.addEventListener("click", (e) => {
-        if (e.target === lightboxView || e.target.id === "lightbox-photo-container") {
-          closeLightbox();
-        }
-      });
-
-      // =========================================================================
-      // 10. EVENT LISTENERS
-      // =========================================================================
-      // Login Form Submit
-      loginForm.addEventListener("submit", (e) => {
-        e.preventDefault();
-        const name = userNameInput.value.trim();
-        if (!name) return;
-
-        state.userName = name;
-        headerUserName.textContent = name;
-        headerUserTag.classList.remove("hidden");
-        headerUserTag.classList.add("flex");
-        logoutBtn.classList.remove("hidden");
-
-        showView("camera-view");
-        startCamera();
-      });
-
-      // Shutter Click (Continuous Back-to-Back Shots)
-      shutterBtn.addEventListener("click", capturePhoto);
-
-      // Flip Camera
-      flipCamBtn.addEventListener("click", flipCamera);
-
-      // Open Album / Gallery Slide-up View
-      galleryOpenBtn.addEventListener("click", openGalleryPanel);
-
-      // Back to Camera from Gallery
-      galleryBackBtn.addEventListener("click", closeGalleryPanel);
-
-      // Lightbox Close Button
-      lightboxCloseBtn.addEventListener("click", (e) => {
-        e.stopPropagation();
-        closeLightbox();
-      });
-
-      // Lightbox Download Button
-      lightboxDownloadBtn.addEventListener("click", (e) => {
-        e.stopPropagation();
-        downloadCurrentLightboxPhoto();
-      });
-
-      // Exit / Switch Guest
-      logoutBtn.addEventListener("click", () => {
-        stopCamera();
-        state.userName = "";
-        sessionPhotos.length = 0; // Clear session album for next guest
-        updateGalleryButton();
-        closeGalleryPanel();
-        closeLightbox();
-        headerUserTag.classList.add("hidden");
-        logoutBtn.classList.add("hidden");
-        userNameInput.value = "";
-        showView("login-view");
-      });
-
-    })();
-  </script>
+  <!-- Main Application Logic Script -->
+  <script src="app.js"></script>
 </body>
 </html>
