@@ -2,14 +2,14 @@
  * ============================================================================
  * GRADUATE 2026 - PHOTOBOOTH APPLICATION (app.js)
  * Architecture: ES6+ Modular Vanilla JS
- * Features:
- *   1. Native Inline SVG Graduation 2026 Frames (4 Themes)
- *   2. Native Instagram-style CSS Video Filters
- *   3. Live Touch-Swipe on Camera Viewfinder (Cycles Themes & Filters)
- *   4. Canvas Compositing with ctx.filter + SVG Frame Layering
- *   5. 100% Silent Background Upload to Google Apps Script
- *   6. Continuous Back-to-Back Flow (Zero Redirection)
- *   7. In-App Gallery & Touch-Swipe Fullscreen Lightbox
+ * Key Features:
+ *   1. 4 Valid Native Inline SVG Graduation 2026 Frames (Fixed Frame 4 XML)
+ *   2. Pre-rendered DOM Layers with Hardware-Accelerated CSS (60fps No-Lag Swipe)
+ *   3. Fixed 3:4 Aspect-Ratio Camera Viewport with Exact Frame Alignment
+ *   4. Object-Cover Cropped Canvas Compositing (ctx.filter + SVG Frame)
+ *   5. 100% Silent Google Apps Script Upload (CORS Bypass)
+ *   6. Continuous Shutter Flow (Zero Redirection)
+ *   7. Fullscreen Isolated Lightbox with Touch-Swipe Navigation
  * ============================================================================
  */
 
@@ -22,7 +22,7 @@
   const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyJqgbbH2UBN-KzefwQspwHAU-iIx-W0gbcBGafuoFNNdzqT5lTlV3-C1lp8KCjuIhH/exec";
 
   // ==========================================================================
-  // 2. NATIVE INLINE SVG FRAMES & INSTAGRAM-STYLE CSS FILTERS (4 THEMES)
+  // 2. 4 NATIVE INLINE SVG FRAMES & INSTAGRAM-STYLE CSS FILTERS
   // ==========================================================================
   const PHOTOBOOTH_THEMES = [
     // ------------------------------------------------------------------------
@@ -127,7 +127,7 @@
             GRADUATE // 2026
           </text>
           <text x="944" y="0" text-anchor="end" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="700" letter-spacing="3" fill="#ffffff" opacity="0.85">
-            [ ISO 100 • 35MM ]
+            [ ISO 100 &#8226; 35MM ]
           </text>
         </g>
         <!-- Bottom Editorial Layout Bar -->
@@ -138,7 +138,7 @@
             CHURCH OF THE VIRGIN MARY &amp; ST. MINA
           </text>
           <text y="24" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="600" letter-spacing="4" fill="#aaaaaa">
-            CLASS OF 2026 • COMMENCEMENT PORTFOLIO
+            CLASS OF 2026 &#8226; COMMENCEMENT PORTFOLIO
           </text>
         </g>
         <!-- Minimal Barcode Element -->
@@ -176,19 +176,16 @@
             <feDropShadow dx="0" dy="3" stdDeviation="6" flood-color="#000000" flood-opacity="0.9"/>
           </filter>
         </defs>
-        <!-- Confetti Diamonds & Stars around borders (leaving center face clear) -->
+        <!-- Confetti Diamonds & Stars around borders -->
         <g fill="url(#partyGold)">
-          <!-- Top Left Streamers -->
           <polygon points="90,65 96,77 108,83 96,89 90,101 84,89 72,83 84,77"/>
           <circle cx="130" cy="90" r="5"/>
           <circle cx="75" cy="130" r="4"/>
           <polygon points="120,135 125,145 135,150 125,155 120,165 115,155 105,150 115,145"/>
-          <!-- Top Right Streamers -->
           <polygon points="990,65 996,77 1008,83 996,89 990,101 984,89 972,83 984,77"/>
           <circle cx="950" cy="90" r="5"/>
           <circle cx="1005" cy="130" r="4"/>
           <polygon points="960,135 965,145 975,150 965,155 960,165 955,155 945,150 955,145"/>
-          <!-- Side Streamer Sparks -->
           <circle cx="50" cy="400" r="4"/>
           <circle cx="58" cy="720" r="5"/>
           <circle cx="48" cy="1000" r="4.5"/>
@@ -218,14 +215,14 @@
             Church Of The Virgin Mary and St. Mina
           </text>
           <text y="90" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" letter-spacing="4" fill="#ffd54f">
-            HONORING OUR GRADUATES • WE DID IT!
+            HONORING OUR GRADUATES &#8226; WE DID IT!
           </text>
         </g>
       </svg>`
     },
 
     // ------------------------------------------------------------------------
-    // THEME 4: VINTAGE POLAROID (Thick bottom border, vintage script, sepia 35mm)
+    // THEME 4: VINTAGE POLAROID (FIXED: 100% Valid XML without HTML entities)
     // ------------------------------------------------------------------------
     {
       id: "vintage-polaroid",
@@ -235,49 +232,44 @@
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1440" width="1080" height="1440">
         <defs>
           <filter id="polaroidShadow" x="-20%" y="-20%" width="140%" height="140%">
-            <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#000000" flood-opacity="0.9"/>
+            <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#000000" flood-opacity="0.85"/>
           </filter>
         </defs>
-        <!-- Polaroid Iconic White/Cream Frame Framing -->
-        <!-- Top border -->
-        <rect x="0" y="0" width="1080" height="52" fill="#faf8f2"/>
-        <!-- Left border -->
-        <rect x="0" y="52" width="52" height="1138" fill="#faf8f2"/>
-        <!-- Right border -->
-        <rect x="1028" y="52" width="52" height="1138" fill="#faf8f2"/>
-        <!-- Massive Polaroid Bottom Chin -->
-        <rect x="0" y="1190" width="1080" height="250" fill="#faf8f2" filter="url(#polaroidShadow)"/>
-        <!-- Inner Vintage Vignette Border Line -->
-        <rect x="52" y="52" width="976" height="1138" fill="none" stroke="#222222" stroke-width="2.5" opacity="0.85"/>
-        <!-- Top Left Vintage Camera HUD Stamp -->
-        <g transform="translate(74, 94)" filter="url(#polaroidShadow)">
+        <!-- Classic Polaroid Border Frame -->
+        <rect x="0" y="0" width="1080" height="48" fill="#f8f6ee"/>
+        <rect x="0" y="48" width="48" height="1144" fill="#f8f6ee"/>
+        <rect x="1032" y="48" width="48" height="1144" fill="#f8f6ee"/>
+        <rect x="0" y="1192" width="1080" height="248" fill="#f8f6ee" filter="url(#polaroidShadow)"/>
+        <rect x="48" y="48" width="984" height="1144" fill="none" stroke="#222222" stroke-width="2" opacity="0.8"/>
+        <!-- Top Left Vintage Recording Badge -->
+        <g transform="translate(68, 90)" filter="url(#polaroidShadow)">
           <circle cx="10" cy="10" r="7" fill="#e53935"/>
-          <text x="26" y="16" font-family="'Courier New', monospace" font-size="18" font-weight="900" letter-spacing="2" fill="#ffffff">
-            REC ● 2026
+          <text x="26" y="16" font-family="'Courier New', monospace" font-size="17" font-weight="900" letter-spacing="2" fill="#ffffff">
+            REC &#9679; 2026
           </text>
         </g>
-        <!-- Bottom Polaroid Script & Metadata -->
-        <g transform="translate(540, 1265)" text-anchor="middle">
+        <!-- Polaroid Bottom Chin Typography -->
+        <g transform="translate(540, 1264)" text-anchor="middle">
           <text y="0" font-family="'Brush Script MT', 'Dancing Script', 'Baskerville', 'Georgia', cursive, serif" font-size="52" font-style="italic" font-weight="bold" fill="#1c1c1e">
-            Graduation Day &bull; Class of 2026
+            Graduation Day &#8226; Class of 2026
           </text>
           <text y="42" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="18" font-weight="700" letter-spacing="2" fill="#444444">
             CHURCH OF THE VIRGIN MARY AND ST. MINA
           </text>
           <text y="70" font-family="'Courier New', monospace" font-size="14" font-weight="bold" letter-spacing="4" fill="#777777">
-            '26 06 15 &bull; COMMENCEMENT MEMORY
+            '26 06 15 &#8226; COMMENCEMENT MEMORY
           </text>
         </g>
-        <!-- Bottom Right Vintage Stamp Seal -->
+        <!-- Vintage Quality Seal -->
         <g transform="translate(980, 1370)" text-anchor="middle">
-          <circle cx="0" cy="0" r="28" fill="none" stroke="#aa7722" stroke-width="2" stroke-dasharray="4 2"/>
+          <circle cx="0" cy="0" r="26" fill="none" stroke="#aa7722" stroke-width="2" stroke-dasharray="4 2"/>
           <text y="4" font-family="sans-serif" font-size="9" font-weight="bold" fill="#aa7722">OFFICIAL</text>
         </g>
       </svg>`
     }
   ];
 
-  // Pre-load all 4 SVG frame themes as Image instances for instantaneous rendering
+  // Pre-load all 4 SVG frame themes as Image instances for instantaneous Canvas compositing
   PHOTOBOOTH_THEMES.forEach((theme) => {
     theme.dataUrl = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(theme.svg.trim());
     theme.frameImage = new Image();
@@ -315,10 +307,10 @@
     headerUserName: document.getElementById("header-user-name"),
     logoutBtn: document.getElementById("logout-btn"),
 
-    // Camera & Viewfinder
-    cameraViewfinder: document.getElementById("camera-viewfinder"),
+    // Camera & Viewport
+    cameraViewport: document.getElementById("camera-viewport"),
+    framesStack: document.getElementById("frames-stack"),
     video: document.getElementById("camera-stream"),
-    cameraFrameOverlay: document.getElementById("camera-frame-overlay"),
     themeNameLabel: document.getElementById("theme-name-label"),
     themeStepBadge: document.getElementById("theme-step-badge"),
     prevFrameBtn: document.getElementById("prev-frame-btn"),
@@ -348,61 +340,83 @@
   };
 
   // ==========================================================================
-  // 5. THEME & FILTER SWITCHING LOGIC (CAMERA VIEW)
+  // 5. PRE-RENDER SVG FRAMES IN DOM (60FPS HARDWARE-ACCELERATED SWIPE)
   // ==========================================================================
-  function applyTheme(index, direction = null) {
-    if (index < 0) index = PHOTOBOOTH_THEMES.length - 1;
-    if (index >= PHOTOBOOTH_THEMES.length) index = 0;
-    currentThemeIndex = index;
-    const theme = PHOTOBOOTH_THEMES[currentThemeIndex];
+  function initPreRenderedFrames() {
+    dom.framesStack.innerHTML = "";
+    PHOTOBOOTH_THEMES.forEach((theme, index) => {
+      const layer = document.createElement("div");
+      layer.className = `frame-layer ${index === 0 ? "active" : ""}`;
+      layer.dataset.index = index;
+      layer.innerHTML = theme.svg.trim();
+      dom.framesStack.appendChild(layer);
+      theme.layerElement = layer;
+    });
+  }
 
-    // 1. Update Video CSS Filter (Smooth transition)
-    dom.video.style.filter = theme.cssFilter;
+  // Pre-render all 4 SVG layers into DOM at startup
+  initPreRenderedFrames();
 
-    // 2. Update Overlay Frame with slide/fade transition
-    if (direction === "left") {
-      dom.cameraFrameOverlay.classList.remove("frame-slide-in");
-      dom.cameraFrameOverlay.classList.add("frame-slide-left-out");
-      setTimeout(() => {
-        dom.cameraFrameOverlay.src = theme.dataUrl;
-        dom.cameraFrameOverlay.classList.remove("frame-slide-left-out");
-        dom.cameraFrameOverlay.classList.add("frame-slide-in");
-      }, 120);
-    } else if (direction === "right") {
-      dom.cameraFrameOverlay.classList.remove("frame-slide-in");
-      dom.cameraFrameOverlay.classList.add("frame-slide-right-out");
-      setTimeout(() => {
-        dom.cameraFrameOverlay.src = theme.dataUrl;
-        dom.cameraFrameOverlay.classList.remove("frame-slide-right-out");
-        dom.cameraFrameOverlay.classList.add("frame-slide-in");
-      }, 120);
-    } else {
-      dom.cameraFrameOverlay.src = theme.dataUrl;
+  // ==========================================================================
+  // 6. 60FPS THEME & FILTER SWITCHING (ZERO LAG)
+  // ==========================================================================
+  function applyTheme(newIndex, direction = null) {
+    if (newIndex < 0) newIndex = PHOTOBOOTH_THEMES.length - 1;
+    if (newIndex >= PHOTOBOOTH_THEMES.length) newIndex = 0;
+
+    const oldIndex = currentThemeIndex;
+    currentThemeIndex = newIndex;
+    const oldTheme = PHOTOBOOTH_THEMES[oldIndex];
+    const newTheme = PHOTOBOOTH_THEMES[currentThemeIndex];
+
+    // 1. Update Video CSS Filter (GPU hardware accelerated)
+    dom.video.style.filter = newTheme.cssFilter;
+
+    // 2. Hardware-accelerated translate3d slide of pre-rendered DOM layers
+    if (oldIndex !== newIndex) {
+      if (direction === "left") {
+        // Swiped Left: old layer exits to the left, new layer slides in from right
+        oldTheme.layerElement.className = "frame-layer slide-left";
+        newTheme.layerElement.className = "frame-layer slide-right";
+        newTheme.layerElement.offsetHeight; // Force reflow
+        newTheme.layerElement.className = "frame-layer active";
+      } else if (direction === "right") {
+        // Swiped Right: old layer exits to the right, new layer slides in from left
+        oldTheme.layerElement.className = "frame-layer slide-right";
+        newTheme.layerElement.className = "frame-layer slide-left";
+        newTheme.layerElement.offsetHeight; // Force reflow
+        newTheme.layerElement.className = "frame-layer active";
+      } else {
+        // Direct jump
+        PHOTOBOOTH_THEMES.forEach((t, i) => {
+          t.layerElement.className = `frame-layer ${i === currentThemeIndex ? "active" : ""}`;
+        });
+      }
     }
 
-    // 3. Update Indicator Pill Label
-    dom.themeNameLabel.textContent = theme.name;
+    // 3. Update Indicator Pill UI
+    dom.themeNameLabel.textContent = newTheme.name;
     dom.themeStepBadge.textContent = `${currentThemeIndex + 1}/${PHOTOBOOTH_THEMES.length}`;
   }
 
-  // Initialize first theme
+  // Initialize active theme
   applyTheme(0);
 
   // ==========================================================================
-  // 6. LIVE CAMERA TOUCH-SWIPE LOGIC
+  // 7. CAMERA VIEWPORT TOUCH-SWIPE ENGINE
   // ==========================================================================
   let camStartX = 0;
   let camStartY = 0;
   let camIsDragging = false;
 
-  dom.cameraViewfinder.addEventListener("touchstart", (e) => {
+  dom.cameraViewport.addEventListener("touchstart", (e) => {
     const touch = e.touches[0];
     camStartX = touch.clientX;
     camStartY = touch.clientY;
     camIsDragging = true;
   }, { passive: true });
 
-  dom.cameraViewfinder.addEventListener("touchmove", (e) => {
+  dom.cameraViewport.addEventListener("touchmove", (e) => {
     if (!camIsDragging) return;
     const touch = e.touches[0];
     const diffX = touch.clientX - camStartX;
@@ -412,7 +426,7 @@
     }
   }, { passive: false });
 
-  dom.cameraViewfinder.addEventListener("touchend", (e) => {
+  dom.cameraViewport.addEventListener("touchend", (e) => {
     if (!camIsDragging) return;
     camIsDragging = false;
     const touch = e.changedTouches[0];
@@ -422,16 +436,16 @@
     // Minimum swipe threshold: 45px
     if (Math.abs(diffX) > 45 && Math.abs(diffX) > Math.abs(diffY)) {
       if (diffX < 0) {
-        // Swiped Left -> Next Frame/Filter
+        // Swiped Left -> Next Frame & Filter
         applyTheme(currentThemeIndex + 1, "left");
       } else {
-        // Swiped Right -> Previous Frame/Filter
+        // Swiped Right -> Previous Frame & Filter
         applyTheme(currentThemeIndex - 1, "right");
       }
     }
   });
 
-  // Desktop click buttons on the indicator pill
+  // Indicator Pill Buttons (Desktop / Tap Support)
   dom.prevFrameBtn.addEventListener("click", (e) => {
     e.stopPropagation();
     applyTheme(currentThemeIndex - 1, "right");
@@ -443,7 +457,7 @@
   });
 
   // ==========================================================================
-  // 7. SCREEN NAVIGATION
+  // 8. SCREEN NAVIGATION
   // ==========================================================================
   function showView(viewId) {
     [dom.loginView, dom.cameraView].forEach(v => {
@@ -469,7 +483,7 @@
   }
 
   // ==========================================================================
-  // 8. CAMERA STREAM MANAGEMENT
+  // 9. CAMERA STREAM MANAGEMENT
   // ==========================================================================
   async function startCamera() {
     stopCamera();
@@ -519,7 +533,7 @@
   }
 
   // ==========================================================================
-  // 9. CONTINUOUS CAPTURE & COMPOSITING (FILTER + SVG FRAME MERGED)
+  // 10. EXACT 3:4 OBJECT-COVER CANVAS CAPTURE (FILTER + SVG FRAME MERGED)
   // ==========================================================================
   function capturePhoto() {
     if (!appState.stream) return;
@@ -532,38 +546,56 @@
       dom.shutterFlash.classList.add("opacity-0");
     }, 80);
 
-    const width = dom.video.videoWidth || 1080;
-    const height = dom.video.videoHeight || 1440;
-    dom.canvas.width = width;
-    dom.canvas.height = height;
+    // Canvas fixed at native 3:4 portrait photobooth resolution
+    const canvasWidth = 1080;
+    const canvasHeight = 1440;
+    dom.canvas.width = canvasWidth;
+    dom.canvas.height = canvasHeight;
 
     const ctx = dom.canvas.getContext("2d");
     const activeTheme = PHOTOBOOTH_THEMES[currentThemeIndex];
 
-    // 2. Apply the Active CSS Filter to the Canvas before drawing video
-    ctx.filter = activeTheme.cssFilter || "none";
+    // 2. Compute object-cover source rectangle matching 3:4 viewport
+    const vWidth = dom.video.videoWidth || 1080;
+    const vHeight = dom.video.videoHeight || 1440;
+    const targetRatio = canvasWidth / canvasHeight; // 0.75
+    const videoRatio = vWidth / vHeight;
 
-    // 3. Draw live video feed FIRST (mirrored if front camera)
-    if (appState.facingMode === "user") {
-      ctx.save();
-      ctx.translate(width, 0);
-      ctx.scale(-1, 1);
-      ctx.drawImage(dom.video, 0, 0, width, height);
-      ctx.restore();
+    let sx = 0, sy = 0, sWidth = vWidth, sHeight = vHeight;
+    if (videoRatio > targetRatio) {
+      // Video is wider than 3:4 -> crop sides symmetrically
+      sWidth = vHeight * targetRatio;
+      sx = (vWidth - sWidth) / 2;
     } else {
-      ctx.drawImage(dom.video, 0, 0, width, height);
+      // Video is taller than 3:4 -> crop top/bottom symmetrically
+      sHeight = vWidth / targetRatio;
+      sy = (vHeight - sHeight) / 2;
     }
 
-    // 4. IMPORTANT: Reset filter back to 'none' so the SVG frame maintains crisp colors
+    // 3. Apply Active Instagram-style CSS Filter to Canvas
+    ctx.filter = activeTheme.cssFilter || "none";
+
+    // 4. Draw Video Feed with horizontal mirroring if front camera
+    if (appState.facingMode === "user") {
+      ctx.save();
+      ctx.translate(canvasWidth, 0);
+      ctx.scale(-1, 1);
+      ctx.drawImage(dom.video, sx, sy, sWidth, sHeight, 0, 0, canvasWidth, canvasHeight);
+      ctx.restore();
+    } else {
+      ctx.drawImage(dom.video, sx, sy, sWidth, sHeight, 0, 0, canvasWidth, canvasHeight);
+    }
+
+    // 5. Reset filter to 'none' so SVG frame colors remain crisp and pristine
     ctx.filter = "none";
 
-    // 5. Draw the Active SVG Frame ON TOP of the filtered photo
-    ctx.drawImage(activeTheme.frameImage, 0, 0, width, height);
+    // 6. Draw the Active SVG Frame ON TOP of the filtered photo
+    ctx.drawImage(activeTheme.frameImage, 0, 0, canvasWidth, canvasHeight);
 
-    // 6. Export high-quality Base64 JPEG
+    // 7. Export high-quality Base64 JPEG
     const finalImage = dom.canvas.toDataURL("image/jpeg", 0.90);
 
-    // 7. Store in global sessionPhotos (newest photo at index 0)
+    // 8. Store in global sessionPhotos (newest photo at index 0)
     sessionPhotos.unshift({
       id: Date.now(),
       dataUrl: finalImage,
@@ -571,15 +603,15 @@
       timestamp: new Date()
     });
 
-    // 8. Update Circular Album Thumbnail Button
+    // 9. Update Circular Album Thumbnail Button
     updateGalleryButton();
 
-    // 9. Silent Background Upload to Google Drive (Zero interruption)
+    // 10. Silent Background Upload to Google Drive (Zero interruption)
     silentUploadToDrive(finalImage, appState.userName);
   }
 
   // ==========================================================================
-  // 10. 100% SILENT BACKGROUND UPLOAD TO GOOGLE DRIVE
+  // 11. 100% SILENT BACKGROUND UPLOAD TO GOOGLE DRIVE
   // ==========================================================================
   async function silentUploadToDrive(imageBase64, userName) {
     const cleanName = (userName || "Guest").replace(/[^a-zA-Z0-9_-]/g, "_");
@@ -628,7 +660,7 @@
   }
 
   // ==========================================================================
-  // 11. IN-APP GALLERY DRAWER LOGIC
+  // 12. IN-APP GALLERY DRAWER LOGIC
   // ==========================================================================
   function updateGalleryButton() {
     const total = sessionPhotos.length;
@@ -696,7 +728,7 @@
   }
 
   // ==========================================================================
-  // 12. FULLSCREEN LIGHTBOX & TOUCH SWIPE MECHANICS
+  // 13. FULLSCREEN LIGHTBOX & TOUCH SWIPE ENGINE
   // ==========================================================================
   let isDragging = false;
   let startX = 0;
@@ -907,7 +939,7 @@
   });
 
   // ==========================================================================
-  // 13. GLOBAL EVENT LISTENERS
+  // 14. GLOBAL EVENT LISTENERS
   // ==========================================================================
   // Login Form
   dom.loginForm.addEventListener("submit", (e) => {

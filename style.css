@@ -1,7 +1,7 @@
 /* ==========================================================================
    GRADUATE 2026 - PHOTOBOOTH STYLESHEET (style.css)
-   Modular CSS3 with GPU Acceleration, Native Filter Transitions,
-   Camera Frame Swiping, and Fullscreen Isolated Lightbox
+   Hardware-Accelerated CSS3, 60fps Pre-rendered Frame Layers,
+   Fixed 3:4 Camera Viewport, and Isolated Fullscreen Lightbox
    ========================================================================== */
 
 /* Universal Reset & Mobile Touch Optimizations */
@@ -48,52 +48,67 @@ input {
 }
 
 /* ==========================================================================
-   LIVE CAMERA VIEW, LIVE FILTERS & FRAME SWIPING
+   CAMERA VIEWPORT (FIXED 3:4 ASPECT RATIO & PERFECT FRAME ALIGNMENT)
    ========================================================================== */
-#camera-viewfinder {
-  touch-action: pan-y;
+#camera-viewport {
   position: relative;
-  overflow: hidden;
+  touch-action: pan-y;
   user-select: none;
+  transform: translate3d(0, 0, 0);
+  contain: layout paint;
 }
 
 #camera-stream {
-  transition: filter 0.35s ease;
+  transition: filter 0.22s ease;
   will-change: filter;
+  transform: translate3d(0, 0, 0);
 }
 
-#camera-frame-overlay {
-  transition: opacity 0.22s ease, transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
-  will-change: opacity, transform;
+/* Pre-rendered Frame Layer Stack (Hardware Accelerated 60fps) */
+#frames-stack {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: hidden;
 }
 
-/* Frame Transition Classes */
-.frame-slide-left-out {
-  transform: translateX(-15%);
+.frame-layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  will-change: transform, opacity;
+  transform: translate3d(100%, 0, 0);
   opacity: 0;
+  transition: transform 0.28s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.28s ease;
 }
-.frame-slide-right-out {
-  transform: translateX(15%);
-  opacity: 0;
-}
-.frame-slide-in {
-  transform: translateX(0);
+
+.frame-layer.active {
+  transform: translate3d(0, 0, 0);
   opacity: 1;
 }
 
-/* Floating Filter / Frame Pill Indicator */
-.theme-pill {
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6), 0 0 10px rgba(212, 175, 55, 0.2);
-  transition: transform 0.2s ease, opacity 0.2s ease;
+.frame-layer.slide-left {
+  transform: translate3d(-100%, 0, 0);
+  opacity: 0;
 }
 
-.theme-pill:active {
-  transform: scale(0.96);
+.frame-layer.slide-right {
+  transform: translate3d(100%, 0, 0);
+  opacity: 0;
 }
 
-/* Shutter Button Breathing Aura */
+.frame-layer svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  pointer-events: none;
+}
+
+/* Shutter Button Aura */
 @keyframes ringPulse {
   0% {
     box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.55);
@@ -110,7 +125,7 @@ input {
   animation: ringPulse 2.4s infinite;
 }
 
-/* Custom Scrollbar for Session Album */
+/* Custom Scrollbar for Album Drawer */
 #gallery-scroll-container::-webkit-scrollbar {
   width: 5px;
 }
@@ -162,7 +177,7 @@ input {
   width: 100%;
   margin: auto 0;
   overflow: hidden;
-  touch-action: none; /* Crucial: Prevents browser scroll hijacking during swipe */
+  touch-action: none;
   user-select: none;
 }
 
@@ -186,12 +201,10 @@ input {
   cursor: grabbing;
 }
 
-/* Class applied during live finger dragging (instant 1:1 movement) */
 #lightbox-photo-img.is-swiping {
   transition: none !important;
 }
 
-/* Class applied when releasing for smooth snap/slide */
 #lightbox-photo-img.snap-transition {
   transition: transform 0.28s cubic-bezier(0.2, 0.9, 0.3, 1), opacity 0.28s ease-out !important;
 }

@@ -123,35 +123,15 @@
       <!-- ========================================== -->
       <section id="camera-view" class="view-fade absolute inset-0 flex flex-col justify-between opacity-0 pointer-events-none z-0">
         
-        <!-- Live Video Viewfinder with Touch Swipe Support -->
-        <div id="camera-viewfinder" class="relative flex-1 overflow-hidden bg-black flex items-center justify-center">
-          
-          <!-- Live Camera Video Feed with dynamic CSS filter -->
-          <video
-            id="camera-stream"
-            autoplay
-            playsinline
-            muted
-            class="h-full w-full object-cover mirrored"
-          ></video>
-
-          <!-- Transparent Native SVG Frame Overlay -->
-          <div class="pointer-events-none absolute inset-0 z-10 flex items-center justify-center">
-            <img
-              id="camera-frame-overlay"
-              alt="Graduation 2026 Frame Overlay"
-              class="h-full w-full object-contain pointer-events-none select-none frame-slide-in"
-            />
-          </div>
-
-          <!-- Top Floating Theme & Filter Swipe Indicator Pill -->
-          <div class="pointer-events-auto absolute top-4 z-20 flex items-center space-x-1.5 rounded-full border border-gold-500/30 bg-black/75 px-3 py-1.5 text-xs text-white theme-pill">
+        <!-- Top Controls: Theme & Filter Indicator Pill -->
+        <div class="relative z-30 flex h-14 shrink-0 items-center justify-center px-4 pt-2">
+          <div class="flex items-center space-x-2 rounded-full border border-gold-500/30 bg-surface-850/95 px-3.5 py-1 text-xs text-white shadow-lg backdrop-blur-md">
             <button id="prev-frame-btn" title="Previous Frame" class="text-gold-400 hover:text-white p-1 active:scale-90 transition-transform">
               <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
               </svg>
             </button>
-            <span id="theme-name-label" class="font-semibold tracking-wide text-gold-300 select-none min-w-[95px] text-center">
+            <span id="theme-name-label" class="font-semibold tracking-wide text-gold-300 min-w-[100px] text-center select-none">
               Classic Gold
             </span>
             <span id="theme-step-badge" class="text-[10px] text-neutral-400 font-mono select-none">
@@ -163,16 +143,40 @@
               </svg>
             </button>
           </div>
+        </div>
 
-          <!-- Camera Loading / Status Message -->
-          <div id="camera-status-msg" class="pointer-events-none absolute inset-0 flex flex-col items-center justify-center p-6 text-center text-sm text-neutral-400 hidden z-20">
-            <div class="h-8 w-8 rounded-full border-2 border-gold-500 border-t-transparent animate-spin mb-2"></div>
-            <p id="camera-status-text">Accessing camera...</p>
+        <!-- Centered Viewfinder Window: Fixed 3:4 Aspect Ratio (No Full-Screen Stretch) -->
+        <div class="relative flex flex-1 items-center justify-center p-3 sm:p-4 overflow-hidden">
+          
+          <div
+            id="camera-viewport"
+            class="relative aspect-[3/4] w-full max-w-[340px] max-h-[62vh] rounded-2xl overflow-hidden bg-black shadow-[0_20px_50px_rgba(0,0,0,0.85)] border-2 border-gold-500/35"
+          >
+            <!-- Live Camera Video Feed (Fitted precisely inside the 3:4 container) -->
+            <video
+              id="camera-stream"
+              autoplay
+              playsinline
+              muted
+              class="absolute inset-0 h-full w-full object-cover mirrored"
+            ></video>
+
+            <!-- Pre-rendered SVG Frames Stack (60fps GPU Hardware Accelerated) -->
+            <div id="frames-stack" class="pointer-events-none absolute inset-0 z-10 overflow-hidden">
+              <!-- Frame layers injected natively by app.js at initialization -->
+            </div>
+
+            <!-- Camera Loading / Status Message -->
+            <div id="camera-status-msg" class="pointer-events-none absolute inset-0 flex flex-col items-center justify-center p-6 text-center text-xs text-neutral-400 hidden z-20 bg-black/75">
+              <div class="h-7 w-7 rounded-full border-2 border-gold-500 border-t-transparent animate-spin mb-2"></div>
+              <p id="camera-status-text">Connecting to camera...</p>
+            </div>
           </div>
+
         </div>
 
         <!-- Camera Controls Toolbar -->
-        <div class="relative z-20 flex h-28 shrink-0 items-center justify-between border-t border-neutral-800 bg-surface-850 px-8">
+        <div class="relative z-20 flex h-24 shrink-0 items-center justify-between border-t border-neutral-800 bg-surface-850 px-8">
           
           <!-- CIRCULAR ALBUM / GALLERY BUTTON -->
           <button
