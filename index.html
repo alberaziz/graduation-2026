@@ -23,6 +23,7 @@
               900: '#0a0a0e',
               850: '#101117',
               800: '#161821',
+              750: '#1e212d',
               700: '#222533',
             }
           },
@@ -47,16 +48,15 @@
       transition: opacity 0.25s ease, transform 0.25s ease;
     }
     .shutter-flash {
-      transition: opacity 0.08s ease-out;
+      transition: opacity 0.09s ease-out;
     }
-    @keyframes spin-fast {
-      to { transform: rotate(360deg); }
-    }
-    .animate-spin-custom {
-      animation: spin-fast 0.8s linear infinite;
-    }
+    /* Natural selfie mirroring */
     .mirrored {
       transform: scaleX(-1);
+    }
+    /* Snappy tap feedback */
+    .btn-press:active {
+      transform: scale(0.92);
     }
   </style>
 </head>
@@ -77,10 +77,15 @@
         <span class="text-sm font-bold tracking-wider text-gold-400 uppercase">GRADUATE 2026</span>
       </div>
 
-      <!-- Active User Tag (Settings gear icon completely removed) -->
-      <div id="header-user-tag" class="hidden items-center space-x-1.5 rounded-full border border-gold-500/25 bg-surface-800 px-3 py-1 text-xs text-neutral-300">
-        <span class="h-1.5 w-1.5 rounded-full bg-gold-400"></span>
-        <span id="header-user-name" class="max-w-[130px] truncate font-medium">Guest</span>
+      <!-- User Badge & Switch Guest Action -->
+      <div class="flex items-center space-x-2">
+        <div id="header-user-tag" class="hidden items-center space-x-1.5 rounded-full border border-gold-500/25 bg-surface-800 px-3 py-1 text-xs text-neutral-300">
+          <span class="h-1.5 w-1.5 rounded-full bg-gold-400"></span>
+          <span id="header-user-name" class="max-w-[100px] truncate font-medium">Guest</span>
+        </div>
+        <button id="logout-btn" title="Switch Guest" class="hidden text-xs text-neutral-400 hover:text-gold-400 transition-colors px-2 py-1 rounded border border-neutral-800 active:scale-95">
+          Exit
+        </button>
       </div>
     </header>
 
@@ -135,7 +140,7 @@
       </section>
 
       <!-- ========================================== -->
-      <!-- VIEW 2: CAMERA VIEW                        -->
+      <!-- VIEW 2: CONTINUOUS CAMERA VIEW             -->
       <!-- ========================================== -->
       <section id="camera-view" class="view-transition absolute inset-0 flex flex-col justify-between opacity-0 pointer-events-none z-0">
         <!-- Live Video Viewfinder with Contemporary Graduation Frame Overlay -->
@@ -157,138 +162,108 @@
             />
           </div>
 
-          <!-- Camera Loading Indicator -->
+          <!-- Camera Loading / Status Message -->
           <div id="camera-status-msg" class="pointer-events-none absolute inset-0 flex flex-col items-center justify-center p-6 text-center text-sm text-neutral-400 hidden z-20">
-            <svg class="h-8 w-8 text-neutral-500 mb-2 animate-spin-custom" fill="none" viewBox="0 0 24 24">
-              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-            </svg>
+            <div class="h-8 w-8 rounded-full border-2 border-gold-500 border-t-transparent animate-spin mb-2"></div>
             <p id="camera-status-text">Accessing camera...</p>
           </div>
         </div>
 
-        <!-- Camera Controls -->
-        <div class="relative z-20 flex h-28 shrink-0 items-center justify-around border-t border-neutral-800 bg-surface-850 px-6">
-          <!-- Flip Camera (Front/Rear) -->
+        <!-- Camera Controls Toolbar -->
+        <div class="relative z-20 flex h-28 shrink-0 items-center justify-between border-t border-neutral-800 bg-surface-850 px-8">
+          
+          <!-- ALBUM / GALLERY BUTTON (Shows thumbnail of last shot & badge count) -->
           <button
-            id="flip-cam-btn"
-            title="Switch Camera"
-            class="flex h-11 w-11 items-center justify-center rounded-full border border-neutral-700 bg-surface-800 text-neutral-300 transition-transform active:scale-90"
+            id="gallery-open-btn"
+            title="Open Session Album"
+            class="group relative flex h-14 w-14 items-center justify-center rounded-2xl border-2 border-gold-500/40 bg-surface-800 p-0.5 shadow-md transition-transform duration-150 active:scale-90"
           >
-            <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"/>
-            </svg>
+            <!-- Thumbnail Image (shown when at least 1 photo exists) -->
+            <img
+              id="gallery-thumb-preview"
+              alt="Latest Photo Thumbnail"
+              class="hidden h-full w-full rounded-xl object-cover"
+            />
+
+            <!-- Placeholder Icon (shown before any photo is captured) -->
+            <div id="gallery-thumb-placeholder" class="flex flex-col items-center justify-center text-gold-400">
+              <svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
+              </svg>
+            </div>
+
+            <!-- Photos Count Badge -->
+            <span
+              id="gallery-count-badge"
+              class="absolute -top-1.5 -right-1.5 hidden h-5 min-w-[20px] items-center justify-center rounded-full bg-gold-400 px-1 text-[11px] font-bold text-black shadow"
+            >
+              0
+            </span>
           </button>
 
-          <!-- Main Shutter Button -->
+          <!-- MAIN SHUTTER BUTTON (Continuous Capture) -->
           <div class="relative flex items-center justify-center">
             <button
               id="shutter-btn"
+              title="Take Photo"
               class="group relative flex h-20 w-20 items-center justify-center rounded-full border-2 border-gold-500 p-1.5 transition-transform duration-100 active:scale-90"
             >
               <div class="h-full w-full rounded-full bg-gradient-to-tr from-gold-500 to-gold-300 shadow-md group-hover:brightness-110"></div>
             </button>
           </div>
 
-          <!-- Switch User Button -->
+          <!-- FLIP CAMERA BUTTON (Front / Rear) -->
           <button
-            id="logout-btn"
-            title="Switch Guest"
-            class="flex h-11 w-11 items-center justify-center rounded-full border border-neutral-700 bg-surface-800 text-neutral-300 transition-transform active:scale-90"
+            id="flip-cam-btn"
+            title="Switch Camera"
+            class="flex h-14 w-14 items-center justify-center rounded-2xl border border-neutral-700 bg-surface-800 text-neutral-300 transition-transform duration-150 active:scale-90 shadow-md"
           >
-            <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9"/>
+            <svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"/>
             </svg>
           </button>
         </div>
       </section>
 
       <!-- ========================================== -->
-      <!-- VIEW 3: RESULT & UPLOAD VIEW               -->
+      <!-- VIEW 3: IN-APP GALLERY / ALBUM VIEW        -->
       <!-- ========================================== -->
-      <section id="result-view" class="view-transition absolute inset-0 flex flex-col justify-between p-5 opacity-0 pointer-events-none z-0">
-        <div class="relative flex-1 overflow-hidden rounded-2xl border border-gold-500/20 bg-black flex items-center justify-center">
-          <img
-            id="captured-image-preview"
-            alt="Captured Graduation Photo"
-            class="h-full w-full object-contain"
-          />
+      <section id="gallery-view" class="view-transition absolute inset-0 flex flex-col bg-surface-900 opacity-0 pointer-events-none z-30">
+        <!-- Gallery Top Navigation Bar -->
+        <div class="flex h-14 shrink-0 items-center justify-between border-b border-neutral-800 bg-surface-850 px-4">
+          <button
+            id="gallery-back-btn"
+            class="flex items-center space-x-1.5 text-xs font-semibold text-gold-400 active:scale-95 transition-transform py-1 px-2.5 rounded-lg border border-gold-500/25 bg-surface-800"
+          >
+            <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+            </svg>
+            <span>Back to Camera</span>
+          </button>
 
-          <!-- Upload Status Notification -->
-          <div id="upload-status-card" class="absolute bottom-4 left-4 right-4 rounded-xl border border-neutral-800 bg-surface-850/95 p-3.5 shadow-xl transition-all duration-200">
-            <!-- Uploading State -->
-            <div id="status-uploading" class="flex items-center space-x-3">
-              <svg class="h-5 w-5 text-gold-400 animate-spin-custom shrink-0" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-              </svg>
-              <div class="flex-1 overflow-hidden">
-                <p class="text-xs font-semibold text-white">Saving to Google Drive...</p>
-                <p class="text-[11px] text-neutral-400 truncate">Folder: <span id="target-folder-label" class="text-gold-400 font-medium"></span></p>
-              </div>
-            </div>
-
-            <!-- Success State -->
-            <div id="status-success" class="hidden items-center space-x-3">
-              <div class="flex h-6 w-6 items-center justify-center rounded-full bg-emerald-500/20 text-emerald-400 shrink-0">
-                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/>
-                </svg>
-              </div>
-              <div class="flex-1 overflow-hidden">
-                <p class="text-xs font-semibold text-emerald-400">Uploaded Successfully!</p>
-                <a id="drive-link" href="#" target="_blank" class="text-[11px] text-gold-400 underline truncate block">
-                  Open photo in Google Drive
-                </a>
-              </div>
-            </div>
-
-            <!-- Error State -->
-            <div id="status-error" class="hidden items-center space-x-3">
-              <div class="flex h-6 w-6 items-center justify-center rounded-full bg-rose-500/20 text-rose-400 shrink-0">
-                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
-                </svg>
-              </div>
-              <div class="flex-1 overflow-hidden">
-                <p class="text-xs font-semibold text-rose-400">Upload Issue</p>
-                <p id="error-details" class="text-[11px] text-neutral-400 truncate">Tap retry or save photo to your device</p>
-              </div>
-            </div>
+          <div class="flex items-center space-x-2">
+            <span class="text-xs font-semibold uppercase tracking-wider text-neutral-300">My Photos</span>
+            <span id="gallery-header-count" class="rounded-full bg-gold-500/20 px-2 py-0.5 text-[11px] font-bold text-gold-400">0</span>
           </div>
         </div>
 
-        <div class="mt-4 flex flex-col space-y-2.5">
-          <div class="flex space-x-2">
-            <button
-              id="retake-btn"
-              class="flex-1 rounded-xl bg-gradient-to-r from-gold-600 via-gold-500 to-gold-400 py-3.5 text-xs font-bold uppercase tracking-wider text-black transition-transform duration-100 active:scale-95"
-            >
-              Take Another Photo
-            </button>
-            <button
-              id="retry-upload-btn"
-              class="hidden rounded-xl border border-gold-500/40 bg-surface-800 px-4 py-3.5 text-xs font-semibold text-gold-400 transition-transform active:scale-95"
-            >
-              Retry
-            </button>
-            <button
-              id="download-fallback-btn"
-              title="Save to Device"
-              class="flex items-center justify-center rounded-xl border border-neutral-700 bg-surface-800 px-3.5 py-3.5 text-neutral-300 transition-transform active:scale-95"
-            >
-              <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/>
+        <!-- Scrollable Photo Grid -->
+        <div id="gallery-scroll-container" class="flex-1 overflow-y-auto p-4">
+          
+          <!-- Empty State (when 0 photos) -->
+          <div id="gallery-empty-state" class="flex h-full flex-col items-center justify-center text-center p-6">
+            <div class="flex h-16 w-16 items-center justify-center rounded-2xl border border-gold-500/30 bg-surface-850 text-gold-400 mb-3">
+              <svg class="h-8 w-8" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0z"/>
               </svg>
-            </button>
+            </div>
+            <h3 class="text-sm font-semibold text-white">No Photos Taken Yet</h3>
+            <p class="mt-1 text-xs text-neutral-500">Tap the shutter button on the camera screen to capture your memories!</p>
           </div>
 
-          <button
-            id="finish-session-btn"
-            class="w-full py-2 text-center text-xs text-neutral-400 hover:text-white transition-colors"
-          >
-            End Session &amp; Switch Guest
-          </button>
+          <!-- Active Photo Grid -->
+          <div id="gallery-grid" class="hidden grid grid-cols-2 gap-3.5 pb-8"></div>
         </div>
       </section>
 
@@ -421,50 +396,50 @@
       cameraFrameOverlay.src = GRADUATION_FRAME_DATA_URL;
 
       // =========================================================================
-      // 3. APPLICATION STATE & DOM REFERENCES
+      // 3. APPLICATION STATE & GLOBAL SESSION PHOTOS ARRAY
       // =========================================================================
+      const sessionPhotos = []; // Stores Base64 data URLs for in-app album
+
       const state = {
         userName: "",
         stream: null,
-        facingMode: "user",
-        capturedBase64: null
+        facingMode: "user"
       };
 
+      // DOM Elements
       const loginView = document.getElementById("login-view");
       const cameraView = document.getElementById("camera-view");
-      const resultView = document.getElementById("result-view");
+      const galleryView = document.getElementById("gallery-view");
 
       const loginForm = document.getElementById("login-form");
       const userNameInput = document.getElementById("user-name-input");
       const headerUserTag = document.getElementById("header-user-tag");
       const headerUserName = document.getElementById("header-user-name");
+      const logoutBtn = document.getElementById("logout-btn");
 
       const video = document.getElementById("camera-stream");
       const shutterBtn = document.getElementById("shutter-btn");
       const flipCamBtn = document.getElementById("flip-cam-btn");
-      const logoutBtn = document.getElementById("logout-btn");
       const shutterFlash = document.getElementById("shutter-flash-overlay");
       const canvas = document.getElementById("capture-canvas");
       const cameraStatusMsg = document.getElementById("camera-status-msg");
       const cameraStatusText = document.getElementById("camera-status-text");
 
-      const previewImage = document.getElementById("captured-image-preview");
-      const targetFolderLabel = document.getElementById("target-folder-label");
-      const statusUploading = document.getElementById("status-uploading");
-      const statusSuccess = document.getElementById("status-success");
-      const statusError = document.getElementById("status-error");
-      const errorDetails = document.getElementById("error-details");
-      const driveLink = document.getElementById("drive-link");
-      const retakeBtn = document.getElementById("retake-btn");
-      const retryUploadBtn = document.getElementById("retry-upload-btn");
-      const downloadFallbackBtn = document.getElementById("download-fallback-btn");
-      const finishSessionBtn = document.getElementById("finish-session-btn");
+      // Gallery Elements
+      const galleryOpenBtn = document.getElementById("gallery-open-btn");
+      const galleryBackBtn = document.getElementById("gallery-back-btn");
+      const galleryThumbPreview = document.getElementById("gallery-thumb-preview");
+      const galleryThumbPlaceholder = document.getElementById("gallery-thumb-placeholder");
+      const galleryCountBadge = document.getElementById("gallery-count-badge");
+      const galleryHeaderCount = document.getElementById("gallery-header-count");
+      const galleryEmptyState = document.getElementById("gallery-empty-state");
+      const galleryGrid = document.getElementById("gallery-grid");
 
       // =========================================================================
       // 4. SCREEN NAVIGATION
       // =========================================================================
       function showView(viewId) {
-        [loginView, cameraView, resultView].forEach(v => {
+        [loginView, cameraView, galleryView].forEach(v => {
           if (v.id === viewId) {
             v.classList.remove("opacity-0", "pointer-events-none", "z-0");
             v.classList.add("opacity-100", "z-10");
@@ -526,12 +501,12 @@
       }
 
       // =========================================================================
-      // 6. PHOTO CAPTURE & COMPOSITING (CAMERA FEED FIRST, FRAME ON TOP)
+      // 6. CONTINUOUS PHOTO CAPTURE & COMPOSITING (CAMERA REMAINS OPEN)
       // =========================================================================
       function capturePhoto() {
         if (!state.stream) return;
 
-        // Lightweight shutter flash effect
+        // Visual shutter flash effect
         shutterFlash.classList.remove("opacity-0");
         shutterFlash.classList.add("opacity-90");
         setTimeout(() => {
@@ -546,7 +521,7 @@
 
         const ctx = canvas.getContext("2d");
 
-        // STEP 1: Draw the user's photo FIRST (with mirroring if front camera)
+        // STEP 1: Draw the user's photo FIRST (with horizontal mirroring if front camera)
         if (state.facingMode === "user") {
           ctx.save();
           ctx.translate(width, 0);
@@ -560,65 +535,42 @@
         // STEP 2: Draw the Graduation 2026 Frame ON TOP of the photo
         ctx.drawImage(frameImage, 0, 0, width, height);
 
+        // Export high-quality Base64 JPEG
         const finalImage = canvas.toDataURL("image/jpeg", 0.90);
-        state.capturedBase64 = finalImage;
 
-        stopCamera();
+        // STEP 3: Store into global sessionPhotos array (newest first)
+        sessionPhotos.unshift({
+          id: Date.now(),
+          dataUrl: finalImage,
+          timestamp: new Date()
+        });
 
-        previewImage.src = finalImage;
-        targetFolderLabel.textContent = state.userName;
-        showView("result-view");
+        // STEP 4: Update Album/Gallery button thumbnail in the camera view
+        updateGalleryButton();
 
-        uploadPhotoToDrive();
+        // STEP 5: SILENT BACKGROUND UPLOAD TO GOOGLE DRIVE (User stays on camera!)
+        silentUploadToDrive(finalImage, state.userName);
       }
 
       // =========================================================================
-      // 7. ROBUST PLAIN-TEXT CORS-BYPASS GOOGLE DRIVE UPLOAD LOGIC
+      // 7. 100% SILENT BACKGROUND UPLOAD (NO POPUPS, NO DRIVE LINKS SHOWN)
       // =========================================================================
-      function showUploadSuccess(result) {
-        statusUploading.classList.add("hidden");
-        statusSuccess.classList.remove("hidden");
-        statusError.classList.add("hidden");
-        retryUploadBtn.classList.add("hidden");
-
-        if (result && result.url) {
-          driveLink.href = result.url;
-          driveLink.textContent = "Open in Drive: " + (result.filename || "View Photo");
-        } else {
-          driveLink.href = "https://drive.google.com/drive/folders/1e7wf16L5M2WGkywKuhhIfSCTi-eFnAvr";
-          driveLink.textContent = "Open in Google Drive folder";
-        }
-      }
-
-      function showUploadError(msg) {
-        statusUploading.classList.add("hidden");
-        statusSuccess.classList.add("hidden");
-        statusError.classList.remove("hidden");
-        retryUploadBtn.classList.remove("hidden");
-        errorDetails.textContent = msg;
-      }
-
-      async function uploadPhotoToDrive() {
-        statusUploading.classList.remove("hidden");
-        statusSuccess.classList.add("hidden");
-        statusError.classList.add("hidden");
-        retryUploadBtn.classList.add("hidden");
-
-        // Payload fields matching the exact Google Apps Script backend:
-        // folderName, image, filename
-        const cleanName = state.userName.replace(/[^a-zA-Z0-9_-]/g, "_");
+      async function silentUploadToDrive(imageBase64, userName) {
+        const cleanName = (userName || "Guest").replace(/[^a-zA-Z0-9_-]/g, "_");
         const filename = `photo_${cleanName}_${Date.now()}.jpg`;
 
+        // Payload matching your exact Google Apps Script doPost() fields:
+        // folderName, image, filename
         const payload = {
-          folderName: state.userName,
-          image: state.capturedBase64,
+          folderName: userName || "Guest",
+          image: imageBase64,
           filename: filename
         };
 
         const serializedPayload = JSON.stringify(payload);
 
         try {
-          // Send as plain text to bypass CORS preflight OPTIONS request
+          // Standard fetch sent as plain text to bypass CORS preflight
           const response = await fetch(APPS_SCRIPT_URL, {
             method: "POST",
             headers: {
@@ -627,27 +579,14 @@
             body: serializedPayload
           });
 
-          let result = null;
-          try {
-            result = await response.json();
-          } catch (jsonErr) {
-            if (response.ok) {
-              result = { status: "success", filename: filename };
-            }
+          // Silent check (never interrupt or alert user)
+          if (!response.ok) {
+            throw new Error("HTTP Status " + response.status);
           }
-
-          if (result && result.status === "success") {
-            showUploadSuccess(result);
-            return;
-          } else {
-            throw new Error((result && result.message) || "Upload failed");
-          }
+          console.log("[Photobooth] Photo silently uploaded to Google Drive folder:", userName);
 
         } catch (fetchError) {
-          console.warn("Standard fetch encountered CORS/redirect, triggering guaranteed no-cors fallback:", fetchError);
-
-          // Guaranteed delivery fallback with mode: 'no-cors'
-          // Delivers plain text payload directly to Apps Script without browser CORS blocking
+          // Fallback with mode: 'no-cors' to guarantee delivery without browser CORS blocking
           try {
             await fetch(APPS_SCRIPT_URL, {
               method: "POST",
@@ -657,32 +596,94 @@
               },
               body: serializedPayload
             });
-
-            // With no-cors, the request completes and creates the folder + file in Google Drive
-            showUploadSuccess({
-              status: "success",
-              filename: filename
-            });
-
-          } catch (noCorsError) {
-            console.error("All upload attempts failed:", noCorsError);
-            showUploadError("Network connection error. Tap retry or save to device.");
+            console.log("[Photobooth] Photo delivered silently via no-cors fallback.");
+          } catch (err) {
+            console.warn("[Photobooth] Silent background upload encountered an issue:", err);
           }
         }
       }
 
-      function downloadPhotoLocally() {
-        if (!state.capturedBase64) return;
+      // =========================================================================
+      // 8. IN-APP GALLERY / ALBUM UI LOGIC
+      // =========================================================================
+      function updateGalleryButton() {
+        const total = sessionPhotos.length;
+        if (total > 0) {
+          galleryThumbPreview.src = sessionPhotos[0].dataUrl;
+          galleryThumbPreview.classList.remove("hidden");
+          galleryThumbPlaceholder.classList.add("hidden");
+
+          galleryCountBadge.textContent = total;
+          galleryCountBadge.classList.remove("hidden");
+          galleryCountBadge.classList.add("flex");
+        } else {
+          galleryThumbPreview.classList.add("hidden");
+          galleryThumbPlaceholder.classList.remove("hidden");
+          galleryCountBadge.classList.add("hidden");
+        }
+      }
+
+      function renderGalleryView() {
+        const total = sessionPhotos.length;
+        galleryHeaderCount.textContent = total;
+
+        if (total === 0) {
+          galleryEmptyState.classList.remove("hidden");
+          galleryGrid.classList.add("hidden");
+          galleryGrid.innerHTML = "";
+          return;
+        }
+
+        galleryEmptyState.classList.add("hidden");
+        galleryGrid.classList.remove("hidden");
+        galleryGrid.innerHTML = "";
+
+        // Build individual photo cards with direct Download buttons
+        sessionPhotos.forEach((photo, idx) => {
+          const card = document.createElement("div");
+          card.className = "flex flex-col rounded-2xl border border-gold-500/25 bg-surface-850 p-2 shadow-lg";
+
+          const imgContainer = document.createElement("div");
+          imgContainer.className = "relative aspect-[3/4] w-full overflow-hidden rounded-xl bg-black";
+
+          const img = document.createElement("img");
+          img.src = photo.dataUrl;
+          img.alt = `Graduation Shot ${total - idx}`;
+          img.className = "h-full w-full object-cover";
+
+          imgContainer.appendChild(img);
+
+          // Download action button
+          const downloadBtn = document.createElement("button");
+          downloadBtn.className = "mt-2.5 flex items-center justify-center space-x-1.5 w-full rounded-xl bg-gradient-to-r from-gold-600 via-gold-500 to-gold-400 py-2.5 text-xs font-bold text-black uppercase tracking-wider transition-transform active:scale-95 shadow";
+          downloadBtn.innerHTML = `
+            <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/>
+            </svg>
+            <span>Download</span>
+          `;
+          downloadBtn.addEventListener("click", () => {
+            downloadSinglePhoto(photo.dataUrl, idx + 1);
+          });
+
+          card.appendChild(imgContainer);
+          card.appendChild(downloadBtn);
+          galleryGrid.appendChild(card);
+        });
+      }
+
+      function downloadSinglePhoto(dataUrl, photoNumber) {
         const link = document.createElement("a");
-        const safeName = state.userName.replace(/[^a-zA-Z0-9]/g, "_");
-        link.download = `${safeName}_Graduation_2026.jpg`;
-        link.href = state.capturedBase64;
+        const safeName = (state.userName || "Guest").replace(/[^a-zA-Z0-9_-]/g, "_");
+        link.download = `${safeName}_Graduation_2026_shot${photoNumber}.jpg`;
+        link.href = dataUrl;
         link.click();
       }
 
       // =========================================================================
-      // 8. EVENT LISTENERS
+      // 9. EVENT LISTENERS
       // =========================================================================
+      // Login Form Submit
       loginForm.addEventListener("submit", (e) => {
         e.preventDefault();
         const name = userNameInput.value.trim();
@@ -692,31 +693,40 @@
         headerUserName.textContent = name;
         headerUserTag.classList.remove("hidden");
         headerUserTag.classList.add("flex");
+        logoutBtn.classList.remove("hidden");
 
         showView("camera-view");
         startCamera();
       });
 
+      // Shutter Click (Continuous Back-to-Back Shots)
       shutterBtn.addEventListener("click", capturePhoto);
+
+      // Flip Camera
       flipCamBtn.addEventListener("click", flipCamera);
 
-      function logout() {
-        stopCamera();
-        state.userName = "";
-        headerUserTag.classList.add("hidden");
-        userNameInput.value = "";
-        showView("login-view");
-      }
-      logoutBtn.addEventListener("click", logout);
-      finishSessionBtn.addEventListener("click", logout);
-
-      retakeBtn.addEventListener("click", () => {
-        showView("camera-view");
-        startCamera();
+      // Open Album / Gallery View
+      galleryOpenBtn.addEventListener("click", () => {
+        renderGalleryView();
+        showView("gallery-view");
       });
 
-      retryUploadBtn.addEventListener("click", uploadPhotoToDrive);
-      downloadFallbackBtn.addEventListener("click", downloadPhotoLocally);
+      // Back to Camera from Gallery
+      galleryBackBtn.addEventListener("click", () => {
+        showView("camera-view");
+      });
+
+      // Exit / Switch Guest
+      logoutBtn.addEventListener("click", () => {
+        stopCamera();
+        state.userName = "";
+        sessionPhotos.length = 0; // Clear session album for next guest
+        updateGalleryButton();
+        headerUserTag.classList.add("hidden");
+        logoutBtn.classList.add("hidden");
+        userNameInput.value = "";
+        showView("login-view");
+      });
 
     })();
   </script>
