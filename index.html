@@ -87,12 +87,12 @@
             </svg>
           </div>
 
-          <!-- Main Heading -->
+          <!-- Main Heading (Clean: No Subtitles, No Helper Text) -->
           <h1 class="text-xl sm:text-2xl font-bold tracking-tight text-white leading-snug">
             Church Of The Virgin Mary and St. Mina
           </h1>
 
-          <!-- Form: Cleaned up with no placeholders, subtitles, or helper text -->
+          <!-- Form: Clean input without placeholder -->
           <form id="login-form" class="mt-8 w-full space-y-5">
             <div class="text-left">
               <label for="user-name-input" class="block text-xs font-semibold uppercase tracking-wider text-gold-400/90 mb-2 ml-1">
@@ -123,9 +123,9 @@
       <!-- ========================================== -->
       <section id="camera-view" class="view-fade absolute inset-0 flex flex-col justify-between opacity-0 pointer-events-none z-0">
         
-        <!-- Top Controls: Theme & Filter Indicator Pill -->
+        <!-- Top Theme Indicator Pill -->
         <div class="relative z-30 flex h-14 shrink-0 items-center justify-center px-4 pt-2">
-          <div class="flex items-center space-x-2 rounded-full border border-gold-500/30 bg-surface-850/95 px-3.5 py-1 text-xs text-white shadow-lg backdrop-blur-md">
+          <div class="theme-pill flex items-center space-x-2 rounded-full border border-gold-500/30 bg-surface-850/95 px-3.5 py-1 text-xs text-white">
             <button id="prev-frame-btn" title="Previous Frame" class="text-gold-400 hover:text-white p-1 active:scale-90 transition-transform">
               <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
@@ -145,14 +145,14 @@
           </div>
         </div>
 
-        <!-- Centered Viewfinder Window: Fixed 3:4 Aspect Ratio (No Full-Screen Stretch) -->
+        <!-- Centered Fixed 3:4 Viewport (Zero-Lag Native CSS Scroll-Snap Track) -->
         <div class="relative flex flex-1 items-center justify-center p-3 sm:p-4 overflow-hidden">
           
           <div
             id="camera-viewport"
             class="relative aspect-[3/4] w-full max-w-[340px] max-h-[62vh] rounded-2xl overflow-hidden bg-black shadow-[0_20px_50px_rgba(0,0,0,0.85)] border-2 border-gold-500/35"
           >
-            <!-- Live Camera Video Feed (Fitted precisely inside the 3:4 container) -->
+            <!-- 100% Clean Video Feed: STRICTLY ZERO CSS FILTERS FOR MAX PERFORMANCE -->
             <video
               id="camera-stream"
               autoplay
@@ -161,9 +161,12 @@
               class="absolute inset-0 h-full w-full object-cover mirrored"
             ></video>
 
-            <!-- Pre-rendered SVG Frames Stack (60fps GPU Hardware Accelerated) -->
-            <div id="frames-stack" class="pointer-events-none absolute inset-0 z-10 overflow-hidden">
-              <!-- Frame layers injected natively by app.js at initialization -->
+            <!-- Native CSS Scroll Snap Track: Sits directly on top of video, 60-120fps GPU Swiping -->
+            <div
+              id="frames-scroll-track"
+              class="scroll-snap-x absolute inset-0 z-10 w-full h-full"
+            >
+              <!-- 4 Snap Frame Slides injected here by app.js -->
             </div>
 
             <!-- Camera Loading / Status Message -->
@@ -284,12 +287,12 @@
   </div>
 
   <!-- ========================================================================= -->
-  <!-- VIEW 4: MASTER FULLSCREEN LIGHTBOX OVERLAY (COMPLETE ISOLATION & SWIPE)  -->
+  <!-- VIEW 4: MASTER FULLSCREEN LIGHTBOX (NATIVE CSS SCROLL SNAP FOR PHOTOS)   -->
   <!-- Placed directly in body at z-[100] with pure black 90% + backdrop blur    -->
   <!-- ========================================================================= -->
   <div id="view-lightbox">
     <!-- 1. Floating Circular Close (X) Button (Top Right) -->
-    <div class="w-full flex justify-end shrink-0 pt-1 pr-1">
+    <div class="w-full flex justify-end shrink-0 pt-1 pr-1 z-20">
       <button
         id="lightbox-close-btn"
         title="Close Preview"
@@ -301,17 +304,13 @@
       </button>
     </div>
 
-    <!-- 2. Centered, Un-stretched Photograph with Touch Swipe Support -->
-    <div id="lightbox-photo-container">
-      <img
-        id="lightbox-photo-img"
-        alt="Graduation Photograph"
-        draggable="false"
-      />
+    <!-- 2. Native CSS Scroll-Snap Photo Carousel (Buttery Smooth 60-120fps) -->
+    <div id="lightbox-scroll-track" class="scroll-snap-x relative flex flex-1 w-full my-auto">
+      <!-- Photos injected here by app.js -->
     </div>
 
     <!-- 3. Prominent Amber/Gold Download Button (Bottom Center) -->
-    <div class="w-full flex justify-center shrink-0 pb-3 sm:pb-5">
+    <div class="w-full flex justify-center shrink-0 pb-3 sm:pb-5 z-20">
       <button
         id="lightbox-download-btn"
         class="btn-bounce flex items-center justify-center space-x-2.5 rounded-2xl bg-gradient-to-r from-gold-600 via-gold-500 to-gold-400 py-3.5 px-8 text-xs sm:text-sm font-bold uppercase tracking-wider text-black shadow-[0_12px_30px_rgba(212,175,55,0.35)] transition-transform duration-100 hover:brightness-105 active:scale-95"

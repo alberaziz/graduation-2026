@@ -3,13 +3,13 @@
  * GRADUATE 2026 - PHOTOBOOTH APPLICATION (app.js)
  * Architecture: ES6+ Modular Vanilla JS
  * Key Features:
- *   1. 4 Valid Native Inline SVG Graduation 2026 Frames (Fixed Frame 4 XML)
- *   2. Pre-rendered DOM Layers with Hardware-Accelerated CSS (60fps No-Lag Swipe)
- *   3. Fixed 3:4 Aspect-Ratio Camera Viewport with Exact Frame Alignment
- *   4. Object-Cover Cropped Canvas Compositing (ctx.filter + SVG Frame)
- *   5. 100% Silent Google Apps Script Upload (CORS Bypass)
- *   6. Continuous Shutter Flow (Zero Redirection)
- *   7. Fullscreen Isolated Lightbox with Touch-Swipe Navigation
+ *   1. 4 Lightweight, 100% Valid XML Inline SVG Frames
+ *   2. Native CSS Scroll-Snap Swiping (Zero JS Touch Math, Native 60-120fps)
+ *   3. Clean Video Feed (Zero CSS Filters for Max Mobile Frame Rate)
+ *   4. IntersectionObserver for Frame & Lightbox Photo Tracking
+ *   5. Exact 3:4 Object-Cover Canvas Compositing
+ *   6. 100% Silent Background Upload to Google Apps Script (CORS Preflight Bypass)
+ *   7. Fullscreen Isolated Lightbox with Native Scroll-Snap Navigation
  * ============================================================================
  */
 
@@ -22,16 +22,15 @@
   const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyJqgbbH2UBN-KzefwQspwHAU-iIx-W0gbcBGafuoFNNdzqT5lTlV3-C1lp8KCjuIhH/exec";
 
   // ==========================================================================
-  // 2. 4 NATIVE INLINE SVG FRAMES & INSTAGRAM-STYLE CSS FILTERS
+  // 2. 4 LIGHTWEIGHT NATIVE INLINE SVG FRAMES (100% VALID XML, NO HEAVY FILTERS)
   // ==========================================================================
   const PHOTOBOOTH_THEMES = [
     // ------------------------------------------------------------------------
-    // THEME 1: CLASSIC ELEGANT (Gold borders, serif 2026, royal monogram)
+    // THEME 1: CLASSIC GOLD (Metallic borders, serif 2026, church dedication)
     // ------------------------------------------------------------------------
     {
       id: "classic-gold",
       name: "Classic Gold",
-      cssFilter: "contrast(1.06) saturate(1.18) brightness(1.02)",
       svg: `
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1440" width="1080" height="1440">
         <defs>
@@ -42,10 +41,9 @@
             <stop offset="75%" stop-color="#9a7610"/>
             <stop offset="100%" stop-color="#ffd976"/>
           </linearGradient>
-          <filter id="glow1" x="-20%" y="-20%" width="140%" height="140%">
-            <feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#000000" flood-opacity="0.85"/>
-          </filter>
         </defs>
+        <!-- Subtle warm ambient tint (Pure lightweight SVG rect) -->
+        <rect width="1080" height="1440" fill="rgba(255, 215, 0, 0.03)"/>
         <!-- Outer Metallic Borders -->
         <rect x="34" y="34" width="1012" height="1372" rx="20" fill="none" stroke="url(#goldMet1)" stroke-width="4.5"/>
         <rect x="48" y="48" width="984" height="1344" rx="14" fill="none" stroke="url(#goldMet1)" stroke-width="1.5" stroke-dasharray="14 8" opacity="0.8"/>
@@ -70,7 +68,7 @@
           <circle cx="-15" cy="-15" r="4" fill="url(#goldMet1)"/>
         </g>
         <!-- Top Header -->
-        <g transform="translate(540, 95)" text-anchor="middle" filter="url(#glow1)">
+        <g transform="translate(540, 95)" text-anchor="middle">
           <path d="M 0 -26 L 40 -12 L 0 2 L -40 -12 Z" fill="url(#goldMet1)"/>
           <text y="36" font-family="'Cinzel', 'Times New Roman', serif" font-size="20" font-weight="700" letter-spacing="8" fill="url(#goldMet1)">
             &#9733; CONGRATULATIONS &#9733;
@@ -81,7 +79,7 @@
         </g>
         <!-- Bottom Plaque -->
         <rect x="52" y="1220" width="976" height="170" rx="22" fill="#090a0e" fill-opacity="0.88" stroke="url(#goldMet1)" stroke-width="2"/>
-        <g transform="translate(540, 1266)" text-anchor="middle" filter="url(#glow1)">
+        <g transform="translate(540, 1266)" text-anchor="middle">
           <text y="24" font-family="'Cinzel', 'Times New Roman', serif" font-size="86" font-weight="900" letter-spacing="12" fill="url(#goldMet1)">
             2026
           </text>
@@ -96,23 +94,19 @@
     },
 
     // ------------------------------------------------------------------------
-    // THEME 2: MODERN MINIMALIST (Clean lines, Swiss typography, Noir B&W)
+    // THEME 2: NOIR MINIMAL (Architectural studio lines, Swiss typography)
     // ------------------------------------------------------------------------
     {
-      id: "modern-minimalist",
+      id: "noir-minimal",
       name: "Noir Minimal",
-      cssFilter: "grayscale(100%) contrast(1.28) brightness(1.04)",
       svg: `
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1440" width="1080" height="1440">
-        <defs>
-          <filter id="shadowNoir" x="-20%" y="-20%" width="140%" height="140%">
-            <feDropShadow dx="0" dy="2" stdDeviation="4" flood-color="#000000" flood-opacity="0.9"/>
-          </filter>
-        </defs>
-        <!-- Architectural Minimal Hairline Borders -->
+        <!-- Subtle studio tint -->
+        <rect width="1080" height="1440" fill="rgba(0, 0, 0, 0.05)"/>
+        <!-- Minimalist Architectural Hairline Borders -->
         <rect x="36" y="36" width="1008" height="1368" rx="8" fill="none" stroke="#ffffff" stroke-width="2" opacity="0.9"/>
         <rect x="50" y="50" width="980" height="1340" rx="4" fill="none" stroke="#ffffff" stroke-width="0.8" opacity="0.4"/>
-        <!-- Studio Rule-of-Thirds Viewfinder Guides -->
+        <!-- Studio Viewfinder Guides -->
         <path d="M 50 180 L 100 180 M 50 180 L 50 230" stroke="#ffffff" stroke-width="2" fill="none"/>
         <path d="M 1030 180 L 980 180 M 1030 180 L 1030 230" stroke="#ffffff" stroke-width="2" fill="none"/>
         <path d="M 50 1260 L 100 1260 M 50 1260 L 50 1210" stroke="#ffffff" stroke-width="2" fill="none"/>
@@ -122,7 +116,7 @@
         <line x1="540" y1="710" x2="540" y2="730" stroke="#ffffff" stroke-width="1.5" opacity="0.75"/>
         <circle cx="540" cy="720" r="18" fill="none" stroke="#ffffff" stroke-width="1" opacity="0.5"/>
         <!-- Top Editorial Header -->
-        <g transform="translate(68, 98)" filter="url(#shadowNoir)">
+        <g transform="translate(68, 98)">
           <text y="0" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="28" font-weight="900" letter-spacing="6" fill="#ffffff">
             GRADUATE // 2026
           </text>
@@ -133,7 +127,7 @@
         <!-- Bottom Editorial Layout Bar -->
         <rect x="50" y="1300" width="980" height="90" fill="#000000" fill-opacity="0.85"/>
         <line x1="50" y1="1300" x2="1030" y2="1300" stroke="#ffffff" stroke-width="1.5"/>
-        <g transform="translate(70, 1342)" filter="url(#shadowNoir)">
+        <g transform="translate(70, 1342)">
           <text y="0" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="18" font-weight="800" letter-spacing="2.5" fill="#ffffff">
             CHURCH OF THE VIRGIN MARY &amp; ST. MINA
           </text>
@@ -157,12 +151,11 @@
     },
 
     // ------------------------------------------------------------------------
-    // THEME 3: FUN / CELEBRATORY (Confetti, celebration stars, Golden Gala)
+    // THEME 3: CELEBRATION (Festive confetti stars, ribbon banner)
     // ------------------------------------------------------------------------
     {
-      id: "celebration-gala",
+      id: "celebration",
       name: "Celebration",
-      cssFilter: "saturate(1.4) contrast(1.1) brightness(1.04) hue-rotate(-6deg)",
       svg: `
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1440" width="1080" height="1440">
         <defs>
@@ -172,10 +165,9 @@
             <stop offset="70%" stop-color="#ffb300"/>
             <stop offset="100%" stop-color="#ff8f00"/>
           </linearGradient>
-          <filter id="festiveGlow" x="-20%" y="-20%" width="140%" height="140%">
-            <feDropShadow dx="0" dy="3" stdDeviation="6" flood-color="#000000" flood-opacity="0.9"/>
-          </filter>
         </defs>
+        <!-- Subtle festive ambiance -->
+        <rect width="1080" height="1440" fill="rgba(255, 230, 150, 0.035)"/>
         <!-- Confetti Diamonds & Stars around borders -->
         <g fill="url(#partyGold)">
           <polygon points="90,65 96,77 108,83 96,89 90,101 84,89 72,83 84,77"/>
@@ -197,7 +189,7 @@
         <rect x="36" y="36" width="1008" height="1368" rx="28" fill="none" stroke="url(#partyGold)" stroke-width="4"/>
         <rect x="48" y="48" width="984" height="1344" rx="20" fill="none" stroke="#ffffff" stroke-width="1.5" stroke-dasharray="10 8" opacity="0.8"/>
         <!-- Top Arch Banner -->
-        <g transform="translate(540, 105)" text-anchor="middle" filter="url(#festiveGlow)">
+        <g transform="translate(540, 105)" text-anchor="middle">
           <text y="0" font-family="'Cinzel', Georgia, serif" font-size="22" font-weight="800" letter-spacing="6" fill="#ffffff">
             &#10024; CELEBRATING THE GRADUATES &#10024;
           </text>
@@ -207,7 +199,7 @@
         </g>
         <!-- Bottom Festivity Badge -->
         <rect x="64" y="1230" width="952" height="155" rx="20" fill="#0c0d12" fill-opacity="0.88" stroke="url(#partyGold)" stroke-width="2.5"/>
-        <g transform="translate(540, 1276)" text-anchor="middle" filter="url(#festiveGlow)">
+        <g transform="translate(540, 1276)" text-anchor="middle">
           <text y="16" font-family="'Cinzel', Georgia, serif" font-size="64" font-weight="900" letter-spacing="8" fill="url(#partyGold)">
             &#9733; 2026 &#9733;
           </text>
@@ -222,27 +214,23 @@
     },
 
     // ------------------------------------------------------------------------
-    // THEME 4: VINTAGE POLAROID (FIXED: 100% Valid XML without HTML entities)
+    // THEME 4: VINTAGE POLAROID (Classic Polaroid chin, vintage camera stamps)
     // ------------------------------------------------------------------------
     {
       id: "vintage-polaroid",
       name: "Vintage Polaroid",
-      cssFilter: "sepia(45%) contrast(1.15) brightness(1.06) saturate(1.15)",
       svg: `
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1440" width="1080" height="1440">
-        <defs>
-          <filter id="polaroidShadow" x="-20%" y="-20%" width="140%" height="140%">
-            <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#000000" flood-opacity="0.85"/>
-          </filter>
-        </defs>
+        <!-- Subtle warm sepia tone -->
+        <rect width="1080" height="1440" fill="rgba(180, 120, 40, 0.05)"/>
         <!-- Classic Polaroid Border Frame -->
         <rect x="0" y="0" width="1080" height="48" fill="#f8f6ee"/>
         <rect x="0" y="48" width="48" height="1144" fill="#f8f6ee"/>
         <rect x="1032" y="48" width="48" height="1144" fill="#f8f6ee"/>
-        <rect x="0" y="1192" width="1080" height="248" fill="#f8f6ee" filter="url(#polaroidShadow)"/>
+        <rect x="0" y="1192" width="1080" height="248" fill="#f8f6ee"/>
         <rect x="48" y="48" width="984" height="1144" fill="none" stroke="#222222" stroke-width="2" opacity="0.8"/>
         <!-- Top Left Vintage Recording Badge -->
-        <g transform="translate(68, 90)" filter="url(#polaroidShadow)">
+        <g transform="translate(68, 90)">
           <circle cx="10" cy="10" r="7" fill="#e53935"/>
           <text x="26" y="16" font-family="'Courier New', monospace" font-size="17" font-weight="900" letter-spacing="2" fill="#ffffff">
             REC &#9679; 2026
@@ -281,7 +269,7 @@
   // 3. APPLICATION STATE
   // ==========================================================================
   const sessionPhotos = []; // Stores Base64 images for current guest
-  let currentThemeIndex = 0; // Current active frame & filter (0 to 3)
+  let activeFrameIndex = 0; // Currently snapped active frame (0 to 3)
   let currentLightboxIndex = 0;
 
   const appState = {
@@ -307,9 +295,9 @@
     headerUserName: document.getElementById("header-user-name"),
     logoutBtn: document.getElementById("logout-btn"),
 
-    // Camera & Viewport
+    // Camera Viewport & Native Scroll Snap Track
     cameraViewport: document.getElementById("camera-viewport"),
-    framesStack: document.getElementById("frames-stack"),
+    framesScrollTrack: document.getElementById("frames-scroll-track"),
     video: document.getElementById("camera-stream"),
     themeNameLabel: document.getElementById("theme-name-label"),
     themeStepBadge: document.getElementById("theme-step-badge"),
@@ -333,131 +321,80 @@
     galleryGrid: document.getElementById("gallery-grid"),
 
     // Lightbox Controls
-    lightboxPhotoContainer: document.getElementById("lightbox-photo-container"),
-    lightboxPhotoImg: document.getElementById("lightbox-photo-img"),
+    lightboxScrollTrack: document.getElementById("lightbox-scroll-track"),
     lightboxCloseBtn: document.getElementById("lightbox-close-btn"),
     lightboxDownloadBtn: document.getElementById("lightbox-download-btn"),
   };
 
   // ==========================================================================
-  // 5. PRE-RENDER SVG FRAMES IN DOM (60FPS HARDWARE-ACCELERATED SWIPE)
+  // 5. NATIVE CSS SCROLL SNAP SETUP (CAMERA FRAMES)
   // ==========================================================================
-  function initPreRenderedFrames() {
-    dom.framesStack.innerHTML = "";
+  function initCameraFrames() {
+    dom.framesScrollTrack.innerHTML = "";
+
     PHOTOBOOTH_THEMES.forEach((theme, index) => {
-      const layer = document.createElement("div");
-      layer.className = `frame-layer ${index === 0 ? "active" : ""}`;
-      layer.dataset.index = index;
-      layer.innerHTML = theme.svg.trim();
-      dom.framesStack.appendChild(layer);
-      theme.layerElement = layer;
+      const slide = document.createElement("div");
+      slide.className = "snap-frame-slide";
+      slide.dataset.index = index;
+      slide.innerHTML = theme.svg.trim();
+      dom.framesScrollTrack.appendChild(slide);
+      theme.slideElement = slide;
+    });
+
+    // IntersectionObserver tracks which frame is snapped into view (Zero JS touch math)
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          const idx = parseInt(entry.target.dataset.index, 10);
+          if (!isNaN(idx)) {
+            activeFrameIndex = idx;
+            updateThemeLabel(idx);
+          }
+        }
+      });
+    }, {
+      root: dom.framesScrollTrack,
+      threshold: 0.6
+    });
+
+    const slides = dom.framesScrollTrack.querySelectorAll(".snap-frame-slide");
+    slides.forEach(slide => observer.observe(slide));
+  }
+
+  function updateThemeLabel(index) {
+    const theme = PHOTOBOOTH_THEMES[index];
+    if (!theme) return;
+    dom.themeNameLabel.textContent = theme.name;
+    dom.themeStepBadge.textContent = `${index + 1}/${PHOTOBOOTH_THEMES.length}`;
+  }
+
+  function scrollToFrame(index) {
+    if (index < 0) index = PHOTOBOOTH_THEMES.length - 1;
+    if (index >= PHOTOBOOTH_THEMES.length) index = 0;
+    const slideWidth = dom.framesScrollTrack.clientWidth || 340;
+    dom.framesScrollTrack.scrollTo({
+      left: index * slideWidth,
+      behavior: "smooth"
     });
   }
 
-  // Pre-render all 4 SVG layers into DOM at startup
-  initPreRenderedFrames();
+  // Mount frames at startup
+  initCameraFrames();
+  updateThemeLabel(0);
 
-  // ==========================================================================
-  // 6. 60FPS THEME & FILTER SWITCHING (ZERO LAG)
-  // ==========================================================================
-  function applyTheme(newIndex, direction = null) {
-    if (newIndex < 0) newIndex = PHOTOBOOTH_THEMES.length - 1;
-    if (newIndex >= PHOTOBOOTH_THEMES.length) newIndex = 0;
-
-    const oldIndex = currentThemeIndex;
-    currentThemeIndex = newIndex;
-    const oldTheme = PHOTOBOOTH_THEMES[oldIndex];
-    const newTheme = PHOTOBOOTH_THEMES[currentThemeIndex];
-
-    // 1. Update Video CSS Filter (GPU hardware accelerated)
-    dom.video.style.filter = newTheme.cssFilter;
-
-    // 2. Hardware-accelerated translate3d slide of pre-rendered DOM layers
-    if (oldIndex !== newIndex) {
-      if (direction === "left") {
-        // Swiped Left: old layer exits to the left, new layer slides in from right
-        oldTheme.layerElement.className = "frame-layer slide-left";
-        newTheme.layerElement.className = "frame-layer slide-right";
-        newTheme.layerElement.offsetHeight; // Force reflow
-        newTheme.layerElement.className = "frame-layer active";
-      } else if (direction === "right") {
-        // Swiped Right: old layer exits to the right, new layer slides in from left
-        oldTheme.layerElement.className = "frame-layer slide-right";
-        newTheme.layerElement.className = "frame-layer slide-left";
-        newTheme.layerElement.offsetHeight; // Force reflow
-        newTheme.layerElement.className = "frame-layer active";
-      } else {
-        // Direct jump
-        PHOTOBOOTH_THEMES.forEach((t, i) => {
-          t.layerElement.className = `frame-layer ${i === currentThemeIndex ? "active" : ""}`;
-        });
-      }
-    }
-
-    // 3. Update Indicator Pill UI
-    dom.themeNameLabel.textContent = newTheme.name;
-    dom.themeStepBadge.textContent = `${currentThemeIndex + 1}/${PHOTOBOOTH_THEMES.length}`;
-  }
-
-  // Initialize active theme
-  applyTheme(0);
-
-  // ==========================================================================
-  // 7. CAMERA VIEWPORT TOUCH-SWIPE ENGINE
-  // ==========================================================================
-  let camStartX = 0;
-  let camStartY = 0;
-  let camIsDragging = false;
-
-  dom.cameraViewport.addEventListener("touchstart", (e) => {
-    const touch = e.touches[0];
-    camStartX = touch.clientX;
-    camStartY = touch.clientY;
-    camIsDragging = true;
-  }, { passive: true });
-
-  dom.cameraViewport.addEventListener("touchmove", (e) => {
-    if (!camIsDragging) return;
-    const touch = e.touches[0];
-    const diffX = touch.clientX - camStartX;
-    const diffY = touch.clientY - camStartY;
-    if (Math.abs(diffX) > Math.abs(diffY) && e.cancelable) {
-      e.preventDefault();
-    }
-  }, { passive: false });
-
-  dom.cameraViewport.addEventListener("touchend", (e) => {
-    if (!camIsDragging) return;
-    camIsDragging = false;
-    const touch = e.changedTouches[0];
-    const diffX = touch.clientX - camStartX;
-    const diffY = touch.clientY - camStartY;
-
-    // Minimum swipe threshold: 45px
-    if (Math.abs(diffX) > 45 && Math.abs(diffX) > Math.abs(diffY)) {
-      if (diffX < 0) {
-        // Swiped Left -> Next Frame & Filter
-        applyTheme(currentThemeIndex + 1, "left");
-      } else {
-        // Swiped Right -> Previous Frame & Filter
-        applyTheme(currentThemeIndex - 1, "right");
-      }
-    }
-  });
-
-  // Indicator Pill Buttons (Desktop / Tap Support)
+  // Chevron click navigation on pill
   dom.prevFrameBtn.addEventListener("click", (e) => {
     e.stopPropagation();
-    applyTheme(currentThemeIndex - 1, "right");
+    scrollToFrame(activeFrameIndex - 1);
   });
 
   dom.nextFrameBtn.addEventListener("click", (e) => {
     e.stopPropagation();
-    applyTheme(currentThemeIndex + 1, "left");
+    scrollToFrame(activeFrameIndex + 1);
   });
 
   // ==========================================================================
-  // 8. SCREEN NAVIGATION
+  // 6. SCREEN NAVIGATION
   // ==========================================================================
   function showView(viewId) {
     [dom.loginView, dom.cameraView].forEach(v => {
@@ -483,7 +420,7 @@
   }
 
   // ==========================================================================
-  // 9. CAMERA STREAM MANAGEMENT
+  // 7. CAMERA STREAM MANAGEMENT (CLEAN VIDEO, NO CSS FILTERS)
   // ==========================================================================
   async function startCamera() {
     stopCamera();
@@ -533,7 +470,7 @@
   }
 
   // ==========================================================================
-  // 10. EXACT 3:4 OBJECT-COVER CANVAS CAPTURE (FILTER + SVG FRAME MERGED)
+  // 8. EXACT 3:4 OBJECT-COVER CANVAS CAPTURE (NO HEAVY CTX FILTERS)
   // ==========================================================================
   function capturePhoto() {
     if (!appState.stream) return;
@@ -546,16 +483,16 @@
       dom.shutterFlash.classList.add("opacity-0");
     }, 80);
 
-    // Canvas fixed at native 3:4 portrait photobooth resolution
+    // Fixed 3:4 Photobooth Resolution
     const canvasWidth = 1080;
     const canvasHeight = 1440;
     dom.canvas.width = canvasWidth;
     dom.canvas.height = canvasHeight;
 
     const ctx = dom.canvas.getContext("2d");
-    const activeTheme = PHOTOBOOTH_THEMES[currentThemeIndex];
+    const activeTheme = PHOTOBOOTH_THEMES[activeFrameIndex];
 
-    // 2. Compute object-cover source rectangle matching 3:4 viewport
+    // 2. Symmetrical 3:4 object-cover crop math
     const vWidth = dom.video.videoWidth || 1080;
     const vHeight = dom.video.videoHeight || 1440;
     const targetRatio = canvasWidth / canvasHeight; // 0.75
@@ -563,19 +500,14 @@
 
     let sx = 0, sy = 0, sWidth = vWidth, sHeight = vHeight;
     if (videoRatio > targetRatio) {
-      // Video is wider than 3:4 -> crop sides symmetrically
       sWidth = vHeight * targetRatio;
       sx = (vWidth - sWidth) / 2;
     } else {
-      // Video is taller than 3:4 -> crop top/bottom symmetrically
       sHeight = vWidth / targetRatio;
       sy = (vHeight - sHeight) / 2;
     }
 
-    // 3. Apply Active Instagram-style CSS Filter to Canvas
-    ctx.filter = activeTheme.cssFilter || "none";
-
-    // 4. Draw Video Feed with horizontal mirroring if front camera
+    // 3. Draw Clean Video Feed (Mirrored horizontally if front camera)
     if (appState.facingMode === "user") {
       ctx.save();
       ctx.translate(canvasWidth, 0);
@@ -586,16 +518,13 @@
       ctx.drawImage(dom.video, sx, sy, sWidth, sHeight, 0, 0, canvasWidth, canvasHeight);
     }
 
-    // 5. Reset filter to 'none' so SVG frame colors remain crisp and pristine
-    ctx.filter = "none";
-
-    // 6. Draw the Active SVG Frame ON TOP of the filtered photo
+    // 4. Draw Currently Active SVG Frame ON TOP
     ctx.drawImage(activeTheme.frameImage, 0, 0, canvasWidth, canvasHeight);
 
-    // 7. Export high-quality Base64 JPEG
+    // 5. Export high-quality Base64 JPEG
     const finalImage = dom.canvas.toDataURL("image/jpeg", 0.90);
 
-    // 8. Store in global sessionPhotos (newest photo at index 0)
+    // 6. Store in global sessionPhotos (newest photo at index 0)
     sessionPhotos.unshift({
       id: Date.now(),
       dataUrl: finalImage,
@@ -603,21 +532,20 @@
       timestamp: new Date()
     });
 
-    // 9. Update Circular Album Thumbnail Button
+    // 7. Update Circular Album Thumbnail Button
     updateGalleryButton();
 
-    // 10. Silent Background Upload to Google Drive (Zero interruption)
+    // 8. 100% Silent Background Upload to Google Drive (Zero interruption)
     silentUploadToDrive(finalImage, appState.userName);
   }
 
   // ==========================================================================
-  // 11. 100% SILENT BACKGROUND UPLOAD TO GOOGLE DRIVE
+  // 9. 100% SILENT BACKGROUND UPLOAD TO GOOGLE DRIVE (NO POPUPS)
   // ==========================================================================
   async function silentUploadToDrive(imageBase64, userName) {
     const cleanName = (userName || "Guest").replace(/[^a-zA-Z0-9_-]/g, "_");
     const filename = `photo_${cleanName}_${Date.now()}.jpg`;
 
-    // Google Apps Script doPost() fields: folderName, image, filename
     const payload = {
       folderName: userName || "Guest",
       image: imageBase64,
@@ -660,7 +588,7 @@
   }
 
   // ==========================================================================
-  // 12. IN-APP GALLERY DRAWER LOGIC
+  // 10. IN-APP GALLERY DRAWER LOGIC
   // ==========================================================================
   function updateGalleryButton() {
     const total = sessionPhotos.length;
@@ -728,80 +656,71 @@
   }
 
   // ==========================================================================
-  // 13. FULLSCREEN LIGHTBOX & TOUCH SWIPE ENGINE
+  // 11. FULLSCREEN LIGHTBOX (NATIVE CSS SCROLL SNAP FOR PHOTOS)
   // ==========================================================================
-  let isDragging = false;
-  let startX = 0;
-  let startY = 0;
-  let currentDiffX = 0;
-  let startTime = 0;
-  let isAnimatingTransition = false;
-
-  function setLightboxImage(index, animateDirection = null) {
-    if (!sessionPhotos[index]) return;
-    currentLightboxIndex = index;
-    const photo = sessionPhotos[index];
-    const img = dom.lightboxPhotoImg;
-
-    if (!animateDirection) {
-      img.src = photo.dataUrl;
-      img.classList.remove("is-swiping");
-      img.classList.add("snap-transition");
-      img.style.transform = "translateX(0) rotate(0deg)";
-      img.style.opacity = "1";
-      return;
-    }
-
-    // Swiping transition animation
-    isAnimatingTransition = true;
-    img.classList.add("snap-transition");
-
-    if (animateDirection === "left") {
-      img.style.transform = "translateX(-120%) rotate(-8deg)";
-      img.style.opacity = "0";
-
-      setTimeout(() => {
-        img.src = photo.dataUrl;
-        img.classList.remove("snap-transition");
-        img.style.transform = "translateX(120%) rotate(8deg)";
-        img.offsetHeight; // Force reflow
-
-        img.classList.add("snap-transition");
-        img.style.transform = "translateX(0) rotate(0deg)";
-        img.style.opacity = "1";
-        setTimeout(() => { isAnimatingTransition = false; }, 280);
-      }, 160);
-
-    } else if (animateDirection === "right") {
-      img.style.transform = "translateX(120%) rotate(8deg)";
-      img.style.opacity = "0";
-
-      setTimeout(() => {
-        img.src = photo.dataUrl;
-        img.classList.remove("snap-transition");
-        img.style.transform = "translateX(-120%) rotate(-8deg)";
-        img.offsetHeight; // Force reflow
-
-        img.classList.add("snap-transition");
-        img.style.transform = "translateX(0) rotate(0deg)";
-        img.style.opacity = "1";
-        setTimeout(() => { isAnimatingTransition = false; }, 280);
-      }, 160);
-    }
-  }
+  let lightboxObserver = null;
 
   function openLightbox(index) {
-    if (!sessionPhotos[index]) return;
+    if (!sessionPhotos.length || !sessionPhotos[index]) return;
+    currentLightboxIndex = index;
+
+    // 1. Populate Lightbox with all taken session photos
+    dom.lightboxScrollTrack.innerHTML = "";
+
+    sessionPhotos.forEach((photo, idx) => {
+      const slide = document.createElement("div");
+      slide.className = "snap-lightbox-slide";
+      slide.dataset.index = idx;
+
+      const img = document.createElement("img");
+      img.src = photo.dataUrl;
+      img.alt = `Photo ${idx + 1}`;
+      img.className = "lightbox-img-card";
+      img.draggable = false;
+
+      slide.appendChild(img);
+      dom.lightboxScrollTrack.appendChild(slide);
+    });
+
+    // 2. Disconnect previous observer if any
+    if (lightboxObserver) lightboxObserver.disconnect();
+
+    // 3. Setup IntersectionObserver to track visible photo
+    lightboxObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          const idx = parseInt(entry.target.dataset.index, 10);
+          if (!isNaN(idx)) {
+            currentLightboxIndex = idx;
+          }
+        }
+      });
+    }, {
+      root: dom.lightboxScrollTrack,
+      threshold: 0.6
+    });
+
+    const slides = dom.lightboxScrollTrack.querySelectorAll(".snap-lightbox-slide");
+    slides.forEach(slide => lightboxObserver.observe(slide));
+
+    // 4. Show Lightbox & instantly scroll to selected photo
     dom.lightboxView.classList.add("lightbox-active");
-    setLightboxImage(index, null);
+
+    requestAnimationFrame(() => {
+      const trackWidth = dom.lightboxScrollTrack.clientWidth || window.innerWidth;
+      dom.lightboxScrollTrack.scrollTo({
+        left: index * trackWidth,
+        behavior: "instant"
+      });
+    });
   }
 
   function closeLightbox() {
     dom.lightboxView.classList.remove("lightbox-active");
-    const img = dom.lightboxPhotoImg;
-    img.classList.remove("is-swiping");
-    img.style.transform = "translateX(0) rotate(0deg)";
-    img.style.opacity = "1";
+    if (lightboxObserver) {
+      lightboxObserver.disconnect();
+      lightboxObserver = null;
+    }
   }
 
   function downloadCurrentLightboxPhoto() {
@@ -814,104 +733,23 @@
     link.click();
   }
 
-  // Touch Swipe for Lightbox
-  const touchArea = dom.lightboxPhotoContainer;
-
-  function onTouchStart(e) {
-    if (isAnimatingTransition) return;
-    const touch = e.touches ? e.touches[0] : e;
-    isDragging = true;
-    startX = touch.clientX;
-    startY = touch.clientY;
-    currentDiffX = 0;
-    startTime = Date.now();
-
-    const img = dom.lightboxPhotoImg;
-    img.classList.remove("snap-transition");
-    img.classList.add("is-swiping");
-  }
-
-  function onTouchMove(e) {
-    if (!isDragging || isAnimatingTransition) return;
-    const touch = e.touches ? e.touches[0] : e;
-    const diffX = touch.clientX - startX;
-    const diffY = touch.clientY - startY;
-
-    if (Math.abs(diffX) > Math.abs(diffY) && e.cancelable) {
-      e.preventDefault();
-    }
-
-    currentDiffX = diffX;
-
-    // Damped boundary resistance
-    const isAtStart = currentLightboxIndex === 0;
-    const isAtEnd = currentLightboxIndex === sessionPhotos.length - 1;
-    let visualX = diffX;
-
-    if ((isAtStart && diffX > 0) || (isAtEnd && diffX < 0)) {
-      visualX = diffX * 0.25;
-    }
-
-    const img = dom.lightboxPhotoImg;
-    const rotation = visualX * 0.035;
-    const opacity = Math.max(0.65, 1 - (Math.abs(visualX) / 800));
-
-    img.style.transform = `translateX(${visualX}px) rotate(${rotation}deg)`;
-    img.style.opacity = opacity.toString();
-  }
-
-  function onTouchEnd() {
-    if (!isDragging || isAnimatingTransition) return;
-    isDragging = false;
-
-    const img = dom.lightboxPhotoImg;
-    img.classList.remove("is-swiping");
-    img.classList.add("snap-transition");
-
-    const timeElapsed = Date.now() - startTime;
-    const isQuickFlick = timeElapsed < 250 && Math.abs(currentDiffX) > 35;
-    const isPastThreshold = Math.abs(currentDiffX) > 65;
-
-    // Swipe Left -> Next Photo
-    if ((isPastThreshold || isQuickFlick) && currentDiffX < 0) {
-      if (currentLightboxIndex < sessionPhotos.length - 1) {
-        setLightboxImage(currentLightboxIndex + 1, "left");
-      } else {
-        img.style.transform = "translateX(0) rotate(0deg)";
-        img.style.opacity = "1";
-      }
-    }
-    // Swipe Right -> Previous Photo
-    else if ((isPastThreshold || isQuickFlick) && currentDiffX > 0) {
-      if (currentLightboxIndex > 0) {
-        setLightboxImage(currentLightboxIndex - 1, "right");
-      } else {
-        img.style.transform = "translateX(0) rotate(0deg)";
-        img.style.opacity = "1";
-      }
-    }
-    // Snap back
-    else {
-      img.style.transform = "translateX(0) rotate(0deg)";
-      img.style.opacity = "1";
-    }
-
-    currentDiffX = 0;
-  }
-
-  // Attach Lightbox swipe listeners
-  touchArea.addEventListener("touchstart", onTouchStart, { passive: false });
-  touchArea.addEventListener("touchmove", onTouchMove, { passive: false });
-  touchArea.addEventListener("touchend", onTouchEnd);
-  touchArea.addEventListener("touchcancel", onTouchEnd);
-
-  // Desktop pointer support for Lightbox
-  touchArea.addEventListener("mousedown", onTouchStart);
-  window.addEventListener("mousemove", (e) => {
-    if (isDragging) onTouchMove(e);
+  // Close Lightbox button
+  dom.lightboxCloseBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    closeLightbox();
   });
-  window.addEventListener("mouseup", () => {
-    if (isDragging) onTouchEnd();
+
+  // Download photo button
+  dom.lightboxDownloadBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    downloadCurrentLightboxPhoto();
+  });
+
+  // Close when clicking empty backdrop area
+  dom.lightboxView.addEventListener("click", (e) => {
+    if (e.target === dom.lightboxView || e.target === dom.lightboxScrollTrack || e.target.classList.contains("snap-lightbox-slide")) {
+      closeLightbox();
+    }
   });
 
   // Keyboard navigation
@@ -919,27 +757,22 @@
     if (dom.lightboxView.classList.contains("lightbox-active")) {
       if (e.key === "Escape") closeLightbox();
       if (e.key === "ArrowLeft" && currentLightboxIndex > 0) {
-        setLightboxImage(currentLightboxIndex - 1, "right");
+        const trackWidth = dom.lightboxScrollTrack.clientWidth;
+        dom.lightboxScrollTrack.scrollTo({ left: (currentLightboxIndex - 1) * trackWidth, behavior: "smooth" });
       }
       if (e.key === "ArrowRight" && currentLightboxIndex < sessionPhotos.length - 1) {
-        setLightboxImage(currentLightboxIndex + 1, "left");
+        const trackWidth = dom.lightboxScrollTrack.clientWidth;
+        dom.lightboxScrollTrack.scrollTo({ left: (currentLightboxIndex + 1) * trackWidth, behavior: "smooth" });
       }
     } else if (dom.cameraView.classList.contains("opacity-100")) {
-      if (e.key === "ArrowLeft") applyTheme(currentThemeIndex - 1, "right");
-      if (e.key === "ArrowRight") applyTheme(currentThemeIndex + 1, "left");
+      if (e.key === "ArrowLeft") scrollToFrame(activeFrameIndex - 1);
+      if (e.key === "ArrowRight") scrollToFrame(activeFrameIndex + 1);
       if (e.key === " " || e.key === "Enter") capturePhoto();
     }
   });
 
-  // Close when clicking outside image in Lightbox
-  dom.lightboxView.addEventListener("click", (e) => {
-    if (e.target === dom.lightboxView || e.target === dom.lightboxPhotoContainer) {
-      closeLightbox();
-    }
-  });
-
   // ==========================================================================
-  // 14. GLOBAL EVENT LISTENERS
+  // 12. GLOBAL EVENT LISTENERS
   // ==========================================================================
   // Login Form
   dom.loginForm.addEventListener("submit", (e) => {
@@ -964,17 +797,6 @@
   // Gallery Controls
   dom.galleryOpenBtn.addEventListener("click", openGalleryPanel);
   dom.galleryBackBtn.addEventListener("click", closeGalleryPanel);
-
-  // Lightbox Buttons
-  dom.lightboxCloseBtn.addEventListener("click", (e) => {
-    e.stopPropagation();
-    closeLightbox();
-  });
-
-  dom.lightboxDownloadBtn.addEventListener("click", (e) => {
-    e.stopPropagation();
-    downloadCurrentLightboxPhoto();
-  });
 
   // Exit / Switch Guest
   dom.logoutBtn.addEventListener("click", () => {
