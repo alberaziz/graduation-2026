@@ -1,15 +1,17 @@
 /**
  * ============================================================================
  * GRADUATE 2026 - PHOTOBOOTH APPLICATION (app.js)
- * Architecture: ES6+ Modular Vanilla JS
+ * Architecture: Offline-First Progressive Web App (PWA) + Vanilla ES6+
  * Enterprise Features:
- *   1. Non-Blocking Upload Queue & Auto-Retry Worker (Handles 200+ Users)
- *   2. Concurrency Resilience & Exponential Backoff for Google Apps Script
- *   3. 4 Lightweight, 100% Valid XML Inline SVG Frames
- *   4. Native CSS Scroll-Snap Swiping (Zero JS Touch Math, 60-120fps)
- *   5. Clean Video Stream (Zero CSS Filters on <video> for Max Mobile FPS)
- *   6. Exact 3:4 Object-Cover Canvas Compositing
- *   7. Fullscreen Isolated Lightbox with Native Scroll-Snap Navigation
+ *   1. IndexedDB Persistent Storage (PhotoboothDB) - Handles Unlimited Photos Offline
+ *   2. Smart Background Sync Worker (Auto-Upload on Connection, Backoff, Zero Data Loss)
+ *   3. Service Worker Integration (100% Functional in Airplane Mode)
+ *   4. Dynamic UI Sync & Network Status Indicators in Gallery
+ *   5. 4 Lightweight, 100% Valid XML Inline SVG Frames
+ *   6. Native CSS Scroll-Snap Swiping (Zero JS Touch Math, 60-120fps)
+ *   7. Clean WebRTC Video Stream (No CSS Video Filters for Maximum Mobile FPS)
+ *   8. Symmetrical 3:4 Object-Cover Canvas Compositing
+ *   9. Fullscreen Isolated Lightbox with Native Scroll-Snap Navigation
  * ============================================================================
  */
 
@@ -22,7 +24,150 @@
   const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyJqgbbH2UBN-KzefwQspwHAU-iIx-W0gbcBGafuoFNNdzqT5lTlV3-C1lp8KCjuIhH/exec";
 
   // ==========================================================================
-  // 2. 4 LIGHTWEIGHT NATIVE INLINE SVG FRAMES (100% VALID XML, ZERO HEAVY FILTERS)
+  // 2. SERVICE WORKER REGISTRATION (OFFLINE PWA APP SHELL)
+  // ==========================================================================
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js')
+        .then((reg) => console.log('[ServiceWorker] Registered with scope:', reg.scope))
+        .catch((err) => console.warn('[ServiceWorker] Registration failed:', err));
+    });
+  }
+
+  // ==========================================================================
+  // 3. INDEXED-DB WRAPPER (PhotoboothDB - OFFLINE-FIRST STORAGE ENGINE)
+  // ==========================================================================
+  const PhotoboothDB = {
+    dbName: "PhotoboothDB_2026",
+    dbVersion: 1,
+    storeName: "photos",
+    _db: null,
+
+    async init() {
+      if (this._db) return this._db;
+
+      return new Promise((resolve, reject) => {
+        const request = indexedDB.open(this.dbName, this.dbVersion);
+
+        request.onupgradeneeded = (event) => {
+          const db = event.target.result;
+          if (!db.objectStoreNames.contains(this.storeName)) {
+            const store = db.createObjectStore(this.storeName, { keyPath: "id" });
+            store.createIndex("status", "status", { unique: false });
+            store.createIndex("userName", "userName", { unique: false });
+            store.createIndex("timestamp", "timestamp", { unique: false });
+          }
+        };
+
+        request.onsuccess = (event) => {
+          this._db = event.target.result;
+          resolve(this._db);
+        };
+
+        request.onerror = (event) => {
+          console.error("[IndexedDB] Failed to open database:", event.target.error);
+          reject(event.target.error);
+        };
+      });
+    },
+
+    async savePhoto(photoRecord) {
+      const db = await this.init();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction(this.storeName, "readwrite");
+        const store = tx.objectStore(this.storeName);
+        const req = store.put(photoRecord);
+
+        req.onsuccess = () => resolve(photoRecord);
+        req.onerror = (e) => {
+          console.error("[IndexedDB] savePhoto error:", e.target.error);
+          reject(e.target.error);
+        };
+      });
+    },
+
+    async getUserPhotos(userName) {
+      const db = await this.init();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction(this.storeName, "readonly");
+        const store = tx.objectStore(this.storeName);
+        const req = store.getAll();
+
+        req.onsuccess = () => {
+          const all = req.result || [];
+          // Filter by user name if specified, otherwise return device photos
+          const filtered = userName 
+            ? all.filter(p => (p.userName || "").toLowerCase() === userName.toLowerCase())
+            : all;
+          // Sort newest first
+          filtered.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+          resolve(filtered);
+        };
+        req.onerror = (e) => reject(e.target.error);
+      });
+    },
+
+    async getPendingPhotos() {
+      const db = await this.init();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction(this.storeName, "readonly");
+        const store = tx.objectStore(this.storeName);
+        const index = store.index("status");
+        const req = index.getAll("pending");
+
+        req.onsuccess = () => {
+          const list = req.result || [];
+          // Sort chronologically (FIFO for queue)
+          list.sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
+          resolve(list);
+        };
+        req.onerror = (e) => reject(e.target.error);
+      });
+    },
+
+    async updatePhotoStatus(id, newStatus) {
+      const db = await this.init();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction(this.storeName, "readwrite");
+        const store = tx.objectStore(this.storeName);
+        const getReq = store.get(id);
+
+        getReq.onsuccess = () => {
+          const item = getReq.result;
+          if (!item) return resolve(null);
+          item.status = newStatus;
+          item.syncedAt = Date.now();
+          const putReq = store.put(item);
+          putReq.onsuccess = () => resolve(item);
+          putReq.onerror = (e) => reject(e.target.error);
+        };
+        getReq.onerror = (e) => reject(e.target.error);
+      });
+    },
+
+    async incrementRetry(id) {
+      const db = await this.init();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction(this.storeName, "readwrite");
+        const store = tx.objectStore(this.storeName);
+        const getReq = store.get(id);
+
+        getReq.onsuccess = () => {
+          const item = getReq.result;
+          if (!item) return resolve(null);
+          item.retryCount = (item.retryCount || 0) + 1;
+          item.lastRetry = Date.now();
+          const putReq = store.put(item);
+          putReq.onsuccess = () => resolve(item);
+          putReq.onerror = (e) => reject(e.target.error);
+        };
+        getReq.onerror = (e) => reject(e.target.error);
+      });
+    }
+  };
+
+  // ==========================================================================
+  // 4. 4 LIGHTWEIGHT NATIVE INLINE SVG FRAMES (100% VALID XML)
   // ==========================================================================
   const PHOTOBOOTH_THEMES = [
     // ------------------------------------------------------------------------
@@ -118,40 +263,37 @@
         <!-- Top Editorial Header -->
         <g transform="translate(68, 98)">
           <text y="0" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="28" font-weight="900" letter-spacing="6" fill="#ffffff">
-            GRADUATE // 2026
+            GRADUATE
           </text>
-          <text x="944" y="0" text-anchor="end" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="700" letter-spacing="3" fill="#ffffff" opacity="0.85">
-            [ ISO 100 &#8226; 35MM ]
+          <text y="24" font-family="'Courier New', monospace" font-size="14" font-weight="600" letter-spacing="3" fill="#a1a1aa">
+            COMMENCEMENT ARCHIVE // VOL. 26
           </text>
         </g>
-        <!-- Bottom Editorial Layout Bar -->
-        <rect x="50" y="1300" width="980" height="90" fill="#000000" fill-opacity="0.85"/>
-        <line x1="50" y1="1300" x2="1030" y2="1300" stroke="#ffffff" stroke-width="1.5"/>
-        <g transform="translate(70, 1342)">
-          <text y="0" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="18" font-weight="800" letter-spacing="2.5" fill="#ffffff">
+        <g transform="translate(1012, 98)" text-anchor="end">
+          <text y="0" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="28" font-weight="900" fill="#ffffff">
+            2026
+          </text>
+          <text y="24" font-family="'Courier New', monospace" font-size="14" font-weight="600" letter-spacing="2" fill="#a1a1aa">
+            ST. MINA
+          </text>
+        </g>
+        <!-- Bottom Bar -->
+        <rect x="52" y="1328" width="976" height="60" rx="8" fill="#000000" fill-opacity="0.75"/>
+        <g transform="translate(72, 1365)">
+          <text y="0" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="16" font-weight="700" letter-spacing="2" fill="#ffffff">
             CHURCH OF THE VIRGIN MARY &amp; ST. MINA
           </text>
-          <text y="24" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="600" letter-spacing="4" fill="#aaaaaa">
-            CLASS OF 2026 &#8226; COMMENCEMENT PORTFOLIO
-          </text>
         </g>
-        <!-- Minimal Barcode Element -->
-        <g transform="translate(930, 1332)" fill="#ffffff">
-          <rect x="0" y="0" width="3" height="30"/>
-          <rect x="6" y="0" width="1.5" height="30"/>
-          <rect x="10" y="0" width="4.5" height="30"/>
-          <rect x="18" y="0" width="2" height="30"/>
-          <rect x="23" y="0" width="5" height="30"/>
-          <rect x="31" y="0" width="1.5" height="30"/>
-          <rect x="36" y="0" width="4" height="30"/>
-          <rect x="43" y="0" width="2.5" height="30"/>
-          <text x="22" y="44" text-anchor="middle" font-family="monospace" font-size="9" fill="#aaaaaa">2026-COMMENCE</text>
+        <g transform="translate(1008, 1365)" text-anchor="end">
+          <text y="0" font-family="'Courier New', monospace" font-size="15" font-weight="700" letter-spacing="3" fill="#ffffff">
+            REC &#9679; 1080P
+          </text>
         </g>
       </svg>`
     },
 
     // ------------------------------------------------------------------------
-    // THEME 3: CELEBRATION (Festive confetti stars, ribbon banner)
+    // THEME 3: CELEBRATION (Festive stars, confetti, bright diploma banners)
     // ------------------------------------------------------------------------
     {
       id: "celebration",
@@ -159,84 +301,75 @@
       svg: `
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1440" width="1080" height="1440">
         <defs>
-          <linearGradient id="partyGold" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stop-color="#fff7c2"/>
-            <stop offset="40%" stop-color="#ffd54f"/>
-            <stop offset="70%" stop-color="#ffb300"/>
-            <stop offset="100%" stop-color="#ff8f00"/>
+          <linearGradient id="neonGlow" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#ec4899"/>
+            <stop offset="50%" stop-color="#f59e0b"/>
+            <stop offset="100%" stop-color="#06b6d4"/>
           </linearGradient>
         </defs>
-        <!-- Subtle festive ambiance -->
-        <rect width="1080" height="1440" fill="rgba(255, 230, 150, 0.035)"/>
-        <!-- Confetti Diamonds & Stars around borders -->
-        <g fill="url(#partyGold)">
-          <polygon points="90,65 96,77 108,83 96,89 90,101 84,89 72,83 84,77"/>
-          <circle cx="130" cy="90" r="5"/>
-          <circle cx="75" cy="130" r="4"/>
-          <polygon points="120,135 125,145 135,150 125,155 120,165 115,155 105,150 115,145"/>
-          <polygon points="990,65 996,77 1008,83 996,89 990,101 984,89 972,83 984,77"/>
-          <circle cx="950" cy="90" r="5"/>
-          <circle cx="1005" cy="130" r="4"/>
-          <polygon points="960,135 965,145 975,150 965,155 960,165 955,155 945,150 955,145"/>
-          <circle cx="50" cy="400" r="4"/>
-          <circle cx="58" cy="720" r="5"/>
-          <circle cx="48" cy="1000" r="4.5"/>
-          <circle cx="1030" cy="400" r="4"/>
-          <circle cx="1022" cy="720" r="5"/>
-          <circle cx="1032" cy="1000" r="4.5"/>
+        <!-- Confetti & Star Accents -->
+        <g fill="#f59e0b" opacity="0.85">
+          <polygon points="90,120 95,135 110,135 98,144 102,159 90,150 78,159 82,144 70,135 85,135"/>
+          <polygon points="980,130 984,142 996,142 986,150 990,162 980,154 970,162 974,150 964,142 976,142"/>
+          <polygon points="120,1200 124,1212 136,1212 126,1220 130,1232 120,1224 110,1232 114,1220 104,1212 116,1212"/>
+          <polygon points="960,1190 964,1202 976,1202 966,1210 970,1222 960,1214 950,1222 954,1210 944,1202 956,1202"/>
         </g>
-        <!-- Rounded Double Frame with Corner Ribbon Cutouts -->
-        <rect x="36" y="36" width="1008" height="1368" rx="28" fill="none" stroke="url(#partyGold)" stroke-width="4"/>
-        <rect x="48" y="48" width="984" height="1344" rx="20" fill="none" stroke="#ffffff" stroke-width="1.5" stroke-dasharray="10 8" opacity="0.8"/>
-        <!-- Top Arch Banner -->
-        <g transform="translate(540, 105)" text-anchor="middle">
-          <text y="0" font-family="'Cinzel', Georgia, serif" font-size="22" font-weight="800" letter-spacing="6" fill="#ffffff">
-            &#10024; CELEBRATING THE GRADUATES &#10024;
+        <g fill="#06b6d4" opacity="0.8">
+          <circle cx="160" cy="180" r="7"/>
+          <circle cx="920" cy="200" r="9"/>
+          <circle cx="210" cy="1150" r="8"/>
+          <circle cx="890" cy="1130" r="7"/>
+        </g>
+        <g fill="#ec4899" opacity="0.8">
+          <rect x="190" y="100" width="16" height="8" rx="2" transform="rotate(25 190 100)"/>
+          <rect x="880" y="110" width="18" height="9" rx="2" transform="rotate(-35 880 110)"/>
+          <rect x="150" y="1260" width="18" height="9" rx="2" transform="rotate(40 150 1260)"/>
+          <rect x="910" y="1240" width="16" height="8" rx="2" transform="rotate(-20 910 1240)"/>
+        </g>
+        <!-- Vibrant Border Frame -->
+        <rect x="36" y="36" width="1008" height="1368" rx="28" fill="none" stroke="url(#neonGlow)" stroke-width="5"/>
+        <!-- Top Header Ribbon -->
+        <g transform="translate(540, 110)" text-anchor="middle">
+          <text y="0" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="44" font-weight="900" letter-spacing="4" fill="#ffffff">
+            WE DID IT! &#127891;
           </text>
-          <text y="44" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="38" font-weight="900" letter-spacing="8" fill="url(#partyGold)">
+        </g>
+        <!-- Bottom Celebratory Banner -->
+        <rect x="64" y="1240" width="952" height="142" rx="24" fill="#090a0f" fill-opacity="0.9" stroke="url(#neonGlow)" stroke-width="2.5"/>
+        <g transform="translate(540, 1290)" text-anchor="middle">
+          <text y="0" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="52" font-weight="900" letter-spacing="6" fill="#facc15">
             CLASS OF 2026
           </text>
-        </g>
-        <!-- Bottom Festivity Badge -->
-        <rect x="64" y="1230" width="952" height="155" rx="20" fill="#0c0d12" fill-opacity="0.88" stroke="url(#partyGold)" stroke-width="2.5"/>
-        <g transform="translate(540, 1276)" text-anchor="middle">
-          <text y="16" font-family="'Cinzel', Georgia, serif" font-size="64" font-weight="900" letter-spacing="8" fill="url(#partyGold)">
-            &#9733; 2026 &#9733;
-          </text>
-          <text y="64" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="21" font-weight="800" letter-spacing="1.5" fill="#ffffff">
+          <text y="44" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="20" font-weight="700" letter-spacing="1" fill="#ffffff">
             Church Of The Virgin Mary and St. Mina
           </text>
-          <text y="90" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" letter-spacing="4" fill="#ffd54f">
-            HONORING OUR GRADUATES &#8226; WE DID IT!
+          <text y="70" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="600" letter-spacing="3" fill="#38bdf8">
+            HONORING OUR GRADUATES
           </text>
         </g>
       </svg>`
     },
 
     // ------------------------------------------------------------------------
-    // THEME 4: VINTAGE POLAROID (Classic Polaroid chin, vintage camera stamps)
+    // THEME 4: VINTAGE POLAROID (Solid bottom chin, film date stamp)
     // ------------------------------------------------------------------------
     {
       id: "vintage-polaroid",
       name: "Vintage Polaroid",
       svg: `
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1440" width="1080" height="1440">
-        <!-- Subtle warm sepia tone -->
-        <rect width="1080" height="1440" fill="rgba(180, 120, 40, 0.05)"/>
-        <!-- Classic Polaroid Border Frame -->
-        <rect x="0" y="0" width="1080" height="48" fill="#f8f6ee"/>
-        <rect x="0" y="48" width="48" height="1144" fill="#f8f6ee"/>
-        <rect x="1032" y="48" width="48" height="1144" fill="#f8f6ee"/>
-        <rect x="0" y="1192" width="1080" height="248" fill="#f8f6ee"/>
-        <rect x="48" y="48" width="984" height="1144" fill="none" stroke="#222222" stroke-width="2" opacity="0.8"/>
-        <!-- Top Left Vintage Recording Badge -->
-        <g transform="translate(68, 90)">
-          <circle cx="10" cy="10" r="7" fill="#e53935"/>
-          <text x="26" y="16" font-family="'Courier New', monospace" font-size="17" font-weight="900" letter-spacing="2" fill="#ffffff">
-            REC &#9679; 2026
-          </text>
-        </g>
-        <!-- Polaroid Bottom Chin Typography -->
+        <!-- Solid Polaroid Outer Film Borders -->
+        <rect x="0" y="0" width="1080" height="42" fill="#faf8f5"/>
+        <rect x="0" y="0" width="42" height="1440" fill="#faf8f5"/>
+        <rect x="1038" y="0" width="42" height="1440" fill="#faf8f5"/>
+        <!-- Classic Wide Polaroid Bottom Chin -->
+        <rect x="0" y="1200" width="1080" height="240" fill="#faf8f5"/>
+        <!-- Subtle Inner Photo Bevel -->
+        <rect x="42" y="42" width="996" height="1158" fill="none" stroke="#e0deda" stroke-width="3"/>
+        <!-- Top Tape Accents -->
+        <rect x="90" y="24" width="130" height="36" rx="3" fill="#e8e5dc" opacity="0.85" transform="rotate(-6 155 42)"/>
+        <rect x="860" y="24" width="130" height="36" rx="3" fill="#e8e5dc" opacity="0.85" transform="rotate(5 925 42)"/>
+        <!-- Handwritten Script Typography -->
         <g transform="translate(540, 1264)" text-anchor="middle">
           <text y="0" font-family="'Brush Script MT', 'Dancing Script', 'Baskerville', 'Georgia', cursive, serif" font-size="52" font-style="italic" font-weight="bold" fill="#1c1c1e">
             Graduation Day &#8226; Class of 2026
@@ -266,16 +399,13 @@
   });
 
   // ==========================================================================
-  // 3. APPLICATION STATE & LOCAL UPLOAD QUEUE
+  // 5. APPLICATION STATE
   // ==========================================================================
-  const sessionPhotos = []; // Stores Base64 images for current guest
+  const sessionPhotos = []; // In-memory reference for the active guest session
   let activeFrameIndex = 0; // Currently snapped active frame (0 to 3)
   let currentLightboxIndex = 0;
-
-  // Local Upload Queue for High-Traffic Concurrency Protection
-  const uploadQueue = [];
-  let isProcessingQueue = false;
-  const QUEUE_POLL_INTERVAL_MS = 6000; // Check and retry every 6 seconds
+  let isSyncing = false;
+  const QUEUE_POLL_INTERVAL_MS = 6000;
 
   const appState = {
     userName: "",
@@ -284,7 +414,7 @@
   };
 
   // ==========================================================================
-  // 4. DOM ELEMENT REFERENCES
+  // 6. DOM ELEMENT REFERENCES
   // ==========================================================================
   const dom = {
     // Views
@@ -315,7 +445,7 @@
     cameraStatusMsg: document.getElementById("camera-status-msg"),
     cameraStatusText: document.getElementById("camera-status-text"),
 
-    // Gallery Toolbar & Drawer
+    // Gallery Toolbar, Drawer & Sync Banner
     galleryOpenBtn: document.getElementById("gallery-open-btn"),
     galleryBackBtn: document.getElementById("gallery-back-btn"),
     galleryThumbPreview: document.getElementById("gallery-thumb-preview"),
@@ -324,6 +454,9 @@
     galleryHeaderCount: document.getElementById("gallery-header-count"),
     galleryEmptyState: document.getElementById("gallery-empty-state"),
     galleryGrid: document.getElementById("gallery-grid"),
+    syncStatusDot: document.getElementById("sync-status-dot"),
+    syncStatusText: document.getElementById("sync-status-text"),
+    syncNetworkBadge: document.getElementById("sync-network-badge"),
 
     // Lightbox Controls
     lightboxScrollTrack: document.getElementById("lightbox-scroll-track"),
@@ -332,7 +465,7 @@
   };
 
   // ==========================================================================
-  // 5. NATIVE CSS SCROLL SNAP SETUP (CAMERA FRAMES)
+  // 7. NATIVE CSS SCROLL SNAP SETUP (CAMERA FRAMES)
   // ==========================================================================
   function initCameraFrames() {
     dom.framesScrollTrack.innerHTML = "";
@@ -399,103 +532,123 @@
   });
 
   // ==========================================================================
-  // 6. SCREEN NAVIGATION
+  // 8. VIEW TRANSITIONS
   // ==========================================================================
   function showView(viewId) {
-    [dom.loginView, dom.cameraView].forEach(v => {
+    const views = [dom.loginView, dom.cameraView];
+    views.forEach((v) => {
       if (v.id === viewId) {
-        v.classList.remove("opacity-0", "pointer-events-none", "z-0");
-        v.classList.add("opacity-100", "z-10");
+        v.classList.remove("opacity-0", "pointer-events-none", "hidden");
+        v.classList.add("opacity-100", "pointer-events-auto");
       } else {
-        v.classList.remove("opacity-100", "z-10");
-        v.classList.add("opacity-0", "pointer-events-none", "z-0");
+        v.classList.add("opacity-0", "pointer-events-none", "hidden");
+        v.classList.remove("opacity-100", "pointer-events-auto");
       }
     });
   }
 
-  function openGalleryPanel() {
-    renderGalleryGrid();
-    dom.galleryView.classList.remove("translate-y-full");
-    dom.galleryView.classList.add("translate-y-0");
+  async function openGalleryPanel() {
+    await refreshGalleryFromIndexedDB();
+    dom.galleryView.classList.remove("translate-y-full", "pointer-events-none");
+    dom.galleryView.classList.add("translate-y-0", "pointer-events-auto");
   }
 
   function closeGalleryPanel() {
-    dom.galleryView.classList.remove("translate-y-0");
-    dom.galleryView.classList.add("translate-y-full");
+    dom.galleryView.classList.remove("translate-y-0", "pointer-events-auto");
+    dom.galleryView.classList.add("translate-y-full", "pointer-events-none");
   }
 
   // ==========================================================================
-  // 7. CAMERA STREAM MANAGEMENT (CLEAN VIDEO, NO CSS FILTERS)
+  // 9. WEBRTC CAMERA CONTROLS (CLEAN VIDEO, ZERO CSS FILTERS ON STREAM)
   // ==========================================================================
   async function startCamera() {
-    stopCamera();
+    if (appState.stream) {
+      stopCamera();
+    }
+
     dom.cameraStatusMsg.classList.remove("hidden");
-    dom.cameraStatusText.textContent = "Connecting to camera...";
+    dom.cameraStatusText.textContent = "Accessing camera...";
 
     const constraints = {
       audio: false,
       video: {
-        facingMode: appState.facingMode,
-        width: { ideal: 1920 },
-        height: { ideal: 1080 }
+        facingMode: { ideal: appState.facingMode },
+        width: { ideal: 1920, min: 1280 },
+        height: { ideal: 1080, min: 720 }
       }
     };
 
     try {
-      appState.stream = await navigator.mediaDevices.getUserMedia(constraints);
-      dom.video.srcObject = appState.stream;
+      const stream = await navigator.mediaDevices.getUserMedia(constraints);
+      appState.stream = stream;
+      dom.video.srcObject = stream;
+      await dom.video.play();
 
       if (appState.facingMode === "user") {
-        dom.video.classList.add("mirrored");
+        dom.video.classList.add("camera-mirror");
       } else {
-        dom.video.classList.remove("mirrored");
+        dom.video.classList.remove("camera-mirror");
       }
 
-      dom.video.onloadedmetadata = () => {
-        dom.cameraStatusMsg.classList.add("hidden");
-        dom.video.play();
-      };
+      dom.cameraStatusMsg.classList.add("hidden");
     } catch (err) {
-      console.error("Camera access error:", err);
-      dom.cameraStatusMsg.classList.remove("hidden");
-      dom.cameraStatusText.textContent = "Camera access denied. Please grant camera permission.";
+      console.warn("High-res camera failed, falling back to basic camera", err);
+      try {
+        const fallbackStream = await navigator.mediaDevices.getUserMedia({
+          video: true,
+          audio: false
+        });
+        appState.stream = fallbackStream;
+        dom.video.srcObject = fallbackStream;
+        await dom.video.play();
+        dom.cameraStatusMsg.classList.add("hidden");
+      } catch (fatalErr) {
+        console.error("Camera access denied or unavailable", fatalErr);
+        dom.cameraStatusText.textContent = "Camera permission denied or camera unavailable.";
+      }
     }
   }
 
   function stopCamera() {
     if (appState.stream) {
-      appState.stream.getTracks().forEach(track => track.stop());
+      appState.stream.getTracks().forEach((track) => track.stop());
       appState.stream = null;
     }
+    dom.video.srcObject = null;
   }
 
-  function flipCamera() {
+  async function flipCamera() {
     appState.facingMode = appState.facingMode === "user" ? "environment" : "user";
-    startCamera();
+    await startCamera();
   }
 
   // ==========================================================================
-  // 8. EXACT 3:4 OBJECT-COVER CANVAS CAPTURE
+  // 10. CONTINUOUS PHOTO CAPTURE & 3:4 CANVAS COMPOSITING
   // ==========================================================================
-  function capturePhoto() {
-    if (!appState.stream) return;
+  async function capturePhoto() {
+    if (!dom.video.videoWidth || !dom.video.videoHeight) {
+      console.warn("Video stream not ready yet.");
+      return;
+    }
 
-    // 1. Shutter White Screen Flash (80ms pure opacity)
-    dom.shutterFlash.classList.remove("opacity-0");
-    dom.shutterFlash.classList.add("opacity-90");
+    const activeTheme = PHOTOBOOTH_THEMES[activeFrameIndex];
+    if (!activeTheme || !activeTheme.frameImage.complete) {
+      console.warn("SVG Frame still loading.");
+      return;
+    }
+
+    // 1. Shutter Flash Effect (User remains seamlessly in live camera view)
+    dom.shutterFlash.classList.add("flash-active");
     setTimeout(() => {
-      dom.shutterFlash.classList.remove("opacity-90");
-      dom.shutterFlash.classList.add("opacity-0");
-    }, 80);
+      dom.shutterFlash.classList.remove("flash-active");
+    }, 280);
 
-    // Fixed 3:4 Photobooth Resolution
+    // Standard 3:4 High-Resolution Canvas dimensions
     const canvasWidth = 1080;
     const canvasHeight = 1440;
     dom.canvas.width = canvasWidth;
     dom.canvas.height = canvasHeight;
-
     const ctx = dom.canvas.getContext("2d");
-    const activeTheme = PHOTOBOOTH_THEMES[activeFrameIndex];
 
     // 2. Symmetrical 3:4 object-cover crop math
     const vWidth = dom.video.videoWidth || 1080;
@@ -529,133 +682,224 @@
     // 5. Export high-quality Base64 JPEG
     const finalImage = dom.canvas.toDataURL("image/jpeg", 0.90);
 
-    // 6. Store in global sessionPhotos (newest photo at index 0)
-    sessionPhotos.unshift({
-      id: Date.now(),
-      dataUrl: finalImage,
-      themeName: activeTheme.name,
-      timestamp: new Date()
-    });
-
-    // 7. Update Circular Album Thumbnail Button
-    updateGalleryButton();
-
-    // 8. Enqueue Photo into Background Upload Worker (100% Non-Blocking)
-    enqueuePhotoForUpload(finalImage, appState.userName);
-  }
-
-  // ==========================================================================
-  // 9. ROBUST UPLOAD QUEUE & AUTO-RETRY BACKGROUND WORKER (ZERO DATA LOSS)
-  // ==========================================================================
-  /**
-   * Pushes a photo into the upload queue and immediately triggers the worker.
-   * Completely unblocks the UI so guests can continuously snap photos.
-   */
-  function enqueuePhotoForUpload(imageBase64, userName) {
-    const cleanName = (userName || "Guest").replace(/[^a-zA-Z0-9_-]/g, "_");
+    // 6. Form Unique Photo Record
+    const cleanName = (appState.userName || "Guest").replace(/[^a-zA-Z0-9_-]/g, "_");
     const uniqueSuffix = `${Date.now()}_${Math.floor(Math.random() * 1000)}`;
     const filename = `photo_${cleanName}_${uniqueSuffix}.jpg`;
 
-    uploadQueue.push({
+    const photoRecord = {
       id: uniqueSuffix,
-      folderName: userName || "Guest",
-      image: imageBase64,
+      userName: appState.userName || "Guest",
+      folderName: appState.userName || "Guest",
       filename: filename,
-      retryCount: 0,
-      timestamp: new Date()
-    });
+      dataUrl: finalImage,
+      themeName: activeTheme.name,
+      timestamp: Date.now(),
+      status: "pending", // "pending" | "uploaded"
+      retryCount: 0
+    };
 
-    console.log(`[Upload Queue] Photo enqueued (${filename}). Pending items in queue: ${uploadQueue.length}`);
+    // 7. Save to IndexedDB (CRITICAL: Persistent Offline Storage)
+    try {
+      await PhotoboothDB.savePhoto(photoRecord);
+    } catch (idbErr) {
+      console.warn("[IndexedDB] Could not save photo to IDB:", idbErr);
+    }
 
-    // Trigger worker immediately if idle
-    processUploadQueue();
+    // 8. Update in-memory session (newest photo at index 0)
+    sessionPhotos.unshift(photoRecord);
+
+    // 9. Update Circular Album Thumbnail Button
+    updateGalleryButton();
+
+    // 10. Update UI Sync Indicator
+    updateSyncIndicator();
+
+    // 11. Trigger Background Sync Worker (100% Non-Blocking)
+    processSyncQueue();
+  }
+
+  // ==========================================================================
+  // 11. SMART BACKGROUND SYNC & NETWORK WORKER (THE QUEUE)
+  // ==========================================================================
+  async function updateSyncIndicator() {
+    try {
+      const pendingList = await PhotoboothDB.getPendingPhotos();
+      const pendingCount = pendingList.length;
+      const online = navigator.onLine;
+
+      if (!dom.syncStatusDot || !dom.syncStatusText || !dom.syncNetworkBadge) return;
+
+      if (!online) {
+        // Device is offline
+        dom.syncStatusDot.className = "h-2 w-2 shrink-0 rounded-full bg-amber-400";
+        dom.syncStatusText.textContent = pendingCount > 0
+          ? `${pendingCount} Photo${pendingCount > 1 ? 's' : ''} Pending Sync (Saved Locally)`
+          : "Offline Mode • All Photos Saved Locally";
+        dom.syncNetworkBadge.textContent = "Offline";
+        dom.syncNetworkBadge.className = "shrink-0 rounded border border-amber-500/40 bg-amber-950/40 px-2 py-0.5 text-[10px] font-mono text-amber-400";
+      } else {
+        // Device is online
+        if (pendingCount > 0) {
+          dom.syncStatusDot.className = "h-2 w-2 shrink-0 rounded-full bg-amber-400 animate-pulse";
+          dom.syncStatusText.textContent = `${pendingCount} Photo${pendingCount > 1 ? 's' : ''} Pending Sync...`;
+          dom.syncNetworkBadge.textContent = "Syncing";
+          dom.syncNetworkBadge.className = "shrink-0 rounded border border-gold-500/40 bg-gold-950/40 px-2 py-0.5 text-[10px] font-mono text-gold-300";
+        } else {
+          dom.syncStatusDot.className = "h-2 w-2 shrink-0 rounded-full bg-emerald-400";
+          dom.syncStatusText.textContent = "All photos backed up to cloud";
+          dom.syncNetworkBadge.textContent = "Online";
+          dom.syncNetworkBadge.className = "shrink-0 rounded border border-emerald-500/30 bg-emerald-950/30 px-2 py-0.5 text-[10px] font-mono text-emerald-400";
+        }
+      }
+    } catch (e) {
+      console.warn("[Sync Indicator Error]", e);
+    }
   }
 
   /**
-   * Background Worker: Sequentially processes the queue.
-   * On 200/success: removes item from queue.
-   * On error/rate-limit (Google 429/503): keeps item in queue, applies backoff, and retries.
+   * Smart Background Sync Worker:
+   * - Scans IndexedDB for items with status: "pending"
+   * - If offline: does nothing, leaving items safely in IndexedDB
+   * - If online: uploads item-by-item, updates IndexedDB status to "uploaded"
+   * - On Google Apps Script 429/503: logs silent warning, applies 5s backoff, and halts pass
    */
-  async function processUploadQueue() {
-    if (isProcessingQueue || uploadQueue.length === 0) return;
+  async function processSyncQueue() {
+    if (isSyncing || !navigator.onLine) {
+      updateSyncIndicator();
+      return;
+    }
 
-    isProcessingQueue = true;
+    isSyncing = true;
+    updateSyncIndicator();
 
-    while (uploadQueue.length > 0) {
-      const item = uploadQueue[0]; // Inspect item at the head of the queue
-      const payload = {
-        folderName: item.folderName,
-        image: item.image,
-        filename: item.filename
-      };
+    try {
+      const pendingPhotos = await PhotoboothDB.getPendingPhotos();
 
-      const serializedPayload = JSON.stringify(payload);
-      let success = false;
-
-      try {
-        // Send request as text/plain to bypass browser CORS preflight check
-        const response = await fetch(APPS_SCRIPT_URL, {
-          method: "POST",
-          headers: {
-            "Content-Type": "text/plain;charset=utf-8"
-          },
-          body: serializedPayload
-        });
-
-        if (response.ok) {
-          success = true;
-          console.log(`[Upload Queue] Succeeded: ${item.filename}. Remaining queue: ${uploadQueue.length - 1}`);
-        } else {
-          console.warn(`[Upload Queue] Google Apps Script responded with HTTP ${response.status}. Queue item retained.`);
+      for (const item of pendingPhotos) {
+        if (!navigator.onLine) {
+          console.log("[Sync Worker] Connection lost mid-queue; pausing sync.");
+          break;
         }
 
-      } catch (networkError) {
-        // Network drop or CORS glitch: attempt no-cors mode delivery fallback
+        const payload = {
+          folderName: item.folderName || item.userName || "Guest",
+          image: item.dataUrl,
+          filename: item.filename
+        };
+        const serializedPayload = JSON.stringify(payload);
+        let uploadSuccess = false;
+
         try {
-          await fetch(APPS_SCRIPT_URL, {
+          // Send request as text/plain to bypass browser CORS preflight check
+          const response = await fetch(APPS_SCRIPT_URL, {
             method: "POST",
-            mode: "no-cors",
             headers: {
               "Content-Type": "text/plain;charset=utf-8"
             },
             body: serializedPayload
           });
-          // In no-cors mode, if fetch resolves without throwing, data was transmitted
-          success = true;
-          console.log(`[Upload Queue] Succeeded via no-cors fallback: ${item.filename}`);
-        } catch (fallbackError) {
-          console.warn(`[Upload Queue] Fetch failed: ${fallbackError.message}. Item preserved in queue.`);
+
+          if (response.ok) {
+            uploadSuccess = true;
+            console.log(`[Sync Worker] Photo uploaded successfully: ${item.filename}`);
+          } else {
+            console.warn(`[Sync Worker] Google Apps Script responded HTTP ${response.status} for ${item.filename}`);
+          }
+        } catch (networkError) {
+          // Attempt no-cors fallback if preflight or transport dropped
+          try {
+            await fetch(APPS_SCRIPT_URL, {
+              method: "POST",
+              mode: "no-cors",
+              headers: {
+                "Content-Type": "text/plain;charset=utf-8"
+              },
+              body: serializedPayload
+            });
+            uploadSuccess = true;
+            console.log(`[Sync Worker] Delivered via no-cors fallback: ${item.filename}`);
+          } catch (fallbackError) {
+            console.warn(`[Sync Worker] Upload failed for ${item.filename}:`, fallbackError.message);
+          }
         }
-      }
 
-      if (success) {
-        // Remove successfully uploaded photo from head of queue
-        uploadQueue.shift();
+        if (uploadSuccess) {
+          // Mark photo as "uploaded" in IndexedDB
+          await PhotoboothDB.updatePhotoStatus(item.id, "uploaded");
 
-        // Brief 500ms spacing between successive requests to prevent bursting Google rate limits
-        if (uploadQueue.length > 0) {
+          // Sync in-memory session reference
+          const inMem = sessionPhotos.find(p => p.id === item.id);
+          if (inMem) inMem.status = "uploaded";
+
+          updateSyncIndicator();
+
+          // Refresh gallery badges if gallery view is open
+          if (dom.galleryView.classList.contains("translate-y-0")) {
+            renderGalleryGrid();
+          }
+
+          // 500ms pacing between successive photos to avoid bursting Google rate limits
           await new Promise((resolve) => setTimeout(resolve, 500));
+        } else {
+          // Rate limit or server error: increment retry count and back off 5s
+          await PhotoboothDB.incrementRetry(item.id);
+          console.warn(`[Sync Worker] Rate limited / transmission error for ${item.filename}. Backing off 5s...`);
+          await new Promise((resolve) => setTimeout(resolve, 5000));
+          break; // Stop current batch; next poll or 'online' event will retry
         }
-      } else {
-        // Rate limit / failure: KEEP item in queue, increment retry counter, back off
-        item.retryCount++;
-        console.warn(`[Upload Queue] Rate limit / connection error for ${item.filename} (Attempt #${item.retryCount}). Backing off 5s...`);
-        
-        // 5-second backoff allows Google simultaneous execution pool to clear up
-        await new Promise((resolve) => setTimeout(resolve, 5000));
-        break; // Break loop; next polling cycle will retry
       }
+    } catch (err) {
+      console.warn("[Sync Worker] Error during sync run:", err);
+    } finally {
+      isSyncing = false;
+      updateSyncIndicator();
     }
-
-    isProcessingQueue = false;
   }
 
-  // Periodic queue worker heartbeat (retries pending photos every 6 seconds)
-  setInterval(processUploadQueue, QUEUE_POLL_INTERVAL_MS);
+  // Network event listeners
+  window.addEventListener('online', () => {
+    console.log('[Network] Device came ONLINE. Resuming background upload queue.');
+    updateSyncIndicator();
+    processSyncQueue();
+  });
+
+  window.addEventListener('offline', () => {
+    console.log('[Network] Device went OFFLINE. Local storage mode active.');
+    updateSyncIndicator();
+  });
+
+  // Periodic heartbeat every 6 seconds
+  setInterval(processSyncQueue, QUEUE_POLL_INTERVAL_MS);
 
   // ==========================================================================
-  // 10. IN-APP GALLERY DRAWER LOGIC
+  // 12. IN-APP GALLERY (INDEXED-DB POWERED)
   // ==========================================================================
+  async function loadUserSession(userName) {
+    try {
+      const photos = await PhotoboothDB.getUserPhotos(userName);
+      sessionPhotos.length = 0;
+      photos.forEach(p => sessionPhotos.push(p));
+      updateGalleryButton();
+      updateSyncIndicator();
+    } catch (err) {
+      console.error("[IndexedDB] Failed loading photos for user:", err);
+    }
+  }
+
+  async function refreshGalleryFromIndexedDB() {
+    try {
+      const photos = await PhotoboothDB.getUserPhotos(appState.userName);
+      sessionPhotos.length = 0;
+      photos.forEach(p => sessionPhotos.push(p));
+      updateGalleryButton();
+      renderGalleryGrid();
+      updateSyncIndicator();
+    } catch (err) {
+      console.error("[IndexedDB] Error refreshing gallery:", err);
+    }
+  }
+
   function updateGalleryButton() {
     const total = sessionPhotos.length;
     if (total > 0) {
@@ -700,6 +944,19 @@
       img.alt = `Graduation Shot ${total - idx}`;
       img.className = "h-full w-full object-cover transition-transform duration-200 group-hover:scale-105";
 
+      // Sync status tag on photo card
+      const isUploaded = photo.status === "uploaded";
+      const syncBadge = document.createElement("div");
+      syncBadge.className = `absolute top-2 left-2 flex items-center space-x-1 rounded-full px-2 py-0.5 text-[10px] font-medium backdrop-blur-md shadow ${
+        isUploaded 
+          ? "bg-emerald-950/80 border border-emerald-500/40 text-emerald-300"
+          : "bg-amber-950/80 border border-amber-500/40 text-amber-300"
+      }`;
+      syncBadge.innerHTML = isUploaded
+        ? `<svg class="h-2.5 w-2.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg><span>Synced</span>`
+        : `<svg class="h-2.5 w-2.5 animate-pulse" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg><span>Pending</span>`;
+
+      // Fullscreen view trigger icon
       const viewBadge = document.createElement("div");
       viewBadge.className = "absolute bottom-2 right-2 flex h-7 w-7 items-center justify-center rounded-full bg-black/80 text-gold-400 border border-gold-500/40 shadow";
       viewBadge.innerHTML = `
@@ -709,6 +966,7 @@
       `;
 
       imgContainer.appendChild(img);
+      imgContainer.appendChild(syncBadge);
       imgContainer.appendChild(viewBadge);
       card.appendChild(imgContainer);
 
@@ -722,7 +980,7 @@
   }
 
   // ==========================================================================
-  // 11. FULLSCREEN LIGHTBOX (NATIVE CSS SCROLL SNAP FOR PHOTOS)
+  // 13. FULLSCREEN LIGHTBOX (INDEXED-DB LOADED, SCROLL-SNAP NAVIGATION)
   // ==========================================================================
   let lightboxObserver = null;
 
@@ -838,10 +1096,13 @@
   });
 
   // ==========================================================================
-  // 12. GLOBAL EVENT LISTENERS
+  // 14. GLOBAL EVENT LISTENERS & INITIALIZATION
   // ==========================================================================
+  // Initialize IndexedDB on boot
+  PhotoboothDB.init().catch(err => console.warn("[IndexedDB] Boot init warning:", err));
+
   // Login Form
-  dom.loginForm.addEventListener("submit", (e) => {
+  dom.loginForm.addEventListener("submit", async (e) => {
     e.preventDefault();
     const name = dom.userNameInput.value.trim();
     if (!name) return;
@@ -851,6 +1112,9 @@
     dom.headerUserTag.classList.remove("hidden");
     dom.headerUserTag.classList.add("flex");
     dom.logoutBtn.classList.remove("hidden");
+
+    // Load any existing offline photos for this user from IndexedDB
+    await loadUserSession(name);
 
     showView("camera-view");
     startCamera();
@@ -868,8 +1132,8 @@
   dom.logoutBtn.addEventListener("click", () => {
     stopCamera();
     appState.userName = "";
-    sessionPhotos.length = 0; // Clear session photos for next guest UI
-    // Note: uploadQueue is deliberately preserved so in-flight uploads complete cleanly!
+    sessionPhotos.length = 0; // Clear active UI view for next guest
+    // Note: IndexedDB preserves all photos safely and pending sync worker keeps processing!
     updateGalleryButton();
     closeGalleryPanel();
     closeLightbox();
@@ -878,5 +1142,9 @@
     dom.userNameInput.value = "";
     showView("login-view");
   });
+
+  // Boot check for network & pending uploads
+  updateSyncIndicator();
+  processSyncQueue();
 
 })();

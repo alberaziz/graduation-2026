@@ -3,6 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="theme-color" content="#07070a" />
   <title>Graduate 2026 - Church of the Virgin Mary & St. Mina Photobooth</title>
 
   <!-- Tailwind CSS CDN -->
@@ -259,6 +262,17 @@
           </div>
         </div>
 
+        <!-- Subtle Offline-First UI Sync Status Indicator -->
+        <div id="gallery-sync-banner" class="flex items-center justify-between border-b border-neutral-800/80 bg-surface-850/90 px-4 py-2 text-xs">
+          <div class="flex items-center space-x-2 min-w-0">
+            <span id="sync-status-dot" class="h-2 w-2 shrink-0 rounded-full bg-emerald-400 transition-colors"></span>
+            <span id="sync-status-text" class="truncate font-medium text-neutral-300">All photos backed up to cloud</span>
+          </div>
+          <span id="sync-network-badge" class="shrink-0 rounded border border-neutral-700 bg-surface-800 px-2 py-0.5 text-[10px] font-mono text-neutral-400">
+            Online
+          </span>
+        </div>
+
         <!-- Scrollable Photo Grid -->
         <div id="gallery-scroll-container" class="flex-1 overflow-y-auto p-4">
           
@@ -316,7 +330,7 @@
         class="btn-bounce flex items-center justify-center space-x-2.5 rounded-2xl bg-gradient-to-r from-gold-600 via-gold-500 to-gold-400 py-3.5 px-8 text-xs sm:text-sm font-bold uppercase tracking-wider text-black shadow-[0_12px_30px_rgba(212,175,55,0.35)] transition-transform duration-100 hover:brightness-105 active:scale-95"
       >
         <svg class="h-4 w-4 sm:h-5 sm:w-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/>
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15"/>
         </svg>
         <span>Download Photo</span>
       </button>
