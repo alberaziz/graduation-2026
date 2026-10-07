@@ -696,35 +696,67 @@
   }
 
   // ==========================================================================
-  // 11. VIEW TRANSITIONS & TOAST FEEDBACK
+  // 11. VIEW TRANSITIONS API WRAPPER (NATIVE iOS OPTICAL MORPH WITH FALLBACK)
   // ==========================================================================
-  function showView(viewId) {
-    const views = [dom.loginView, dom.cameraView];
-    views.forEach((v) => {
-      if (!v) return;
-      if (v.id === viewId) {
-        v.classList.remove("opacity-0", "pointer-events-none", "hidden");
-        v.classList.add("opacity-100", "pointer-events-auto");
-      } else {
-        v.classList.add("opacity-0", "pointer-events-none", "hidden");
-        v.classList.remove("opacity-100", "pointer-events-auto");
+  function executeViewTransition(updateCallback) {
+    if (typeof document.startViewTransition === "function") {
+      try {
+        return document.startViewTransition(updateCallback);
+      } catch (e) {
+        console.warn("[ViewTransition] Notice:", e);
+        updateCallback();
+        return {
+          finished: Promise.resolve(),
+          ready: Promise.resolve(),
+          updateCallbackDone: Promise.resolve()
+        };
       }
-    });
+    } else {
+      updateCallback();
+      return {
+        finished: Promise.resolve(),
+        ready: Promise.resolve(),
+        updateCallbackDone: Promise.resolve()
+      };
+    }
+  }
+
+  function showView(viewId) {
+    const update = () => {
+      const views = [dom.loginView, dom.cameraView];
+      views.forEach((v) => {
+        if (!v) return;
+        if (v.id === viewId) {
+          v.classList.remove("opacity-0", "pointer-events-none", "hidden");
+          v.classList.add("opacity-100", "pointer-events-auto");
+          v.style.display = "flex";
+        } else {
+          v.classList.add("opacity-0", "pointer-events-none", "hidden");
+          v.classList.remove("opacity-100", "pointer-events-auto");
+          v.style.display = "none";
+        }
+      });
+    };
+    executeViewTransition(update);
   }
 
   async function openGalleryPanel() {
     await refreshGalleryFromIndexedDB();
-    if (dom.galleryView) {
-      dom.galleryView.classList.remove("translate-y-full", "pointer-events-none");
-      dom.galleryView.classList.add("translate-y-0", "pointer-events-auto");
-    }
+    executeViewTransition(() => {
+      if (dom.galleryView) {
+        dom.galleryView.classList.remove("translate-y-full", "pointer-events-none");
+        dom.galleryView.classList.add("translate-y-0", "pointer-events-auto");
+      }
+    });
   }
 
   function closeGalleryPanel() {
-    if (dom.galleryView) {
-      dom.galleryView.classList.remove("translate-y-0", "pointer-events-auto");
-      dom.galleryView.classList.add("translate-y-full", "pointer-events-none");
-    }
+    executeViewTransition(() => {
+      if (dom.galleryView) {
+        dom.galleryView.classList.remove("translate-y-0", "pointer-events-auto");
+        dom.galleryView.classList.add("translate-y-full", "pointer-events-none");
+      }
+    });
   }
 
   function showToast(message) {
@@ -1300,12 +1332,14 @@
 
     sessionPhotos.forEach((photo, idx) => {
       const card = document.createElement("div");
+      card.id = `gallery-card-${idx}`;
       card.className = "btn-bounce group relative flex flex-col rounded-2xl border border-gold-500/25 bg-surface-850 p-2 shadow-lg cursor-pointer transition-transform";
 
       const imgContainer = document.createElement("div");
       imgContainer.className = "relative aspect-[3/4] w-full overflow-hidden rounded-xl bg-black";
 
       const img = document.createElement("img");
+      img.id = `gallery-img-${idx}`;
       img.src = photo.dataUrl;
       img.alt = `Graduation Shot ${total - idx}`;
       img.className = "h-full w-full object-cover transition-transform duration-200 group-hover:scale-105";
@@ -1343,7 +1377,7 @@
   }
 
   // ==========================================================================
-  // 17. FULLSCREEN LIGHTBOX (SCROLL-SNAP NAVIGATION)
+  // 17. FULLSCREEN LIGHTBOX (GALLERY-TO-LIGHTBOX HERO MORPH WITH SCROLL-SNAP)
   // ==========================================================================
   let lightboxObserver = null;
 
@@ -1351,22 +1385,54 @@
     if (!sessionPhotos.length || !sessionPhotos[index] || !dom.lightboxScrollTrack || !dom.lightboxView) return;
     currentLightboxIndex = index;
 
-    dom.lightboxScrollTrack.innerHTML = "";
+    const sourceThumbImg = document.getElementById(`gallery-img-${index}`);
 
-    sessionPhotos.forEach((photo, idx) => {
-      const slide = document.createElement("div");
-      slide.className = "snap-lightbox-slide";
-      slide.dataset.index = idx;
+    const buildLightboxDOM = () => {
+      dom.lightboxScrollTrack.innerHTML = "";
 
-      const img = document.createElement("img");
-      img.src = photo.dataUrl;
-      img.alt = `Photo ${idx + 1}`;
-      img.className = "lightbox-img-card";
-      img.draggable = false;
+      sessionPhotos.forEach((photo, idx) => {
+        const slide = document.createElement("div");
+        slide.className = "snap-lightbox-slide";
+        slide.dataset.index = idx;
 
-      slide.appendChild(img);
-      dom.lightboxScrollTrack.appendChild(slide);
-    });
+        const img = document.createElement("img");
+        img.id = `lightbox-img-${idx}`;
+        img.src = photo.dataUrl;
+        img.alt = `Photo ${idx + 1}`;
+        img.className = "lightbox-img-card";
+        img.draggable = false;
+
+        // Active image participates in Hero Shared Element Morph
+        if (idx === index) {
+          img.style.viewTransitionName = "hero-lightbox-photo";
+          if (sourceThumbImg) sourceThumbImg.style.viewTransitionName = "";
+        }
+
+        slide.appendChild(img);
+        dom.lightboxScrollTrack.appendChild(slide);
+      });
+
+      dom.lightboxView.classList.add("lightbox-active");
+
+      // Position scroll track directly at target slide
+      const trackWidth = dom.lightboxScrollTrack.clientWidth || window.innerWidth;
+      dom.lightboxScrollTrack.scrollLeft = index * trackWidth;
+    };
+
+    if (typeof document.startViewTransition === "function" && sourceThumbImg) {
+      sourceThumbImg.style.viewTransitionName = "hero-lightbox-photo";
+      const transition = document.startViewTransition(() => {
+        buildLightboxDOM();
+      });
+
+      transition.finished.finally(() => {
+        const activeImg = document.getElementById(`lightbox-img-${index}`);
+        if (activeImg) activeImg.style.viewTransitionName = "";
+        if (sourceThumbImg) sourceThumbImg.style.viewTransitionName = "";
+      });
+    } else {
+      buildLightboxDOM();
+    }
 
     if (lightboxObserver) lightboxObserver.disconnect();
 
@@ -1390,23 +1456,36 @@
     } catch (obsErr) {
       console.warn("[Lightbox Observer] Notice:", obsErr);
     }
-
-    dom.lightboxView.classList.add("lightbox-active");
-
-    requestAnimationFrame(() => {
-      const trackWidth = dom.lightboxScrollTrack.clientWidth || window.innerWidth;
-      dom.lightboxScrollTrack.scrollTo({
-        left: index * trackWidth,
-        behavior: "instant"
-      });
-    });
   }
 
   function closeLightbox() {
-    if (dom.lightboxView) dom.lightboxView.classList.remove("lightbox-active");
-    if (lightboxObserver) {
-      lightboxObserver.disconnect();
-      lightboxObserver = null;
+    if (!dom.lightboxView) return;
+    const activeIdx = currentLightboxIndex;
+    const currentSlideImg = document.getElementById(`lightbox-img-${activeIdx}`);
+    const targetThumbImg = document.getElementById(`gallery-img-${activeIdx}`);
+
+    const teardownLightboxDOM = () => {
+      dom.lightboxView.classList.remove("lightbox-active");
+      if (targetThumbImg) targetThumbImg.style.viewTransitionName = "hero-lightbox-photo";
+      if (currentSlideImg) currentSlideImg.style.viewTransitionName = "";
+      if (lightboxObserver) {
+        lightboxObserver.disconnect();
+        lightboxObserver = null;
+      }
+    };
+
+    if (typeof document.startViewTransition === "function" && currentSlideImg && targetThumbImg) {
+      currentSlideImg.style.viewTransitionName = "hero-lightbox-photo";
+      const transition = document.startViewTransition(() => {
+        teardownLightboxDOM();
+      });
+
+      transition.finished.finally(() => {
+        if (targetThumbImg) targetThumbImg.style.viewTransitionName = "";
+        if (currentSlideImg) currentSlideImg.style.viewTransitionName = "";
+      });
+    } else {
+      teardownLightboxDOM();
     }
   }
 
@@ -1679,7 +1758,7 @@
   if (dom.createStripBtn) dom.createStripBtn.addEventListener("click", createPolaroidStrip);
 
   // ==========================================================================
-  // LOGIN SCREEN TRANSITION (SMOOTH 0.5s CROSSFADE TO CAMERA VIEW)
+  // LOGIN SCREEN TRANSITION (NATIVE VIEW TRANSITION WITH 0.5s FALLBACK)
   // ==========================================================================
   let isLoggingIn = false;
 
@@ -1704,46 +1783,70 @@
     // Load user photos in background
     loadUserSession(name).catch(() => {});
 
-    if (dom.cameraView && dom.loginView) {
-      // 1. Prepare camera view in DOM at opacity 0
-      dom.cameraView.style.display = "flex";
-      dom.cameraView.classList.remove("hidden", "pointer-events-none");
-      dom.cameraView.classList.add("pointer-events-auto");
-      dom.cameraView.style.opacity = "0";
-      dom.cameraView.style.transition = "opacity 0.5s ease";
+    // Start camera stream so video begins streaming immediately
+    startCamera();
 
-      // 2. Concurrently fade out the login screen over 0.5s
-      dom.loginView.style.transition = "opacity 0.5s ease";
-      dom.loginView.style.opacity = "0";
-      dom.loginView.style.pointerEvents = "none";
-
-      // 3. Start camera stream so video begins streaming during crossfade
-      startCamera();
-
-      // 4. Trigger camera view fade-in to opacity: 1 on next animation frames
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          dom.cameraView.style.opacity = "1";
-        });
-      });
-
-      // 5. Set login screen to display: none ONLY after the 500ms transition completes
-      setTimeout(() => {
+    const switchViews = () => {
+      if (dom.loginView) {
         dom.loginView.style.display = "none";
-        dom.loginView.classList.add("hidden");
+        dom.loginView.classList.add("hidden", "opacity-0", "pointer-events-none");
+        dom.loginView.classList.remove("opacity-100", "pointer-events-auto");
+      }
+      if (dom.cameraView) {
+        dom.cameraView.style.display = "flex";
+        dom.cameraView.classList.remove("hidden", "opacity-0", "pointer-events-none");
+        dom.cameraView.classList.add("opacity-100", "pointer-events-auto");
+        dom.cameraView.style.opacity = "1";
+      }
+    };
+
+    if (typeof document.startViewTransition === "function") {
+      const transition = executeViewTransition(switchViews);
+      transition.finished.finally(() => {
         isLoggingIn = false;
-      }, 500);
+      });
     } else {
-      // Fallback
-      showView("camera-view");
-      startCamera();
-      isLoggingIn = false;
+      // Smooth 0.5s CSS crossfade fallback for older browsers
+      if (dom.cameraView && dom.loginView) {
+        dom.cameraView.style.display = "flex";
+        dom.cameraView.classList.remove("hidden", "pointer-events-none");
+        dom.cameraView.classList.add("pointer-events-auto");
+        dom.cameraView.style.opacity = "0";
+        dom.cameraView.style.transition = "opacity 0.5s ease";
+
+        dom.loginView.style.transition = "opacity 0.5s ease";
+        dom.loginView.style.opacity = "0";
+        dom.loginView.style.pointerEvents = "none";
+
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            dom.cameraView.style.opacity = "1";
+          });
+        });
+
+        setTimeout(() => {
+          switchViews();
+          isLoggingIn = false;
+        }, 500);
+      } else {
+        switchViews();
+        isLoggingIn = false;
+      }
     }
   }
 
   // Login Form
   if (dom.loginForm) {
     dom.loginForm.addEventListener("submit", handleLoginSubmit);
+  }
+
+  // Backdrop tap on Lightbox to dismiss
+  if (dom.lightboxView) {
+    dom.lightboxView.addEventListener("click", (e) => {
+      if (e.target === dom.lightboxView || e.target === dom.lightboxScrollTrack || e.target.classList.contains("snap-lightbox-slide")) {
+        closeLightbox();
+      }
+    });
   }
 
   // Exit / Switch Guest
@@ -1759,20 +1862,24 @@
       if (dom.logoutBtn) dom.logoutBtn.classList.add("hidden");
       if (dom.userNameInput) dom.userNameInput.value = "";
 
-      // Reset inline styles on views
-      if (dom.loginView) {
-        dom.loginView.style.display = "";
-        dom.loginView.style.opacity = "";
-        dom.loginView.style.transition = "";
-        dom.loginView.style.pointerEvents = "";
-      }
-      if (dom.cameraView) {
-        dom.cameraView.style.display = "";
-        dom.cameraView.style.opacity = "";
-        dom.cameraView.style.transition = "";
-        dom.cameraView.style.pointerEvents = "";
-      }
-      showView("login-view");
+      const resetViews = () => {
+        // Reset inline styles on views
+        if (dom.loginView) {
+          dom.loginView.style.display = "";
+          dom.loginView.style.opacity = "";
+          dom.loginView.style.transition = "";
+          dom.loginView.style.pointerEvents = "";
+        }
+        if (dom.cameraView) {
+          dom.cameraView.style.display = "";
+          dom.cameraView.style.opacity = "";
+          dom.cameraView.style.transition = "";
+          dom.cameraView.style.pointerEvents = "";
+        }
+        showView("login-view");
+      };
+
+      executeViewTransition(resetViews);
     });
   }
 

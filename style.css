@@ -119,8 +119,50 @@ input {
 }
 
 /* ==========================================================================
-   3. VIEW TRANSITIONS & MICRO-INTERACTIONS
+   3. VIEW TRANSITIONS API CONFIGURATION (NATIVE iOS OPTICAL MORPHS)
    ========================================================================== */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.35s;
+  animation-timing-function: cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+/* Gallery-to-Lightbox Hero Shared Element Morph */
+::view-transition-group(hero-lightbox-photo) {
+  animation-duration: 0.44s;
+  animation-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1);
+  z-index: 99999;
+}
+
+::view-transition-old(hero-lightbox-photo),
+::view-transition-new(hero-lightbox-photo) {
+  animation-duration: 0.44s;
+  animation-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1);
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+  border-radius: 1.25rem;
+  mix-blend-mode: normal;
+}
+
+#gallery-view {
+  view-transition-name: gallery-sheet;
+}
+
+::view-transition-group(gallery-sheet) {
+  animation-duration: 0.36s;
+  animation-timing-function: cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+#app-header {
+  view-transition-name: header-bar;
+}
+
+::view-transition-group(header-bar) {
+  animation-duration: 0.35s;
+}
+
+/* View transitions & micro-interactions */
 .view-fade {
   transition: opacity 0.22s cubic-bezier(0.16, 1, 0.3, 1), transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
   will-change: opacity, transform;
@@ -139,7 +181,7 @@ input {
 }
 
 .slide-panel {
-  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 0.32s cubic-bezier(0.32, 0.72, 0, 1);
   will-change: transform;
 }
 
@@ -152,13 +194,40 @@ input {
   opacity: 1 !important;
 }
 
-.btn-bounce {
-  transition: transform 0.12s cubic-bezier(0.16, 1, 0.3, 1), filter 0.12s ease;
-  will-change: transform;
+/* ==========================================================================
+   BOUNCY MICRO-INTERACTIONS (GLOBAL iOS SPRING TIMING)
+   cubic-bezier(0.34, 1.56, 0.64, 1) spring rebound with instant scale(0.92) press
+   ========================================================================== */
+:root {
+  --spring-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --spring-ios: cubic-bezier(0.32, 0.72, 0, 1);
 }
 
-.btn-bounce:active {
-  transform: scale(0.92);
+button,
+[role="button"],
+.btn-bounce,
+.clickable,
+#gallery-grid > div {
+  transition: transform 0.28s var(--spring-bounce), 
+              filter 0.2s ease, 
+              box-shadow 0.25s var(--spring-bounce) !important;
+  will-change: transform;
+  touch-action: manipulation;
+  cursor: pointer;
+}
+
+button:active,
+[role="button"]:active,
+.btn-bounce:active,
+.clickable:active,
+#gallery-grid > div:active {
+  transform: scale(0.92) !important;
+  transition: transform 0.08s ease-out !important;
+}
+
+#shutter-btn:active {
+  transform: scale(0.88) !important;
+  transition: transform 0.08s ease-out !important;
 }
 
 /* Natural selfie mirroring */
@@ -167,25 +236,38 @@ input {
 }
 
 /* ==========================================================================
-   4. SMART COUNTDOWN TIMER POPUP ANIMATION
+   4. THE 3-2-1 COUNTDOWN "POP" (Spring Overshoot, Hold, & Fade)
+   Scale up from 0.5 to 1 with overshoot bounce, stay visible, then fade out
    ========================================================================== */
 @keyframes countdownPop {
   0% {
     opacity: 0;
-    transform: scale(1.6) translate3d(0, 0, 0);
+    transform: scale(0.5) translate3d(0, 0, 0);
   }
-  35% {
+  28% {
     opacity: 1;
-    transform: scale(0.94) translate3d(0, 0, 0);
+    transform: scale(1.18) translate3d(0, 0, 0); /* Overshoot bounce */
+  }
+  42% {
+    opacity: 1;
+    transform: scale(0.96) translate3d(0, 0, 0); /* Gentle spring settle */
+  }
+  56% {
+    opacity: 1;
+    transform: scale(1.0) translate3d(0, 0, 0);  /* Resting position */
+  }
+  82% {
+    opacity: 1;
+    transform: scale(1.0) translate3d(0, 0, 0);  /* Holds visibly on screen */
   }
   100% {
-    opacity: 1;
-    transform: scale(1) translate3d(0, 0, 0);
+    opacity: 0;
+    transform: scale(0.88) translate3d(0, 8px, 0); /* Smooth fade-out before next tick */
   }
 }
 
 .countdown-active-num {
-  animation: countdownPop 0.82s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: countdownPop 0.95s cubic-bezier(0.34, 1.56, 0.64, 1) forwards !important;
   will-change: transform, opacity;
 }
 
@@ -332,14 +414,15 @@ input {
 
 .lightbox-img-card {
   max-width: 90%;
-  max-height: 75vh;
+  max-height: 72vh;
+  aspect-ratio: 3 / 4;
   width: auto;
   height: auto;
-  object-fit: contain;
+  object-fit: cover;
   margin: 0 auto;
   border-radius: 1.25rem;
-  box-shadow: 0 25px 60px -10px rgba(0, 0, 0, 0.9), 0 0 25px rgba(212, 175, 55, 0.18);
-  border: 1px solid rgba(212, 175, 55, 0.35);
+  box-shadow: 0 25px 60px -10px rgba(0, 0, 0, 0.9), 0 0 25px rgba(212, 175, 55, 0.22);
+  border: 2px solid rgba(212, 175, 55, 0.45);
   user-select: none;
   pointer-events: auto;
 }
