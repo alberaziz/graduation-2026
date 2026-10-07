@@ -47,7 +47,7 @@
   <!-- ========================================================================= -->
   <!-- 1. CINEMATIC SPLASH SCREEN (HARDWARE-ACCELERATED, PURE BLACK OVERLAY)    -->
   <!-- ========================================================================= -->
-  <div id="splash-screen" class="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-black transition-opacity duration-700 ease-out select-none">
+  <div id="splash-screen" class="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-black transition-opacity duration-500 ease-out select-none">
     <div class="splash-content flex flex-col items-center text-center px-6">
       <!-- Graduation Crest Emblem -->
       <div class="mb-5 flex h-20 w-20 items-center justify-center rounded-3xl border border-gold-500/40 bg-surface-850 shadow-[0_15px_40px_rgba(212,175,55,0.25)]">
@@ -64,6 +64,31 @@
       </p>
     </div>
   </div>
+
+  <!-- Inline Failsafe: Guarantees splash dismissal even under network/CDN delay -->
+  <script>
+    (function() {
+      function dismissSplash() {
+        setTimeout(function() {
+          var s = document.getElementById("splash-screen");
+          if (s) {
+            s.classList.add("opacity-0", "pointer-events-none");
+            s.style.opacity = "0";
+            s.style.pointerEvents = "none";
+            setTimeout(function() {
+              if (s && s.parentNode) s.parentNode.removeChild(s);
+            }, 600);
+          }
+        }, 2000);
+      }
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", dismissSplash, { once: true });
+        window.addEventListener("load", dismissSplash, { once: true });
+      } else {
+        dismissSplash();
+      }
+    })();
+  </script>
 
   <!-- Mobile-First App Shell -->
   <div class="relative mx-auto flex h-full w-full max-w-md flex-col overflow-hidden bg-surface-900 shadow-2xl border-x border-neutral-900">
@@ -111,12 +136,12 @@
             </svg>
           </div>
 
-          <!-- Main Heading (Clean: No Subtitles, No Helper Text) -->
+          <!-- Main Heading -->
           <h1 class="text-xl sm:text-2xl font-bold tracking-tight text-white leading-snug">
             Church Of The Virgin Mary and St. Mina
           </h1>
 
-          <!-- Form: Clean input without placeholder -->
+          <!-- Form -->
           <form id="login-form" class="mt-8 w-full space-y-5">
             <div class="text-left">
               <label for="user-name-input" class="block text-xs font-semibold uppercase tracking-wider text-gold-400/90 mb-2 ml-1">
@@ -193,7 +218,7 @@
             id="camera-viewport"
             class="relative aspect-[3/4] w-full max-w-[340px] max-h-[62vh] rounded-2xl overflow-hidden bg-black shadow-[0_20px_50px_rgba(0,0,0,0.85)] border-2 border-gold-500/35"
           >
-            <!-- 100% Clean Video Feed: STRICTLY ZERO CSS FILTERS FOR MAX PERFORMANCE -->
+            <!-- Clean Video Feed (No CSS Filters) -->
             <video
               id="camera-stream"
               autoplay
@@ -202,12 +227,12 @@
               class="absolute inset-0 h-full w-full object-cover camera-mirror"
             ></video>
 
-            <!-- Native CSS Scroll Snap Track: Sits directly on top of video, 60-120fps GPU Swiping -->
+            <!-- Native CSS Scroll Snap Track: 60-120fps GPU Swiping -->
             <div
               id="frames-scroll-track"
               class="scroll-snap-x absolute inset-0 z-10 w-full h-full"
             >
-              <!-- 4 Snap Frame Slides injected here by app.js -->
+              <!-- 4 Snap Frame Slides injected by app.js -->
             </div>
 
             <!-- SMART COUNTDOWN POPUP ANIMATION OVERLAY -->
@@ -267,7 +292,7 @@
             </span>
           </button>
 
-          <!-- MAIN SHUTTER BUTTON (Continuous Back-to-Back Capture) -->
+          <!-- MAIN SHUTTER BUTTON -->
           <div class="relative flex items-center justify-center">
             <button
               id="shutter-btn"
@@ -372,11 +397,9 @@
   </div>
 
   <!-- ========================================================================= -->
-  <!-- VIEW 4: MASTER FULLSCREEN LIGHTBOX (NATIVE CSS SCROLL SNAP FOR PHOTOS)   -->
-  <!-- Placed directly in body at z-[100] with pure black 90% + backdrop blur    -->
+  <!-- VIEW 4: MASTER FULLSCREEN LIGHTBOX (SCROLL-SNAP FOR PHOTOS)               -->
   <!-- ========================================================================= -->
   <div id="view-lightbox">
-    <!-- 1. Floating Circular Close (X) Button (Top Right) -->
     <div class="w-full flex justify-end shrink-0 pt-1 pr-1 z-20">
       <button
         id="lightbox-close-btn"
@@ -389,12 +412,10 @@
       </button>
     </div>
 
-    <!-- 2. Native CSS Scroll-Snap Photo Carousel (Buttery Smooth 60-120fps) -->
     <div id="lightbox-scroll-track" class="scroll-snap-x relative flex flex-1 w-full my-auto">
-      <!-- Photos injected here by app.js -->
+      <!-- Injected by app.js -->
     </div>
 
-    <!-- 3. Prominent Amber/Gold Download Button (Bottom Center) -->
     <div class="w-full flex justify-center shrink-0 pb-3 sm:pb-5 z-20">
       <button
         id="lightbox-download-btn"
@@ -408,7 +429,6 @@
     </div>
   </div>
 
-  <!-- Main Application Logic Script -->
   <script src="app.js"></script>
 </body>
 </html>

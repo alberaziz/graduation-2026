@@ -19,12 +19,17 @@ input {
    1. CINEMATIC SPLASH SCREEN (HARDWARE-ACCELERATED)
    ========================================================================== */
 #splash-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background-color: #000000;
+  transition: opacity 0.5s ease-out;
   will-change: opacity;
   contain: layout paint;
 }
 
 .splash-content {
-  animation: splashFadeIn 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: splashFadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   will-change: transform, opacity;
 }
 
@@ -39,10 +44,10 @@ input {
   }
 }
 
-.splash-fade-out {
+.splash-fade-out,
+#splash-screen.opacity-0 {
   opacity: 0 !important;
   pointer-events: none !important;
-  transition: opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 /* ==========================================================================
@@ -70,7 +75,7 @@ input {
   height: 100%;
   scroll-snap-align: center;
   scroll-snap-stop: always;
-  pointer-events: none; /* Allows touch drag events to reach scroll container */
+  pointer-events: none;
 }
 
 .snap-frame-slide svg {
@@ -162,20 +167,17 @@ input {
   contain: layout paint;
 }
 
-/* Clean Video Feed: STRICTLY NO HEAVY CSS FILTERS */
 #camera-stream {
   transform: translate3d(0, 0, 0);
   object-fit: cover;
 }
 
-/* Floating Indicator Pill */
 .theme-pill {
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6), 0 0 10px rgba(212, 175, 55, 0.25);
 }
 
-/* Shutter Button Aura */
 @keyframes ringPulse {
   0% {
     box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.55);
@@ -234,7 +236,6 @@ input {
   pointer-events: auto;
 }
 
-/* Lightbox Image Presentation */
 .lightbox-img-card {
   max-width: 90%;
   max-height: 75vh;

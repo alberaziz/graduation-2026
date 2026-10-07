@@ -2,186 +2,342 @@
  * ============================================================================
  * GRADUATE 2026 - PHOTOBOOTH APPLICATION (app.js)
  * Architecture: Offline-First Progressive Web App (PWA) + Vanilla ES6+
- * Enterprise & Native Features:
- *   1. Hardware-Accelerated Cinematic Splash Screen ("Class of 2026")
- *   2. Multi-State Smart Countdown Timer (OFF -> 3s -> 5s -> OFF) + Pop Animations
- *   3. Tactile Haptic Feedback (navigator.vibrate) & Offline Shutter Sound (Audio Data URI)
- *   4. On-Device Auto-Polaroid Collage Strip Engine (IndexedDB + Canvas API)
- *   5. IndexedDB Persistent Storage (PhotoboothDB) - 100% Offline Resilience
- *   6. Smart Background Sync Worker (Auto-Upload, Rate-Limit Backoff, Zero Data Loss)
- *   7. Service Worker Integration (100% Functional in Airplane Mode)
- *   8. 4 Valid XML Inline SVG Frames with Native CSS Scroll-Snapping (60-120fps)
- *   9. Clean WebRTC Stream (Zero CSS Video Filters for Maximum Mobile FPS)
- *  10. Fullscreen Isolated Lightbox with Native Scroll-Snap Navigation
+ * Enterprise Resilience:
+ *   1. 100% Foolproof Splash Screen Removal (Guaranteed Non-Blocking 2000ms Fade)
+ *   2. Comprehensive Try/Catch Wrapping & Incognito In-Memory IndexedDB Fallback
+ *   3. Multi-State Smart Countdown Timer (OFF -> 3s -> 5s -> OFF)
+ *   4. Tactile Haptic Vibration & Offline Camera Shutter Sound (Audio Data URI)
+ *   5. On-Device Auto-Polaroid Collage Strip Engine (Canvas API)
+ *   6. Smart Background Sync Worker (Silent Uploads, Rate-Limit Backoff)
+ *   7. 4 Valid XML Inline SVG Frames with Native CSS Scroll-Snapping (60-120fps)
+ *   8. Fullscreen Isolated Lightbox with Native Scroll-Snap Navigation
  * ============================================================================
  */
+
+// ============================================================================
+// 1. FOOLPROOF CINEMATIC SPLASH SCREEN REMOVAL
+// Runs with zero dependencies at the very top of the script.
+// Handles DOMContentLoaded, window.onload, and document.readyState !== 'loading'.
+// Strictly waits 2000ms, triggers smooth CSS fade-out, and purges after 600ms.
+// ============================================================================
+(function initFoolproofSplash() {
+  const triggerFadeAndRemove = () => {
+    setTimeout(() => {
+      const splash = document.getElementById("splash-screen");
+      if (!splash) return;
+
+      // Trigger smooth CSS fade-out
+      splash.classList.add("opacity-0", "pointer-events-none");
+      splash.style.opacity = "0";
+      splash.style.pointerEvents = "none";
+
+      // 600ms later, completely remove from DOM
+      setTimeout(() => {
+        try {
+          const el = document.getElementById("splash-screen");
+          if (el && el.parentNode) {
+            el.parentNode.removeChild(el);
+          }
+        } catch (e) {
+          console.warn("[Splash] Removal notice:", e);
+        }
+      }, 600);
+    }, 2000);
+  };
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", triggerFadeAndRemove, { once: true });
+    window.addEventListener("load", triggerFadeAndRemove, { once: true });
+  } else {
+    triggerFadeAndRemove();
+  }
+})();
 
 (() => {
   'use strict';
 
   // ==========================================================================
-  // 1. BACKEND GOOGLE APPS SCRIPT WEB APP CONFIGURATION
+  // 2. BACKEND GOOGLE APPS SCRIPT WEB APP CONFIGURATION
   // ==========================================================================
   const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyJqgbbH2UBN-KzefwQspwHAU-iIx-W0gbcBGafuoFNNdzqT5lTlV3-C1lp8KCjuIhH/exec";
 
   // ==========================================================================
-  // 2. HARDCODED BASE64 CAMERA SHUTTER SOUND (100% OFFLINE DATA URI)
+  // 3. HARDCODED BASE64 CAMERA SHUTTER SOUND (100% OFFLINE DATA URI)
   // ==========================================================================
   const SHUTTER_SOUND_DATA_URL = "data:audio/wav;base64,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";
   let shutterAudio = null;
   try {
-    shutterAudio = new Audio(SHUTTER_SOUND_DATA_URL);
-    shutterAudio.volume = 0.9;
+    if (typeof Audio !== "undefined") {
+      shutterAudio = new Audio(SHUTTER_SOUND_DATA_URL);
+      shutterAudio.volume = 0.9;
+    }
   } catch (audioErr) {
-    console.warn("[Audio] Could not preload audio data URI:", audioErr);
+    console.warn("[Audio] Audio preload notice:", audioErr);
   }
 
   // ==========================================================================
-  // 3. SERVICE WORKER REGISTRATION (OFFLINE PWA APP SHELL)
+  // 4. SERVICE WORKER REGISTRATION (SAFE NON-BLOCKING TRY/CATCH)
   // ==========================================================================
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./sw.js')
-        .then((reg) => console.log('[ServiceWorker] Registered with scope:', reg.scope))
-        .catch((err) => console.warn('[ServiceWorker] Registration failed:', err));
-    });
+  try {
+    if ('serviceWorker' in navigator && window.location.protocol.startsWith('http')) {
+      window.addEventListener('load', () => {
+        try {
+          navigator.serviceWorker.register('./sw.js')
+            .then((reg) => console.log('[ServiceWorker] Registered with scope:', reg.scope))
+            .catch((err) => console.warn('[ServiceWorker] Registration notice:', err));
+        } catch (err) {
+          console.warn('[ServiceWorker] Register exception:', err);
+        }
+      });
+    }
+  } catch (swErr) {
+    console.warn('[ServiceWorker] ServiceWorker check exception:', swErr);
   }
 
   // ==========================================================================
-  // 4. INDEXED-DB WRAPPER (PhotoboothDB - OFFLINE STORAGE ENGINE)
+  // 5. INDEXED-DB WRAPPER WITH IN-MEMORY RESILIENCE (INCOGNITO-SAFE)
   // ==========================================================================
+  const memoryStore = []; // In-memory fallback if IndexedDB is blocked or unavailable
+
   const PhotoboothDB = {
     dbName: "PhotoboothDB_2026",
     dbVersion: 1,
     storeName: "photos",
     _db: null,
+    _failed: false,
 
     async init() {
+      if (this._failed) return null;
       if (this._db) return this._db;
 
-      return new Promise((resolve, reject) => {
-        const request = indexedDB.open(this.dbName, this.dbVersion);
+      try {
+        if (!window.indexedDB) {
+          console.warn("[IndexedDB] Not supported, using in-memory store.");
+          this._failed = true;
+          return null;
+        }
 
-        request.onupgradeneeded = (event) => {
-          const db = event.target.result;
-          if (!db.objectStoreNames.contains(this.storeName)) {
-            const store = db.createObjectStore(this.storeName, { keyPath: "id" });
-            store.createIndex("status", "status", { unique: false });
-            store.createIndex("userName", "userName", { unique: false });
-            store.createIndex("timestamp", "timestamp", { unique: false });
+        return await new Promise((resolve) => {
+          try {
+            const request = indexedDB.open(this.dbName, this.dbVersion);
+
+            request.onupgradeneeded = (event) => {
+              try {
+                const db = event.target.result;
+                if (!db.objectStoreNames.contains(this.storeName)) {
+                  const store = db.createObjectStore(this.storeName, { keyPath: "id" });
+                  store.createIndex("status", "status", { unique: false });
+                  store.createIndex("userName", "userName", { unique: false });
+                  store.createIndex("timestamp", "timestamp", { unique: false });
+                }
+              } catch (upgradeErr) {
+                console.warn("[IndexedDB] Upgrade error:", upgradeErr);
+              }
+            };
+
+            request.onsuccess = (event) => {
+              this._db = event.target.result;
+              resolve(this._db);
+            };
+
+            request.onerror = (event) => {
+              console.warn("[IndexedDB] Access blocked or errored (incognito mode), fallback active:", event.target.error);
+              this._failed = true;
+              resolve(null);
+            };
+          } catch (openErr) {
+            console.warn("[IndexedDB] Open exception, fallback active:", openErr);
+            this._failed = true;
+            resolve(null);
           }
-        };
-
-        request.onsuccess = (event) => {
-          this._db = event.target.result;
-          resolve(this._db);
-        };
-
-        request.onerror = (event) => {
-          console.error("[IndexedDB] Failed to open database:", event.target.error);
-          reject(event.target.error);
-        };
-      });
+        });
+      } catch (err) {
+        console.warn("[IndexedDB] General init exception, fallback active:", err);
+        this._failed = true;
+        return null;
+      }
     },
 
     async savePhoto(photoRecord) {
-      const db = await this.init();
-      return new Promise((resolve, reject) => {
-        const tx = db.transaction(this.storeName, "readwrite");
-        const store = tx.objectStore(this.storeName);
-        const req = store.put(photoRecord);
+      try {
+        const db = await this.init();
+        if (!db || this._failed) {
+          memoryStore.push(photoRecord);
+          return photoRecord;
+        }
 
-        req.onsuccess = () => resolve(photoRecord);
-        req.onerror = (e) => {
-          console.error("[IndexedDB] savePhoto error:", e.target.error);
-          reject(e.target.error);
-        };
-      });
+        return await new Promise((resolve) => {
+          try {
+            const tx = db.transaction(this.storeName, "readwrite");
+            const store = tx.objectStore(this.storeName);
+            const req = store.put(photoRecord);
+
+            req.onsuccess = () => resolve(photoRecord);
+            req.onerror = () => {
+              memoryStore.push(photoRecord);
+              resolve(photoRecord);
+            };
+          } catch (txErr) {
+            memoryStore.push(photoRecord);
+            resolve(photoRecord);
+          }
+        });
+      } catch (err) {
+        memoryStore.push(photoRecord);
+        return photoRecord;
+      }
     },
 
     async getUserPhotos(userName) {
-      const db = await this.init();
-      return new Promise((resolve, reject) => {
-        const tx = db.transaction(this.storeName, "readonly");
-        const store = tx.objectStore(this.storeName);
-        const req = store.getAll();
-
-        req.onsuccess = () => {
-          const all = req.result || [];
+      try {
+        const db = await this.init();
+        if (!db || this._failed) {
           const filtered = userName 
-            ? all.filter(p => (p.userName || "").toLowerCase() === userName.toLowerCase())
-            : all;
+            ? memoryStore.filter(p => (p.userName || "").toLowerCase() === userName.toLowerCase())
+            : [...memoryStore];
           filtered.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
-          resolve(filtered);
-        };
-        req.onerror = (e) => reject(e.target.error);
-      });
+          return filtered;
+        }
+
+        return await new Promise((resolve) => {
+          try {
+            const tx = db.transaction(this.storeName, "readonly");
+            const store = tx.objectStore(this.storeName);
+            const req = store.getAll();
+
+            req.onsuccess = () => {
+              const all = req.result || [];
+              const combined = [...all, ...memoryStore];
+              const filtered = userName 
+                ? combined.filter(p => (p.userName || "").toLowerCase() === userName.toLowerCase())
+                : combined;
+              filtered.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+              resolve(filtered);
+            };
+            req.onerror = () => {
+              resolve([...memoryStore]);
+            };
+          } catch (e) {
+            resolve([...memoryStore]);
+          }
+        });
+      } catch (err) {
+        return [...memoryStore];
+      }
     },
 
     async getPendingPhotos() {
-      const db = await this.init();
-      return new Promise((resolve, reject) => {
-        const tx = db.transaction(this.storeName, "readonly");
-        const store = tx.objectStore(this.storeName);
-        const index = store.index("status");
-        const req = index.getAll("pending");
+      try {
+        const db = await this.init();
+        if (!db || this._failed) {
+          return memoryStore.filter(p => p.status === "pending").sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
+        }
 
-        req.onsuccess = () => {
-          const list = req.result || [];
-          list.sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
-          resolve(list);
-        };
-        req.onerror = (e) => reject(e.target.error);
-      });
+        return await new Promise((resolve) => {
+          try {
+            const tx = db.transaction(this.storeName, "readonly");
+            const store = tx.objectStore(this.storeName);
+            const index = store.index("status");
+            const req = index.getAll("pending");
+
+            req.onsuccess = () => {
+              const list = req.result || [];
+              const memPending = memoryStore.filter(p => p.status === "pending");
+              const combined = [...list, ...memPending];
+              combined.sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
+              resolve(combined);
+            };
+            req.onerror = () => {
+              resolve(memoryStore.filter(p => p.status === "pending"));
+            };
+          } catch (e) {
+            resolve(memoryStore.filter(p => p.status === "pending"));
+          }
+        });
+      } catch (err) {
+        return memoryStore.filter(p => p.status === "pending");
+      }
     },
 
     async updatePhotoStatus(id, newStatus) {
-      const db = await this.init();
-      return new Promise((resolve, reject) => {
-        const tx = db.transaction(this.storeName, "readwrite");
-        const store = tx.objectStore(this.storeName);
-        const getReq = store.get(id);
+      try {
+        const memItem = memoryStore.find(p => p.id === id);
+        if (memItem) {
+          memItem.status = newStatus;
+          memItem.syncedAt = Date.now();
+        }
 
-        getReq.onsuccess = () => {
-          const item = getReq.result;
-          if (!item) return resolve(null);
-          item.status = newStatus;
-          item.syncedAt = Date.now();
-          const putReq = store.put(item);
-          putReq.onsuccess = () => resolve(item);
-          putReq.onerror = (e) => reject(e.target.error);
-        };
-        getReq.onerror = (e) => reject(e.target.error);
-      });
+        const db = await this.init();
+        if (!db || this._failed) return memItem;
+
+        return await new Promise((resolve) => {
+          try {
+            const tx = db.transaction(this.storeName, "readwrite");
+            const store = tx.objectStore(this.storeName);
+            const getReq = store.get(id);
+
+            getReq.onsuccess = () => {
+              const item = getReq.result;
+              if (!item) return resolve(memItem);
+              item.status = newStatus;
+              item.syncedAt = Date.now();
+              const putReq = store.put(item);
+              putReq.onsuccess = () => resolve(item);
+              putReq.onerror = () => resolve(memItem);
+            };
+            getReq.onerror = () => resolve(memItem);
+          } catch (e) {
+            resolve(memItem);
+          }
+        });
+      } catch (err) {
+        return null;
+      }
     },
 
     async incrementRetry(id) {
-      const db = await this.init();
-      return new Promise((resolve, reject) => {
-        const tx = db.transaction(this.storeName, "readwrite");
-        const store = tx.objectStore(this.storeName);
-        const getReq = store.get(id);
+      try {
+        const memItem = memoryStore.find(p => p.id === id);
+        if (memItem) {
+          memItem.retryCount = (memItem.retryCount || 0) + 1;
+          memItem.lastRetry = Date.now();
+        }
 
-        getReq.onsuccess = () => {
-          const item = getReq.result;
-          if (!item) return resolve(null);
-          item.retryCount = (item.retryCount || 0) + 1;
-          item.lastRetry = Date.now();
-          const putReq = store.put(item);
-          putReq.onsuccess = () => resolve(item);
-          putReq.onerror = (e) => reject(e.target.error);
-        };
-        getReq.onerror = (e) => reject(e.target.error);
-      });
+        const db = await this.init();
+        if (!db || this._failed) return memItem;
+
+        return await new Promise((resolve) => {
+          try {
+            const tx = db.transaction(this.storeName, "readwrite");
+            const store = tx.objectStore(this.storeName);
+            const getReq = store.get(id);
+
+            getReq.onsuccess = () => {
+              const item = getReq.result;
+              if (!item) return resolve(memItem);
+              item.retryCount = (item.retryCount || 0) + 1;
+              item.lastRetry = Date.now();
+              const putReq = store.put(item);
+              putReq.onsuccess = () => resolve(item);
+              putReq.onerror = () => resolve(memItem);
+            };
+            getReq.onerror = () => resolve(memItem);
+          } catch (e) {
+            resolve(memItem);
+          }
+        });
+      } catch (err) {
+        return null;
+      }
     }
   };
 
   // ==========================================================================
-  // 5. 4 LIGHTWEIGHT NATIVE INLINE SVG FRAMES (100% VALID XML)
+  // 6. 4 LIGHTWEIGHT NATIVE INLINE SVG FRAMES (100% VALID XML)
   // ==========================================================================
   const PHOTOBOOTH_THEMES = [
     // ------------------------------------------------------------------------
-    // THEME 1: CLASSIC GOLD (Metallic borders, serif 2026, church dedication)
+    // THEME 1: CLASSIC GOLD
     // ------------------------------------------------------------------------
     {
       id: "classic-gold",
@@ -243,7 +399,7 @@
     },
 
     // ------------------------------------------------------------------------
-    // THEME 2: NOIR MINIMAL (Architectural studio lines, Swiss typography)
+    // THEME 2: NOIR MINIMAL
     // ------------------------------------------------------------------------
     {
       id: "noir-minimal",
@@ -291,7 +447,7 @@
     },
 
     // ------------------------------------------------------------------------
-    // THEME 3: CELEBRATION (Festive stars, confetti, bright diploma banners)
+    // THEME 3: CELEBRATION
     // ------------------------------------------------------------------------
     {
       id: "celebration",
@@ -345,7 +501,7 @@
     },
 
     // ------------------------------------------------------------------------
-    // THEME 4: VINTAGE POLAROID (Solid bottom chin, film date stamp)
+    // THEME 4: VINTAGE POLAROID
     // ------------------------------------------------------------------------
     {
       id: "vintage-polaroid",
@@ -378,26 +534,28 @@
     }
   ];
 
-  // Pre-load all 4 SVG frame themes as Image instances for instantaneous Canvas compositing
   PHOTOBOOTH_THEMES.forEach((theme) => {
-    theme.dataUrl = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(theme.svg.trim());
-    theme.frameImage = new Image();
-    theme.frameImage.crossOrigin = "anonymous";
-    theme.frameImage.src = theme.dataUrl;
+    try {
+      theme.dataUrl = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(theme.svg.trim());
+      theme.frameImage = new Image();
+      theme.frameImage.crossOrigin = "anonymous";
+      theme.frameImage.src = theme.dataUrl;
+    } catch (e) {
+      console.warn("[Theme] Preload notice:", e);
+    }
   });
 
   // ==========================================================================
-  // 6. APPLICATION STATE & SMART COUNTDOWN TIMER STATE
+  // 7. APPLICATION STATE & SMART COUNTDOWN TIMER STATE
   // ==========================================================================
-  const sessionPhotos = []; // In-memory reference for current guest session
-  let activeFrameIndex = 0; // Currently snapped active frame (0 to 3)
+  const sessionPhotos = [];
+  let activeFrameIndex = 0;
   let currentLightboxIndex = 0;
   let isSyncing = false;
   const QUEUE_POLL_INTERVAL_MS = 6000;
 
-  // Multi-state smart countdown timer (OFF -> 3s -> 5s -> OFF)
   const TIMER_STATES = ["OFF", "3s", "5s"];
-  let timerStateIndex = 0; // 0 = OFF, 1 = 3s, 2 = 5s
+  let timerStateIndex = 0;
   let isCountingDown = false;
   let countdownTimerId = null;
 
@@ -408,26 +566,20 @@
   };
 
   // ==========================================================================
-  // 7. DOM ELEMENT REFERENCES
+  // 8. DOM ELEMENT REFERENCES (SAFE RESOLUTION)
   // ==========================================================================
   const dom = {
-    // Cinematic Splash Screen
-    splashScreen: document.getElementById("splash-screen"),
-
-    // Views
     loginView: document.getElementById("login-view"),
     cameraView: document.getElementById("camera-view"),
     galleryView: document.getElementById("gallery-view"),
     lightboxView: document.getElementById("view-lightbox"),
 
-    // Login Elements
     loginForm: document.getElementById("login-form"),
     userNameInput: document.getElementById("user-name-input"),
     headerUserTag: document.getElementById("header-user-tag"),
     headerUserName: document.getElementById("header-user-name"),
     logoutBtn: document.getElementById("logout-btn"),
 
-    // Camera Viewport & Countdown Overlay
     cameraViewport: document.getElementById("camera-viewport"),
     framesScrollTrack: document.getElementById("frames-scroll-track"),
     video: document.getElementById("camera-stream"),
@@ -446,7 +598,6 @@
     cameraStatusMsg: document.getElementById("camera-status-msg"),
     cameraStatusText: document.getElementById("camera-status-text"),
 
-    // Gallery Toolbar, Drawer, Auto-Strip & Sync Banner
     galleryOpenBtn: document.getElementById("gallery-open-btn"),
     galleryBackBtn: document.getElementById("gallery-back-btn"),
     createStripBtn: document.getElementById("create-strip-btn"),
@@ -462,32 +613,16 @@
     syncStatusText: document.getElementById("sync-status-text"),
     syncNetworkBadge: document.getElementById("sync-network-badge"),
 
-    // Lightbox Controls
     lightboxScrollTrack: document.getElementById("lightbox-scroll-track"),
     lightboxCloseBtn: document.getElementById("lightbox-close-btn"),
     lightboxDownloadBtn: document.getElementById("lightbox-download-btn"),
   };
 
   // ==========================================================================
-  // 8. 1. CINEMATIC SPLASH SCREEN CONTROLLER
-  // ==========================================================================
-  function initSplashScreen() {
-    if (!dom.splashScreen) return;
-    // Hold for 1.5 seconds, then smoothly fade out and remove from DOM
-    setTimeout(() => {
-      dom.splashScreen.classList.add("splash-fade-out");
-      setTimeout(() => {
-        if (dom.splashScreen && dom.splashScreen.parentNode) {
-          dom.splashScreen.remove();
-        }
-      }, 750);
-    }, 1500);
-  }
-
-  // ==========================================================================
-  // 9. 2. MULTI-STATE SMART COUNTDOWN TIMER CONTROLLER
+  // 9. MULTI-STATE SMART COUNTDOWN TIMER CONTROLLER
   // ==========================================================================
   function updateTimerButtonUI() {
+    if (!dom.timerBadge || !dom.cameraTimerBtn) return;
     const currentState = TIMER_STATES[timerStateIndex];
     dom.timerBadge.textContent = currentState;
 
@@ -510,6 +645,7 @@
   // 10. NATIVE CSS SCROLL SNAP SETUP (CAMERA FRAMES)
   // ==========================================================================
   function initCameraFrames() {
+    if (!dom.framesScrollTrack) return;
     dom.framesScrollTrack.innerHTML = "";
 
     PHOTOBOOTH_THEMES.forEach((theme, index) => {
@@ -521,33 +657,38 @@
       theme.slideElement = slide;
     });
 
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          const idx = parseInt(entry.target.dataset.index, 10);
-          if (!isNaN(idx)) {
-            activeFrameIndex = idx;
-            updateThemeLabel(idx);
+    try {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const idx = parseInt(entry.target.dataset.index, 10);
+            if (!isNaN(idx)) {
+              activeFrameIndex = idx;
+              updateThemeLabel(idx);
+            }
           }
-        }
+        });
+      }, {
+        root: dom.framesScrollTrack,
+        threshold: 0.6
       });
-    }, {
-      root: dom.framesScrollTrack,
-      threshold: 0.6
-    });
 
-    const slides = dom.framesScrollTrack.querySelectorAll(".snap-frame-slide");
-    slides.forEach(slide => observer.observe(slide));
+      const slides = dom.framesScrollTrack.querySelectorAll(".snap-frame-slide");
+      slides.forEach(slide => observer.observe(slide));
+    } catch (obsErr) {
+      console.warn("[IntersectionObserver] Frame track observer notice:", obsErr);
+    }
   }
 
   function updateThemeLabel(index) {
     const theme = PHOTOBOOTH_THEMES[index];
-    if (!theme) return;
+    if (!theme || !dom.themeNameLabel || !dom.themeStepBadge) return;
     dom.themeNameLabel.textContent = theme.name;
     dom.themeStepBadge.textContent = `${index + 1}/${PHOTOBOOTH_THEMES.length}`;
   }
 
   function scrollToFrame(index) {
+    if (!dom.framesScrollTrack) return;
     if (index < 0) index = PHOTOBOOTH_THEMES.length - 1;
     if (index >= PHOTOBOOTH_THEMES.length) index = 0;
     const slideWidth = dom.framesScrollTrack.clientWidth || 340;
@@ -560,22 +701,27 @@
   initCameraFrames();
   updateThemeLabel(0);
 
-  dom.prevFrameBtn.addEventListener("click", (e) => {
-    e.stopPropagation();
-    scrollToFrame(activeFrameIndex - 1);
-  });
+  if (dom.prevFrameBtn) {
+    dom.prevFrameBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      scrollToFrame(activeFrameIndex - 1);
+    });
+  }
 
-  dom.nextFrameBtn.addEventListener("click", (e) => {
-    e.stopPropagation();
-    scrollToFrame(activeFrameIndex + 1);
-  });
+  if (dom.nextFrameBtn) {
+    dom.nextFrameBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      scrollToFrame(activeFrameIndex + 1);
+    });
+  }
 
   // ==========================================================================
-  // 11. VIEW TRANSITIONS
+  // 11. VIEW TRANSITIONS & TOAST FEEDBACK
   // ==========================================================================
   function showView(viewId) {
     const views = [dom.loginView, dom.cameraView];
     views.forEach((v) => {
+      if (!v) return;
       if (v.id === viewId) {
         v.classList.remove("opacity-0", "pointer-events-none", "hidden");
         v.classList.add("opacity-100", "pointer-events-auto");
@@ -588,13 +734,17 @@
 
   async function openGalleryPanel() {
     await refreshGalleryFromIndexedDB();
-    dom.galleryView.classList.remove("translate-y-full", "pointer-events-none");
-    dom.galleryView.classList.add("translate-y-0", "pointer-events-auto");
+    if (dom.galleryView) {
+      dom.galleryView.classList.remove("translate-y-full", "pointer-events-none");
+      dom.galleryView.classList.add("translate-y-0", "pointer-events-auto");
+    }
   }
 
   function closeGalleryPanel() {
-    dom.galleryView.classList.remove("translate-y-0", "pointer-events-auto");
-    dom.galleryView.classList.add("translate-y-full", "pointer-events-none");
+    if (dom.galleryView) {
+      dom.galleryView.classList.remove("translate-y-0", "pointer-events-auto");
+      dom.galleryView.classList.add("translate-y-full", "pointer-events-none");
+    }
   }
 
   function showToast(message) {
@@ -609,15 +759,15 @@
   }
 
   // ==========================================================================
-  // 12. WEBRTC CAMERA CONTROLS (CLEAN VIDEO, ZERO CSS FILTERS ON STREAM)
+  // 12. WEBRTC CAMERA CONTROLS (CLEAN VIDEO FEED)
   // ==========================================================================
   async function startCamera() {
     if (appState.stream) {
       stopCamera();
     }
 
-    dom.cameraStatusMsg.classList.remove("hidden");
-    dom.cameraStatusText.textContent = "Accessing camera...";
+    if (dom.cameraStatusMsg) dom.cameraStatusMsg.classList.remove("hidden");
+    if (dom.cameraStatusText) dom.cameraStatusText.textContent = "Accessing camera...";
 
     const constraints = {
       audio: false,
@@ -629,42 +779,56 @@
     };
 
     try {
-      const stream = await navigator.mediaDevices.getUserMedia(constraints);
-      appState.stream = stream;
-      dom.video.srcObject = stream;
-      await dom.video.play();
-
-      if (appState.facingMode === "user") {
-        dom.video.classList.add("camera-mirror");
-      } else {
-        dom.video.classList.remove("camera-mirror");
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        throw new Error("getUserMedia not supported in this environment");
       }
 
-      dom.cameraStatusMsg.classList.add("hidden");
-    } catch (err) {
-      console.warn("High-res camera failed, falling back to basic camera", err);
-      try {
-        const fallbackStream = await navigator.mediaDevices.getUserMedia({
-          video: true,
-          audio: false
-        });
-        appState.stream = fallbackStream;
-        dom.video.srcObject = fallbackStream;
+      const stream = await navigator.mediaDevices.getUserMedia(constraints);
+      appState.stream = stream;
+      if (dom.video) {
+        dom.video.srcObject = stream;
         await dom.video.play();
-        dom.cameraStatusMsg.classList.add("hidden");
+        if (appState.facingMode === "user") {
+          dom.video.classList.add("camera-mirror");
+        } else {
+          dom.video.classList.remove("camera-mirror");
+        }
+      }
+      if (dom.cameraStatusMsg) dom.cameraStatusMsg.classList.add("hidden");
+    } catch (err) {
+      console.warn("High-res camera failed, attempting basic camera fallback", err);
+      try {
+        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+          const fallbackStream = await navigator.mediaDevices.getUserMedia({
+            video: true,
+            audio: false
+          });
+          appState.stream = fallbackStream;
+          if (dom.video) {
+            dom.video.srcObject = fallbackStream;
+            await dom.video.play();
+          }
+          if (dom.cameraStatusMsg) dom.cameraStatusMsg.classList.add("hidden");
+        }
       } catch (fatalErr) {
-        console.error("Camera access denied or unavailable", fatalErr);
-        dom.cameraStatusText.textContent = "Camera permission denied or camera unavailable.";
+        console.warn("Camera access denied or unavailable:", fatalErr);
+        if (dom.cameraStatusText) {
+          dom.cameraStatusText.textContent = "Camera permission needed or camera unavailable.";
+        }
       }
     }
   }
 
   function stopCamera() {
-    if (appState.stream) {
-      appState.stream.getTracks().forEach((track) => track.stop());
-      appState.stream = null;
+    try {
+      if (appState.stream) {
+        appState.stream.getTracks().forEach((track) => track.stop());
+        appState.stream = null;
+      }
+      if (dom.video) dom.video.srcObject = null;
+    } catch (e) {
+      console.warn("[Camera] Stop notice:", e);
     }
-    dom.video.srcObject = null;
   }
 
   async function flipCamera() {
@@ -675,19 +839,12 @@
   // ==========================================================================
   // 13. PHOTO CAPTURE PIPELINE (HAPTIC, SOUND & COUNTDOWN INTEGRATION)
   // ==========================================================================
-  /**
-   * Shutter button entrance: Evaluates active timer state.
-   * If OFF -> captures instantly.
-   * If 3s or 5s -> animates countdown popup, then triggers executePhotoCapture().
-   */
   function handleShutterTrigger() {
-    if (isCountingDown) return; // Block double-tap spamming
+    if (isCountingDown) return;
 
     if (timerStateIndex === 0) {
-      // Timer OFF -> Instant Capture
       executePhotoCapture();
     } else {
-      // Timer ON (3s or 5s) -> Start animated countdown overlay
       startCountdownCapture(timerStateIndex === 1 ? 3 : 5);
     }
   }
@@ -696,14 +853,14 @@
     isCountingDown = true;
     let remaining = seconds;
 
-    dom.countdownNumber.textContent = remaining;
-    dom.countdownOverlay.classList.remove("opacity-0", "pointer-events-none");
-    dom.countdownOverlay.classList.add("opacity-100");
+    if (dom.countdownNumber) dom.countdownNumber.textContent = remaining;
+    if (dom.countdownOverlay) {
+      dom.countdownOverlay.classList.remove("opacity-0", "pointer-events-none");
+      dom.countdownOverlay.classList.add("opacity-100");
+    }
 
-    // Trigger initial number pop
     triggerCountdownPop();
 
-    // Subtle tactile pulse on countdown start
     if (navigator.vibrate) {
       try { navigator.vibrate([25]); } catch (e) {}
     }
@@ -712,18 +869,19 @@
       remaining--;
 
       if (remaining > 0) {
-        dom.countdownNumber.textContent = remaining;
+        if (dom.countdownNumber) dom.countdownNumber.textContent = remaining;
         triggerCountdownPop();
         if (navigator.vibrate) {
           try { navigator.vibrate([25]); } catch (e) {}
         }
       } else {
-        // Countdown completed (fired exactly after "1")
         clearInterval(countdownTimerId);
         countdownTimerId = null;
 
-        dom.countdownOverlay.classList.remove("opacity-100");
-        dom.countdownOverlay.classList.add("opacity-0", "pointer-events-none");
+        if (dom.countdownOverlay) {
+          dom.countdownOverlay.classList.remove("opacity-100");
+          dom.countdownOverlay.classList.add("opacity-0", "pointer-events-none");
+        }
         isCountingDown = false;
 
         executePhotoCapture();
@@ -732,20 +890,14 @@
   }
 
   function triggerCountdownPop() {
+    if (!dom.countdownNumber) return;
     dom.countdownNumber.classList.remove("countdown-active-num");
-    void dom.countdownNumber.offsetWidth; // Force CSS reflow
+    void dom.countdownNumber.offsetWidth;
     dom.countdownNumber.classList.add("countdown-active-num");
   }
 
-  /**
-   * Physical photo execution:
-   * 1. Haptic vibration (50ms)
-   * 2. Mechanical shutter sound (data URI)
-   * 3. Shutter flash animation
-   * 4. Canvas compositing & IndexedDB persistence
-   */
   async function executePhotoCapture() {
-    if (!dom.video.videoWidth || !dom.video.videoHeight) {
+    if (!dom.video || !dom.video.videoWidth || !dom.video.videoHeight) {
       console.warn("Video stream not ready yet.");
       return;
     }
@@ -756,12 +908,12 @@
       return;
     }
 
-    // 1. Trigger Haptic Feedback (50ms)
+    // 1. Haptic Vibration (50ms)
     if (navigator.vibrate) {
       try {
         navigator.vibrate([50]);
       } catch (vibErr) {
-        console.warn("[Haptic] Vibration skipped:", vibErr);
+        console.warn("[Haptic] Vibration notice:", vibErr);
       }
     }
 
@@ -771,15 +923,17 @@
         shutterAudio.currentTime = 0;
         shutterAudio.play().catch(() => {});
       } catch (audioErr) {
-        console.warn("[Audio] Shutter sound play error:", audioErr);
+        console.warn("[Audio] Shutter sound play notice:", audioErr);
       }
     }
 
     // 3. Shutter Flash Effect
-    dom.shutterFlash.classList.add("flash-active");
-    setTimeout(() => {
-      dom.shutterFlash.classList.remove("flash-active");
-    }, 280);
+    if (dom.shutterFlash) {
+      dom.shutterFlash.classList.add("flash-active");
+      setTimeout(() => {
+        dom.shutterFlash.classList.remove("flash-active");
+      }, 280);
+    }
 
     // Standard 3:4 High-Resolution Canvas dimensions
     const canvasWidth = 1080;
@@ -837,11 +991,11 @@
       retryCount: 0
     };
 
-    // 9. Save to IndexedDB (Persistent Offline Storage)
+    // 9. Save to IndexedDB (or in-memory fallback)
     try {
       await PhotoboothDB.savePhoto(photoRecord);
     } catch (idbErr) {
-      console.warn("[IndexedDB] Could not save photo to IDB:", idbErr);
+      console.warn("[IndexedDB] Photo save notice:", idbErr);
     }
 
     // 10. Update in-memory session (newest photo at index 0)
@@ -858,10 +1012,9 @@
   }
 
   // ==========================================================================
-  // 14. 4. AUTO-POLAROID COLLAGE STRIP (ON-DEVICE IMAGE PROCESSING)
+  // 14. AUTO-POLAROID COLLAGE STRIP (ON-DEVICE IMAGE PROCESSING)
   // ==========================================================================
   async function createPolaroidStrip() {
-    // 1. Query user photos from IndexedDB
     const photos = await PhotoboothDB.getUserPhotos(appState.userName);
 
     if (!photos || photos.length < 3) {
@@ -871,7 +1024,6 @@
 
     showToast("Generating Polaroid Strip...");
 
-    // Take the last 3 photos in chronological sequence (top-to-bottom)
     const last3Photos = photos.slice(0, 3).reverse();
 
     const loadImg = (dataUrl) => new Promise((resolve, reject) => {
@@ -885,11 +1037,9 @@
     try {
       const [img1, img2, img3] = await Promise.all(last3Photos.map(p => loadImg(p.dataUrl)));
 
-      // Off-screen canvas for vertical photo strip
       const stripCanvas = document.createElement("canvas");
       const ctx = stripCanvas.getContext("2d");
 
-      // Dimensions: 800px width, 40px outer/inner padding, 720x960 (3:4) photos, 180px footer
       const padding = 40;
       const photoWidth = 720;
       const photoHeight = 960;
@@ -927,10 +1077,8 @@
       ctx.fillStyle = "#666666";
       ctx.fillText("COMMENCEMENT POLAROID MEMORY STRIP", totalWidth / 2, textY + 34);
 
-      // Export high-res Base64 JPEG
       const stripDataUrl = stripCanvas.toDataURL("image/jpeg", 0.92);
 
-      // Save into IndexedDB as a new gallery item
       const cleanName = (appState.userName || "Guest").replace(/[^a-zA-Z0-9_-]/g, "_");
       const uniqueSuffix = `${Date.now()}_strip_${Math.floor(Math.random() * 1000)}`;
       const filename = `photo_${cleanName}_strip_${uniqueSuffix}.jpg`;
@@ -949,20 +1097,16 @@
 
       await PhotoboothDB.savePhoto(stripRecord);
 
-      // Add to session photos (index 0)
       sessionPhotos.unshift(stripRecord);
 
-      // Update UI components
       updateGalleryButton();
       renderGalleryGrid();
       updateSyncIndicator();
 
-      // Trigger background sync to Google Drive
       processSyncQueue();
 
       showToast("Polaroid Strip generated!");
 
-      // Open in Lightbox immediately
       openLightbox(0);
 
     } catch (err) {
@@ -977,7 +1121,7 @@
   async function updateSyncIndicator() {
     try {
       const pendingList = await PhotoboothDB.getPendingPhotos();
-      const pendingCount = pendingList.length;
+      const pendingCount = pendingList ? pendingList.length : 0;
       const online = navigator.onLine;
 
       if (!dom.syncStatusDot || !dom.syncStatusText || !dom.syncNetworkBadge) return;
@@ -1073,11 +1217,10 @@
 
           updateSyncIndicator();
 
-          if (dom.galleryView.classList.contains("translate-y-0")) {
+          if (dom.galleryView && dom.galleryView.classList.contains("translate-y-0")) {
             renderGalleryGrid();
           }
 
-          // 500ms pacing between successive photos
           await new Promise((resolve) => setTimeout(resolve, 500));
         } else {
           await PhotoboothDB.incrementRetry(item.id);
@@ -1108,17 +1251,17 @@
   setInterval(processSyncQueue, QUEUE_POLL_INTERVAL_MS);
 
   // ==========================================================================
-  // 16. IN-APP GALLERY (INDEXED-DB POWERED)
+  // 16. IN-APP GALLERY (INDEXED-DB / IN-MEMORY POWERED)
   // ==========================================================================
   async function loadUserSession(userName) {
     try {
       const photos = await PhotoboothDB.getUserPhotos(userName);
       sessionPhotos.length = 0;
-      photos.forEach(p => sessionPhotos.push(p));
+      if (photos) photos.forEach(p => sessionPhotos.push(p));
       updateGalleryButton();
       updateSyncIndicator();
     } catch (err) {
-      console.error("[IndexedDB] Failed loading photos for user:", err);
+      console.warn("[Session] Failed loading photos for user:", err);
     }
   }
 
@@ -1126,18 +1269,19 @@
     try {
       const photos = await PhotoboothDB.getUserPhotos(appState.userName);
       sessionPhotos.length = 0;
-      photos.forEach(p => sessionPhotos.push(p));
+      if (photos) photos.forEach(p => sessionPhotos.push(p));
       updateGalleryButton();
       renderGalleryGrid();
       updateSyncIndicator();
     } catch (err) {
-      console.error("[IndexedDB] Error refreshing gallery:", err);
+      console.warn("[Gallery] Error refreshing gallery:", err);
     }
   }
 
   function updateGalleryButton() {
+    if (!dom.galleryCountBadge) return;
     const total = sessionPhotos.length;
-    if (total > 0) {
+    if (total > 0 && dom.galleryThumbPreview && dom.galleryThumbPlaceholder) {
       dom.galleryThumbPreview.src = sessionPhotos[0].dataUrl;
       dom.galleryThumbPreview.classList.remove("hidden");
       dom.galleryThumbPlaceholder.classList.add("hidden");
@@ -1146,24 +1290,25 @@
       dom.galleryCountBadge.classList.remove("hidden");
       dom.galleryCountBadge.classList.add("flex");
     } else {
-      dom.galleryThumbPreview.classList.add("hidden");
-      dom.galleryThumbPlaceholder.classList.remove("hidden");
+      if (dom.galleryThumbPreview) dom.galleryThumbPreview.classList.add("hidden");
+      if (dom.galleryThumbPlaceholder) dom.galleryThumbPlaceholder.classList.remove("hidden");
       dom.galleryCountBadge.classList.add("hidden");
     }
   }
 
   function renderGalleryGrid() {
+    if (!dom.galleryGrid || !dom.galleryHeaderCount) return;
     const total = sessionPhotos.length;
     dom.galleryHeaderCount.textContent = total;
 
     if (total === 0) {
-      dom.galleryEmptyState.classList.remove("hidden");
+      if (dom.galleryEmptyState) dom.galleryEmptyState.classList.remove("hidden");
       dom.galleryGrid.classList.add("hidden");
       dom.galleryGrid.innerHTML = "";
       return;
     }
 
-    dom.galleryEmptyState.classList.add("hidden");
+    if (dom.galleryEmptyState) dom.galleryEmptyState.classList.add("hidden");
     dom.galleryGrid.classList.remove("hidden");
     dom.galleryGrid.innerHTML = "";
 
@@ -1179,7 +1324,6 @@
       img.alt = `Graduation Shot ${total - idx}`;
       img.className = "h-full w-full object-cover transition-transform duration-200 group-hover:scale-105";
 
-      // Sync status tag on photo card
       const isUploaded = photo.status === "uploaded";
       const syncBadge = document.createElement("div");
       syncBadge.className = `absolute top-2 left-2 flex items-center space-x-1 rounded-full px-2 py-0.5 text-[10px] font-medium backdrop-blur-md shadow ${
@@ -1191,7 +1335,6 @@
         ? `<svg class="h-2.5 w-2.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg><span>Synced</span>`
         : `<svg class="h-2.5 w-2.5 animate-pulse" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg><span>Pending</span>`;
 
-      // Fullscreen view trigger icon
       const viewBadge = document.createElement("div");
       viewBadge.className = "absolute bottom-2 right-2 flex h-7 w-7 items-center justify-center rounded-full bg-black/80 text-gold-400 border border-gold-500/40 shadow";
       viewBadge.innerHTML = `
@@ -1214,12 +1357,12 @@
   }
 
   // ==========================================================================
-  // 17. FULLSCREEN LIGHTBOX (INDEXED-DB LOADED, SCROLL-SNAP NAVIGATION)
+  // 17. FULLSCREEN LIGHTBOX (SCROLL-SNAP NAVIGATION)
   // ==========================================================================
   let lightboxObserver = null;
 
   function openLightbox(index) {
-    if (!sessionPhotos.length || !sessionPhotos[index]) return;
+    if (!sessionPhotos.length || !sessionPhotos[index] || !dom.lightboxScrollTrack || !dom.lightboxView) return;
     currentLightboxIndex = index;
 
     dom.lightboxScrollTrack.innerHTML = "";
@@ -1241,22 +1384,26 @@
 
     if (lightboxObserver) lightboxObserver.disconnect();
 
-    lightboxObserver = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          const idx = parseInt(entry.target.dataset.index, 10);
-          if (!isNaN(idx)) {
-            currentLightboxIndex = idx;
+    try {
+      lightboxObserver = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const idx = parseInt(entry.target.dataset.index, 10);
+            if (!isNaN(idx)) {
+              currentLightboxIndex = idx;
+            }
           }
-        }
+        });
+      }, {
+        root: dom.lightboxScrollTrack,
+        threshold: 0.6
       });
-    }, {
-      root: dom.lightboxScrollTrack,
-      threshold: 0.6
-    });
 
-    const slides = dom.lightboxScrollTrack.querySelectorAll(".snap-lightbox-slide");
-    slides.forEach(slide => lightboxObserver.observe(slide));
+      const slides = dom.lightboxScrollTrack.querySelectorAll(".snap-lightbox-slide");
+      slides.forEach(slide => lightboxObserver.observe(slide));
+    } catch (obsErr) {
+      console.warn("[Lightbox Observer] Notice:", obsErr);
+    }
 
     dom.lightboxView.classList.add("lightbox-active");
 
@@ -1270,7 +1417,7 @@
   }
 
   function closeLightbox() {
-    dom.lightboxView.classList.remove("lightbox-active");
+    if (dom.lightboxView) dom.lightboxView.classList.remove("lightbox-active");
     if (lightboxObserver) {
       lightboxObserver.disconnect();
       lightboxObserver = null;
@@ -1287,24 +1434,30 @@
     link.click();
   }
 
-  dom.lightboxCloseBtn.addEventListener("click", (e) => {
-    e.stopPropagation();
-    closeLightbox();
-  });
-
-  dom.lightboxDownloadBtn.addEventListener("click", (e) => {
-    e.stopPropagation();
-    downloadCurrentLightboxPhoto();
-  });
-
-  dom.lightboxView.addEventListener("click", (e) => {
-    if (e.target === dom.lightboxView || e.target === dom.lightboxScrollTrack || e.target.classList.contains("snap-lightbox-slide")) {
+  if (dom.lightboxCloseBtn) {
+    dom.lightboxCloseBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
       closeLightbox();
-    }
-  });
+    });
+  }
+
+  if (dom.lightboxDownloadBtn) {
+    dom.lightboxDownloadBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      downloadCurrentLightboxPhoto();
+    });
+  }
+
+  if (dom.lightboxView) {
+    dom.lightboxView.addEventListener("click", (e) => {
+      if (e.target === dom.lightboxView || e.target === dom.lightboxScrollTrack || (e.target.classList && e.target.classList.contains("snap-lightbox-slide"))) {
+        closeLightbox();
+      }
+    });
+  }
 
   window.addEventListener("keydown", (e) => {
-    if (dom.lightboxView.classList.contains("lightbox-active")) {
+    if (dom.lightboxView && dom.lightboxView.classList.contains("lightbox-active")) {
       if (e.key === "Escape") closeLightbox();
       if (e.key === "ArrowLeft" && currentLightboxIndex > 0) {
         const trackWidth = dom.lightboxScrollTrack.clientWidth;
@@ -1314,7 +1467,7 @@
         const trackWidth = dom.lightboxScrollTrack.clientWidth;
         dom.lightboxScrollTrack.scrollTo({ left: (currentLightboxIndex + 1) * trackWidth, behavior: "smooth" });
       }
-    } else if (dom.cameraView.classList.contains("opacity-100")) {
+    } else if (dom.cameraView && dom.cameraView.classList.contains("opacity-100")) {
       if (e.key === "ArrowLeft") scrollToFrame(activeFrameIndex - 1);
       if (e.key === "ArrowRight") scrollToFrame(activeFrameIndex + 1);
       if (e.key === " " || e.key === "Enter") handleShutterTrigger();
@@ -1322,61 +1475,79 @@
   });
 
   // ==========================================================================
-  // 18. GLOBAL EVENT LISTENERS & BOOTSTRAP INITIALIZATION
+  // 18. GLOBAL EVENT LISTENERS & INITIALIZATION
   // ==========================================================================
-  // 1. Kick off Cinematic Splash Screen
-  initSplashScreen();
+  // Initialize IndexedDB (Non-blocking with error catching)
+  try {
+    PhotoboothDB.init().catch(err => console.warn("[IndexedDB] Boot init notice:", err));
+  } catch (dbErr) {
+    console.warn("[IndexedDB] Init exception notice:", dbErr);
+  }
 
-  // 2. Initialize IndexedDB on boot
-  PhotoboothDB.init().catch(err => console.warn("[IndexedDB] Boot init warning:", err));
-
-  // 3. Setup Timer UI state
+  // Setup Timer UI state
   updateTimerButtonUI();
-  dom.cameraTimerBtn.addEventListener("click", toggleCountdownTimer);
+  if (dom.cameraTimerBtn) {
+    dom.cameraTimerBtn.addEventListener("click", toggleCountdownTimer);
+  }
 
-  // 4. Shutter and Camera Flip
-  dom.shutterBtn.addEventListener("click", handleShutterTrigger);
-  dom.flipCamBtn.addEventListener("click", flipCamera);
+  // Shutter and Camera Flip
+  if (dom.shutterBtn) dom.shutterBtn.addEventListener("click", handleShutterTrigger);
+  if (dom.flipCamBtn) dom.flipCamBtn.addEventListener("click", flipCamera);
 
-  // 5. Gallery & Auto-Strip Controls
-  dom.galleryOpenBtn.addEventListener("click", openGalleryPanel);
-  dom.galleryBackBtn.addEventListener("click", closeGalleryPanel);
-  dom.createStripBtn.addEventListener("click", createPolaroidStrip);
+  // Gallery & Auto-Strip Controls
+  if (dom.galleryOpenBtn) dom.galleryOpenBtn.addEventListener("click", openGalleryPanel);
+  if (dom.galleryBackBtn) dom.galleryBackBtn.addEventListener("click", closeGalleryPanel);
+  if (dom.createStripBtn) dom.createStripBtn.addEventListener("click", createPolaroidStrip);
 
-  // 6. Login Form
-  dom.loginForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const name = dom.userNameInput.value.trim();
-    if (!name) return;
+  // Login Form
+  if (dom.loginForm) {
+    dom.loginForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const name = dom.userNameInput ? dom.userNameInput.value.trim() : "";
+      if (!name) return;
 
-    appState.userName = name;
-    dom.headerUserName.textContent = name;
-    dom.headerUserTag.classList.remove("hidden");
-    dom.headerUserTag.classList.add("flex");
-    dom.logoutBtn.classList.remove("hidden");
+      appState.userName = name;
+      if (dom.headerUserName) dom.headerUserName.textContent = name;
+      if (dom.headerUserTag) {
+        dom.headerUserTag.classList.remove("hidden");
+        dom.headerUserTag.classList.add("flex");
+      }
+      if (dom.logoutBtn) dom.logoutBtn.classList.remove("hidden");
 
-    await loadUserSession(name);
+      await loadUserSession(name);
 
-    showView("camera-view");
-    startCamera();
-  });
+      showView("camera-view");
+      startCamera();
+    });
+  }
 
-  // 7. Exit / Switch Guest
-  dom.logoutBtn.addEventListener("click", () => {
-    stopCamera();
-    appState.userName = "";
-    sessionPhotos.length = 0;
-    updateGalleryButton();
-    closeGalleryPanel();
-    closeLightbox();
-    dom.headerUserTag.classList.add("hidden");
-    dom.logoutBtn.classList.add("hidden");
-    dom.userNameInput.value = "";
-    showView("login-view");
-  });
+  // Exit / Switch Guest
+  if (dom.logoutBtn) {
+    dom.logoutBtn.addEventListener("click", () => {
+      stopCamera();
+      appState.userName = "";
+      sessionPhotos.length = 0;
+      updateGalleryButton();
+      closeGalleryPanel();
+      closeLightbox();
+      if (dom.headerUserTag) dom.headerUserTag.classList.add("hidden");
+      if (dom.logoutBtn) dom.logoutBtn.classList.add("hidden");
+      if (dom.userNameInput) dom.userNameInput.value = "";
+      showView("login-view");
+    });
+  }
 
-  // 8. Boot check for network & pending uploads
-  updateSyncIndicator();
-  processSyncQueue();
+  // Boot check for network & pending uploads
+  try {
+    updateSyncIndicator();
+  } catch (e) {
+    console.warn("[Sync Indicator] Boot notice:", e);
+  }
+
+  try {
+    processSyncQueue();
+  } catch (e) {
+    console.warn("[Sync Queue] Boot notice:", e);
+  }
 
 })();
