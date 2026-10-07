@@ -68,7 +68,7 @@
       </div>
 
       <!-- HERO SHARED ELEMENT TITLE (Morphs & scales into #header-brand-title) -->
-      <h1 id="splash-hero-title" class="splash-initial-fade text-2xl sm:text-3xl font-black tracking-[0.22em] text-gold-400 uppercase drop-shadow-md whitespace-nowrap">
+      <h1 id="splash-hero-title" class="splash-initial-fade text-2xl sm:text-3xl font-bold tracking-wider text-gold-400 uppercase whitespace-nowrap">
         Class of 2026
       </h1>
 
@@ -219,19 +219,19 @@
         </div>
 
         <!-- Centered Fixed 3:4 Viewport (Zero-Lag Native CSS Scroll-Snap Track) -->
-        <div class="camera-stage relative flex flex-1 items-center justify-center p-2 sm:p-4 overflow-hidden">
+        <div class="camera-stage relative flex flex-1 items-center justify-center p-3 sm:p-4 overflow-hidden min-h-0">
           
           <div
             id="camera-viewport"
-            class="relative rounded-2xl overflow-hidden bg-black shadow-[0_20px_50px_rgba(0,0,0,0.85)] border-2 border-gold-500/40"
+            class="relative aspect-[3/4] w-full max-w-[340px] max-h-[68vh] rounded-2xl overflow-hidden bg-black shadow-2xl border-2 border-gold-500/40"
           >
-            <!-- Clean Video Feed (No CSS Filters) -->
+            <!-- Clean Video Feed (Mirroring applied dynamically via .mirrored class) -->
             <video
               id="camera-stream"
               autoplay
               playsinline
               muted
-              class="absolute inset-0 h-full w-full object-cover camera-mirror"
+              class="absolute inset-0 h-full w-full object-cover"
             ></video>
 
             <!-- Native CSS Scroll Snap Track: 60-120fps GPU Swiping -->

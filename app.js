@@ -36,7 +36,7 @@
   // ==========================================================================
   // 3. HARDCODED BASE64 CAMERA SHUTTER SOUND (100% OFFLINE DATA URI)
   // ==========================================================================
-  const SHUTTER_SOUND_DATA_URL = "data:audio/wav;base64,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";
+  const SHUTTER_SOUND_DATA_URL = "data:audio/wav;base64,UklGRmwdAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YUgdAADHKDFl5nTCIwwynMxbyCu15tlv0rLPktrC9eQ2pEDAU4XR48yL2Vfuw/qO+/sv8DDeHkPpyN+SGvjbDM0Q5xv06OmxJrpb9j/1/57YALbu5775nRdyIqwBkw1kGBcxJg9L7obrA8Sdz8gTNSCtK1ctEwoiGAXX0+af8Zb90sh50YwQxT0RNMZCLQAN8kPVpcrV4y8jNAeXH7oqGB2pCN8FrQfuwiTGYtRDBgILkiMHJ5IAnuz4+1rauQELDPj7N+1SGlEs4Ty4C1T8x/czxJnchvBIDbczmgaQEGsRQAOr+IgHrOkV43njEBKuIjw2MBX3C3b1l/Ro5Gf0iui3FIMDGwf2Cf0kEBSy7l/0peuf1iYHhQ6/Jwoc9gEg/wT96P5N6aj83+uK7KoQ+gPoK1wrwwx6ABrQ4eud4Z4KVhb1HQ8FChkwFVAUUu6c9vHkj+CiCMweUyZVJAEH2Pie4abxQfchB5X7uQ6BCuALfBGLGEH7i/nH2z3yHwFT/vwE8BdXGlv6ovm08RED9P4a+MrpJ/E2A2ERviEcCNfxZe2L9uL7G/+WCuH+Tg2BE+IAFgDv/WHp/e3W5UwDqAeiCWYMbg+OALT7BP3I7/r1jQJA/54GzhP8DLUS+w5Q+ITuRPb5+LEImv+GCcUPoge1+hcEmv5D7+740fPi/0MBpBFrCQwPg/Y2/DTy3fx99+3/Jv8t/ukNMBJQEYD/+vB18nzrlvU9/DsMQwYxD0UKv/jAAgn88fvr8dX2GAM8Bc4N/REcARL8y/kF9hf/L/w+B9kBlAbKA/oKtAcN/HX/Efih9lL0GQLcDvQICw3E/4b0rf/3AF32zQK0/CT7BweqCHwFGADf+6r0XPeC9+P6KgKKB/8A1QMC/oYC5fnJ/MX7fvRG+W8DOgTVCLQKm/om/cr4ifc0/isFt/8DAcYBuwOe/1gFnv8X+jX4L/iZA2EIYAPwAnECp/t3AZD84fhBAXL+gP+/AYMIvwnABBn/1/sK9Jj7hAJpBYv/JAdFBpoDdQPq/QcBVP0N+2X+HwT3BlYGTAYTBJf6Gfqn/xP78fvG/5r/Zv96BCYDuwCY/i37z/iH+iUCEgM0CAEHIAAVAZMCdQD6+tL7a/4f/WUD1AUxA6AEx/0N/T/71f45AX7+a/8nBL4C4QJ5ARkDKf8C+/z8c/8C/sICKgI2BRr/nAA3/nYAhP9xABr83/7z/ggDdgWbA7//xPy1+Rz+u/+BAUABNwBqAfEC2QLu/2X8E/4U/8/+P/5mAWgEUQG2AB3/l/uj//D9ZP9w/mgBigMUALEDCAAaAJP9DPxq/HD+uf8HAYUDlQLd/8f9+f2j/1//ZP9N/UL//AJgAxEBiAEr/4H92/yX/uD+TQBCAdUAoP97AQwCWQAZ/5n89vw9/zwCEQRoAlH/af7+/dz/kP7f/fr/Q/5tAXsC2QIkAsf/e/19/pX91v6M/3oANAGj/0z/+P8JAaf/Xv0j/Z/9WP8dAi0C7gGO/8D/MP4u/db+qP8E/ygACgChAEICNgBaAFT/kP0Z/bb+kwGDAhgBHQIt/9z/n/+b/lr+8/8Q/5QAYgHbAh0C9ACB/5b+M/4H/80AyAFRABABfwHu//P/DQA1/iv+ZP6b/7kBkAGFAjkBtP5b/5b/Y/9iAAwAGf8ZAQYAKAHuAX7/fP/W/sP9sP6dAAYB4wGAADwARQCR/73/Vv/d//L/PgAMAOQBvgHEAHf/ZP8s/xf/jQCj/8H/fgD0AM0AYACTAF7/tv6q/iwADACJAesArADE/1v/cv8hAD7/Yv8AAIYAUwCDAU0AygBd/y3/6P7V/9L/DgDmAHoAwwBYAIb/aQCq/wL/YP8r/9AA6gB9AWUACgCe/1D/y//8/wQAMwDJ/6YA5ACPAO3/mf8a/2r/kP/k/50A7QCbAH8AxP/c/x4AhP84/6z/JQDVAPkA3QCpAEEAQ/9g/2z/3v+TAEEAegBwAA8AYwAAAJD/If/+/tj/oABiAA0BnADY/xQA2P/N/+n/7/9AANz/NwCAAIAAbgDb/2L/K/+i/yYABwDHAFkAZABUAKj/EQDS/8H/ff+n/zIAvgDKAFIAyv/R/7X/yf+i/04AOwBVAAkAEwBoANr/mf+x/3r/vP/l/4MAtwBxAC4At/+b/+3/FgDb/9n/NgDv/4sANwD9/xkA5P+h/5f/1P82ACMAWwAwAPf/GwDa/7P/bf+H/8L/3P8nAHEAWQBLAL//9f+Y/87/u/8JAEMAOAAoABcA8f/h/83/pv+y//X/VwBRAEMA+v/4/8r/DgCm/8L/7v/w/yYAUgA8ADEA+v/k/8X/sf8HAPf/QQBGAPv/OgAJAOj/y/+w/9X/sv/z/0cAJABJAAgA0P/k/8//uf/2/9L/6f/w/zIAGgBEAAcA8v+l/83/0f/+/xcAKQARACcAKQDY//n/zv/h/8r/FQAiACkAMQAqAO3/8f+4/+X///8hAB4AJwAMAEUAMgAPAPL/1f/n/9j/IAA0AEYAIwDm/wEA0v/T/9X/+/8IAB0AKQBEADcAHgD6/9r/0/8HAB4A+P8FAP3/JQATABMA9v/s/+n/6/8JAB4ANgA/AP7/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/jOAPzpqrXb/f4ND4x7QJE9TEXUNa/s/GB8h8nneI8x784IuJhumLrhJmQTr9VHPt7YN8VfnZ/0ouS6k6I8BgAGAC4VupLngsQJoAwgu9+9iF2goR08YW7p1IEmxJ8cW5xNCDbYJExHrVE8avCZeCZrmOPFV6oX1sw+8DX3yl+lCoPqGAYDwg62nRLu3wmzaDrTc4y7jC88zMaFF/0fcSDRWgxWIO0QaOiN4MJlE+Tj4CB83V/7u/G4EKx1XJl9Sc0lPKSz6ZuX75TDpjr4F5Y++O7WisziyHcERxb3PpOjwFGcHPRA9AvQpcQi7HZxDU0FURLgN8xvoCNYNYPj6Peo/py3dL9pG0TkcGPX6oQLCA3ToVQG72kWmCK2AneCUAcOWvuPSWMfn6P0AD/nn+TQeEzIwOI4Ywx0MEREVhge0He4HmDYgIj4hHik/Mi89hz+BLJ4YODUKGTEf5+gv1EvOFcFo08O1FbN1xWHXmrlovxnnUPCH/XETxAJC+9oSiQrIAVYP4fU0B2sH5Q59CLshNywPHXw7ujqcP6c/tyqTJqIZ6fU0+7b5et8V1QflVMUaz5/UO8P51kjx0vdaA6cG2AGHDLnsagQx9E8TFwgcBCsKJRHr8skMuQ46HWQkUiNXKyEwPEG5IrIVvhXGI3oJnfFR/T/y488v14bj/s380aLYSO5b+eH6EeQvBOgIlepoCY7opukG7LDySfHCDcL6AAAhFOYrTxXrL2gxfir8Pk0xDRhFECYLrxUf8a34qOMr+dPtct5J6ZbVBeaO6SL20+l976zw9fDs/evgt/ED3yb17flX5/8HGPjK9BAHuhueJ1sxozKwLmowoTHEG+sfBBbkBRoS6wMP69DryOTa4KnlR9y165Plt+it99HpPuMA5JP8/+yH91X2n+mE7T7x2PUM7qEEUv8pBD0T0yrKJdolJituGeslSyXTG1kUZQwpDGL6PPDE8kPmUe5M50/7kPRw/jv9iQH7+yPnbPMk84HxY+Dt5j7k8/Aa7cH3bwUpDNIKcxQDGRUjDCMcHCEasRy4JLQNWA7NB/YBTv4CAKT5q/Y79kb2PvHg+HAAwfzD8rnvHvxp9Lzmz+2Y7YffVedb7tD3uvEg74IDGw4eCZkMHBFtGT4mWyBcH8gfOQiSDkMTKf59C5QF5vb49u721wdc+Bv9x/toBpv/KfBI+Lr5fvX46wHhB+nF5K3xPfMI92HxgPN5BBkNBxPLGm0akRAuDvEcgxSGCEYRSQD7/vYHBAUADbT74/2mAeMJpQn4BXf4ggDc/qT4WPl+7Hzt6ukF7untF+gO8DfrUe8G9yD7jgYBC3oHigibEewO+wmJB0UT3AVWCHsOw/95Caj/YwI2APIKuw/rADgDowgEAdz1WvLK+cvzd+kU6//pauYk4xHwevW4+CMAt/59BJ8GvwizD8oRjQtlCuQOfg0nC5MEiApeA+AMtAfsAqoE0QfEA2oNkAzBB9wFu/m3AL70HvQO8ib0Z+fF5DXsreel9X/0XfO7+7f5OQE1AXIAcgZKAt8GbwztCS4A+gbO/nII1Ao3DkkH2QS6CnsNJwu6CWcCpwKLAaP58Pyh/Gz0B/D78C3u8/KP7vXtv/Vu+xX2dv9LBdwBDwmUAeIDHgSV/6//FwMLBagGuAMOCEgJ4AlxDt0OgQn1Dr0QFQ4PAnUECgKk+IH49PBR8WTuMu0d81zxD/Ln9iL48v98/oYDFAKiAQoDUgVcA9cBXv17/4v9lP87BXEK4QopDqsJNAmpDnUQ9Qq6DAIJtAjC/mH/4QA39Qn48vR48AvxOfhs9/X7Avd2/qD3Pv/u/FT/wvoy/SMAHACnAs374/1I/qcClwC/CckG8AuGDkgQXA+7D9cL8wZMBVgB1v5O/X//efWi9NTzpvSs9iX8ovu5+E3/JfpS/F4AUgHq+fz5t/qA/dH9s/4l/zoClgAkAE8G+wPcBBkKMwtFCMIKjAo9C2AFiQKL/nH8j/m99yz7LPhs+Vr6y/03/gj5zf/O+cr+/fsF+pj4Dvo/+9X8RP63/NP+6vywAeL/+wC/BbMHRglEC+cMfQnLB1QI2gYyAcAF7f1ZAWgAk/yZ+Cr5NvtL/ub8sPtJ/5gAjfva/SL6f/hM/UL39vz+/NH7k/yF+oD/q/06BUkFxAb1BmAJywldCkoLFAi5BcEF1QSX/lj9nACV/a3+8/8k/xH7CPtsANX8/gDo/Nb9kf6y/f/48Pcc/Cj7Kfw3+EX5sfwnAtMDPgHaBaIIcQhLBiMGawUfBesGngR5AVkBSP4tAmUANP/5/F4Bzv1tAAn/FAH6/03/cf82/Q77Ofwt/DH73/fe98n6XPlu+8T9mf7LAFgBCwZWA0EFuwY+CK4DVAMKA6sCmf8i/yL/zgL2/8L+ugHC/uACCQIUAkIA7vxH/OX6hfs1+aD4o/uF+Pv4gvje/Gr90vvXAA8BUQJGBU0G1AYJB9kGYwOxAVkESgK7AW8DdQPBAnoAf/+nAE8CZwEiASkAIP+nAZX9hP8u+1L8OPkp/Of7b/nQ++36Wv1r/SwA/gDhAUAE5wTJA0cDGgP/BB8DcwJ/AhsBrgB+AfH/kgFmAMAAvgFWA7gA+f+q/94A3v/i/jH8kfoV/QX6yPow+4n57/wV+3D9HP5S/7YA7P+WAfMB8wFZA6YB1gK3AU0ACwK1AXAAhAC1AjYDqAOIAh4C7AHNAv4AXgAJAHH9I/7r/BT8LfuM+lL8Zvt8/OL7Afzq/ywA8P8EAqgBowKEAYECmgIlAgwAzf81AtH/1QDBAc0CigHpA0cDEwPlAUICrAHsAfgAdAAa/iH/Kf3j+0n9h/tc/CD8vP18/Q/+8v1i/gwBiP+nAdQBcgHR/8r/QgHKAKgA1f9MATIBIwI9AiQDOQLvAasCxwFwAZgAkf/t/xr/I/4n/fv7xv2m+1T9ePwT/un9p//l/SEAz/8m/9z+6AB9AGX/tAB+AOUAigBtAQQCSgGLAW8CDQImAxsEZwO1A2wD1AKbAdUAiP8q/tL9kP78/Qr+lv2o/SD+Wv2m/j/+Nf/y//z+JQAEAJb+Lf8rAPX+cQBXAKQAqv8tADMBxwFvAu8BugKGA8EBQwLVAh8CQAHqAAEAMf+m/oD9s/2T/X395P2l/gH+yf/m/xAAkf4+/nL/If40/9j+0f5k/37/9v8OAcIAiwF1AqACdwOuAjMC8gL9Af0B5AD9APsA+f4hAAz/7f0b/pn+Mv+2/0D+AwDr/rL/D//A/z3/Yf4f//H+MP/k/RP/mP5TAC//HACwAWQBKwGMAsQCtQIbA1UCeQEdAUQB9P90/xL/7/4FAJL+8/4n/xX/rv6x/tr/d//H/pr+4P4Y//n98f3V/RP+9v2D/lH/LP+lABgBegCWAdYB8QHWAawBRQIgAmwBeADxAKP/hADY/4n/BP9I/zL/W/8pAEkAMAB6/9L+p/4O/+H+D/7c/h/+af70/qb+lv66/10AdgBCAKcAvgE2AjsBhAE9AY0BnQB1AcwAowCy/3AAg/9//3EABgAIAO3/XwDd/ygAbf/j/kT/Y/5q/g7/3v0K/wb/6/6i/0X/jv/O/10A5gCVAWcBtAHCAawAZQH0AKIAAgGBAIMA6f9FAEIAmwAWACMA/f/F/8//WgCp/yn/h/+z/qP+qP4G/2L+dP53/jz/CP/C/wsAQQBeADIBeAAdAcAAywCUAKIARQChABQAMwC1ABAAKAC2AIoA8AAgAJwAQQCl/1sALf+G/3P/W/+a/hb/KP5t/nb+8P4Q/+T/6//x/74AbwB4AK4AtgCIAJIA/ABGAKEAqQD7/0sAPABiAGAAwgCyAGQA3wBVAOz/TQA1AJH/LP/0/tn+Gf+//mL+i/7X/nb/qP+I//b/+//l/68AQgA+AIYAsABdADIA7/9hAHoAZgBXANcA1wB0AGcAigD5AKEAlwDy/yMADACK/yn/Xf9A/7n+VP8E/1L/kf+7/wIAAgD7/08AbABtADYAjwBRANr/AQAqACwAUQCiANcA6wB7APIAyQDzAKYAZAA7AIAAAQAlALP/sf82/xX/T/8J/93+af90/5v/WP8aAL3/NABQAMn/LAAgANH/4v9SAPD/QwDw/1cALABsALQAkQB9AJ4AtQCPAJoACABDAAQAkP/b/6L/dv+K/zv/DP9S/6L/3v+D/7b/6P/t/7X/+f/n/xUA6/+n/7D/9v/q/2QARgApAI8AmAB9AI8ABQGoAHMAiAAzABIAEADb//r/g/9i/1b/Nv+B/23/vP/G/47/BACT/87/EgDb/wYA5/+d/6T//v8NAPb/RAD2/yIAPAC3AJIAjwCbAJwArwBpAIcAVABIAB8A3/+V/8z/lP/M/7b/bv/g/+n/oP/w/wMA9v/5/+L/2f+A/8L/t//c/6v/AgDc/yYAVwBkAJ4AwQCRANIAiQBmAKcAlgBnAPv/3v/P/8//lf/P/6r/zf+6/6D/0v+v//v/zf/f/5z/5f+M/9f/of/I/6j/3f/p/+D/MQBLAHUAXAB8ALMAqgC4AIEATABbACIAEwD6/x0AGADD/+b/q//n/8T/4v/z/7n/zf/J/9X/nv/F/8X/oP+6/8f/f/+f/9f/uf8TADoAMwAdAHQAaQByAHQAhgB6AEIAFwApAEAAIADh//H/2P8OANX/0f8QANv/6v/7//j/+/+p/8H/vf+r/8D/nv+7/8P/pf/J/9b/5f/5/0wAWQBWAFgATwBLADoAOwBGADIALwA5ADMAEwAXAOT/8/8DAOz/FwAUAB0A0v/Q/9D/xP+a/6b/t/+q/5f/iP+c/+b/vv/l/x4ACgAYAE4AZABpAEYALAAbAEkALgApAAwA/f8nAPz/DAD3/zIA/v/1/wMA9/////n/y//R/5z/tv+u/6v/vv/A/9r/x//h/+f/+P8RADEARwBHADEASAAbABAAHwAmAB8AHAAuACQAMgAeABcANwAMAB8AFgAiAOr/AADQ/+T/wf+3/7//vv/E/8//yv/f/8n/2P///yEAKAA1ACoAKAAiAC4ACwAgAA0ABwAIAAkAMgAfACkAPAATAEEAGwApABcA9//3/+v/5v/D/8f/tv/B/8j/0v+1/8v/w//j//X/EwDw/yQAGgASAC4A/P/+/yAAJwAbAAkALQATADUAFQA/ADMAIQBAACIAJAAdAAAACgD7/+r/1v+2/7f/tf/O/7j/v//n/9n/8//r/wgA8P8bAPP/CwAZAAgAEAAZAPz/IQAAAC0ALwA2ACIAHgBCAD0AKwAcABwACgDw////9P/c/+T/0//D/+L/x//a//L/4P/c//3//P/t/w4A7v/y/wsACgD0//T/EgACAB8AHgAwABQAGgA3AD8ALwAyABwAIgAaAPX/6v/4/9b/7v/Z/8f/2v/g/9P/7P/t/+L/+v/t/wAACAADAO7/5P8DAP//5//z/xAAEwARABgAIgApADoANgAkACoAJQANAB4ACwAFAAMA4//u/+X/6P/Y/9b/3f/i/+r/+f/k/+f/6P/s////+P/i//b/9f8AAPz//f8NAAEAEQATACcAGQAhADEALQAqACEAHwABAP3/BgDo/+T/+v/o/+n/6P/t//T//v/3//7////9//z/8v/t//T/7f/o/+H/8f/0//3///8EAA0AJwAWACcAIgAWACQAEgAKAAoA+//7//X//P/p/+f/+f/4/wEA7f/x//3/8v/4//T/+P/3/+n/5P/n/+r/9P/k/+r//v8KAAQADgAZABYAKQAjACgAFgAUABQAEQAQAP7/9/8EAP7/BAD1/wUA+P/2//r/9P////v//f/q//L/6f/s/+//5f/w/+z/8P/5//3/BQAKABYAGwAdABMAHAAPAB0AEgAGAAcABAAJAPf/BwD//wQA9/8FAAAA/P8HAPn/8//2/+z/9f/z//H/3v/j/+D/8v/p//v/9/8CAAYADgAPABEADwATABoAEwANAAYABAACAAYA///+/wkA+/8GAAUA///7/wIA9//+//X/8//z/+//8v/r/+r/7v/t/+z/7f/5/wcAAgAEAAwAEAATAA4ADgANAA4ACwAJAAgACwAMAA0AAgAHAAkAAQAIAAAACwD8/wUA9v/z//L/6v/q/+z/7P/k/+v/7v/x//T/AAD9//3/DgAFAAUADAAGAAQACgACAAEACgAIAAMABwANABAACQAPAAQACAAFAP//AQD9//X/8v/3//X/8v/r/+//7P/r//r//P/9/wUA/f8HAAIACAABAAMACAAEAAUACgAIAAUACQAEAAUACgAJAAoACAAHAAkACwD/////+v/1/+//7f/s/+n/7v/t//P/8v/9//r//f8CAAEAAQAFAAgAAAAGAP3/AwD+/wAABgAAAAIACgAFAA8ADgARAA4ABQAMAAcA+//5//v/9P/4//b/9f/1//X/9v/1//X/+P/4//r/AAACAPz///8BAAAABAD9//7/AAACAAYABgAHAAcADwAPAAwACwAMAAkAAgD9/////v/7//n/8f/5//j/8v/0//X//P/+//j/+//+/wIAAwD8//r//f8BAAIA/v8DAAMAAQAGAAkACAAJAAgADAAIAAcACwADAP//BAABAP///P/7//X/+//z//T/+f/5//r/+P/9//7/+v////v/+P/8/wAA/P/6/wEAAwAGAAIABgAKAAcACwAHAAgACQAJAAMABgADAAIA+v/9/w==";
   let shutterAudio = null;
   try {
     if (typeof Audio !== "undefined") {
@@ -769,9 +769,9 @@
         dom.video.srcObject = stream;
         await dom.video.play();
         if (appState.facingMode === "user") {
-          dom.video.classList.add("camera-mirror");
+          dom.video.classList.add("mirrored");
         } else {
-          dom.video.classList.remove("camera-mirror");
+          dom.video.classList.remove("mirrored");
         }
       }
       if (dom.cameraStatusMsg) dom.cameraStatusMsg.classList.add("hidden");
@@ -787,6 +787,11 @@
           if (dom.video) {
             dom.video.srcObject = fallbackStream;
             await dom.video.play();
+            if (appState.facingMode === "user") {
+              dom.video.classList.add("mirrored");
+            } else {
+              dom.video.classList.remove("mirrored");
+            }
           }
           if (dom.cameraStatusMsg) dom.cameraStatusMsg.classList.add("hidden");
         }
@@ -937,8 +942,9 @@
       sy = (vHeight - sHeight) / 2;
     }
 
-    // 5. Draw Clean Video Feed (Mirrored horizontally if front camera)
-    if (appState.facingMode === "user") {
+    // 5. Draw Clean Video Feed (Mirrored horizontally if .mirrored is active)
+    const isMirrored = (dom.video && dom.video.classList.contains("mirrored")) || appState.facingMode === "user";
+    if (isMirrored) {
       ctx.save();
       ctx.translate(canvasWidth, 0);
       ctx.scale(-1, 1);
@@ -948,7 +954,7 @@
       ctx.drawImage(dom.video, sx, sy, sWidth, sHeight, 0, 0, canvasWidth, canvasHeight);
     }
 
-    // 6. Draw Currently Active SVG Frame ON TOP
+    // 6. Draw Currently Active SVG Frame ON TOP (un-mirrored context, frame text is 100% normal)
     ctx.drawImage(activeTheme.frameImage, 0, 0, canvasWidth, canvasHeight);
 
     // 7. Export high-quality Base64 JPEG
@@ -1563,24 +1569,24 @@
       return;
     }
 
-    // Hide target title in header during transition to prevent ghosting
+    // Hide target title in header during initial movement
     headerTitle.style.opacity = "0";
 
-    // Hardware-accelerated translate and scale
+    // Pure CSS hardware-accelerated translate and scale
     const dx = headerRect.left - splashRect.left;
     const dy = headerRect.top - splashRect.top;
     const scale = headerRect.height / splashRect.height;
 
-    // Single unified duration and cubic-bezier curve for perfect lockstep synchronization
-    const EASING = "cubic-bezier(0.22, 1, 0.36, 1)";
-    const DURATION = 700; // ms
+    // Smooth cubic-bezier deceleration curve
+    const EASING = "cubic-bezier(0.16, 1, 0.3, 1)";
+    const DURATION = 650; // ms
 
     splashTitle.style.transformOrigin = "0 0";
-    splashTitle.style.willChange = "transform";
+    splashTitle.style.willChange = "transform, opacity";
     if (splashBackdrop) splashBackdrop.style.willChange = "opacity";
 
     requestAnimationFrame(() => {
-      // 1. Black backdrop & glow smoothly fade out over exact duration
+      // 1. Black backdrop & glow smoothly fade out
       if (splashBackdrop) {
         splashBackdrop.style.transition = `opacity ${DURATION}ms ${EASING}`;
         splashBackdrop.style.opacity = "0";
@@ -1592,25 +1598,29 @@
 
       // 2. Auxiliary elements smoothly slide and fade away
       if (splashAuxTop) {
-        splashAuxTop.style.transition = `opacity 350ms ${EASING}, transform 350ms ${EASING}`;
+        splashAuxTop.style.transition = `opacity 300ms ${EASING}, transform 300ms ${EASING}`;
         splashAuxTop.style.opacity = "0";
         splashAuxTop.style.transform = "translate3d(0, -14px, 0) scale(0.96)";
       }
       if (splashAuxBottom) {
-        splashAuxBottom.style.transition = `opacity 350ms ${EASING}, transform 350ms ${EASING}`;
+        splashAuxBottom.style.transition = `opacity 300ms ${EASING}, transform 300ms ${EASING}`;
         splashAuxBottom.style.opacity = "0";
         splashAuxBottom.style.transform = "translate3d(0, 14px, 0) scale(0.96)";
       }
 
-      // 3. Hero Title glides in lockstep with the backdrop fade
-      splashTitle.style.transition = `transform ${DURATION}ms ${EASING}`;
+      // 3. Hero Title glides with pure CSS transform smoothly to destination
+      // Seamlessly cross-fade during final 120ms to eliminate ANY snap/glitch at the end
+      splashTitle.style.transition = `transform ${DURATION}ms ${EASING}, opacity 120ms ease-out ${DURATION - 120}ms`;
       splashTitle.style.transform = `translate3d(${dx}px, ${dy}px, 0) scale(${scale})`;
+      splashTitle.style.opacity = "0";
+
+      headerTitle.style.transition = `opacity 150ms ease-in ${DURATION - 150}ms`;
+      headerTitle.style.opacity = "1";
     });
 
-    // 4. Reveal header title and completely purge splash screen from DOM
+    // 4. Clean up splash DOM node after transform completes
     setTimeout(() => {
       headerTitle.style.opacity = "1";
-      headerTitle.style.transition = "opacity 0.2s ease-out";
       try {
         if (splash && splash.parentNode) {
           splash.parentNode.removeChild(splash);
@@ -1618,7 +1628,7 @@
       } catch (cleanErr) {
         console.warn("[Splash] Clean up notice:", cleanErr);
       }
-    }, DURATION + 20);
+    }, DURATION + 30);
   }
 
   function initTapToEnterSplashHero() {
@@ -1669,7 +1679,7 @@
   if (dom.createStripBtn) dom.createStripBtn.addEventListener("click", createPolaroidStrip);
 
   // ==========================================================================
-  // LOGIN SCREEN TRANSITION (HERO TITLE SLIDES UP AND LEFT INTO HEADER)
+  // LOGIN SCREEN TRANSITION (SMOOTH 0.5s CROSSFADE TO CAMERA VIEW)
   // ==========================================================================
   let isLoggingIn = false;
 
@@ -1683,108 +1693,51 @@
     isLoggingIn = true;
     appState.userName = name;
     if (dom.headerUserName) dom.headerUserName.textContent = name;
-
-    const loginTitle = document.getElementById("login-hero-title") || document.getElementById("login-title-wrap");
-    const headerTitle = dom.headerBrandTitle || document.getElementById("header-brand-title");
-    const loginEmblem = document.getElementById("login-emblem");
-    const loginSubtitle = document.getElementById("login-subtitle");
-    const loginForm = dom.loginForm;
+    if (dom.headerUserTag) {
+      dom.headerUserTag.classList.remove("hidden");
+      dom.headerUserTag.classList.add("flex");
+    }
+    if (dom.logoutBtn) {
+      dom.logoutBtn.classList.remove("hidden");
+    }
 
     // Load user photos in background
     loadUserSession(name).catch(() => {});
 
-    if (loginTitle && headerTitle) {
-      const titleRect = loginTitle.getBoundingClientRect();
-      const headerRect = headerTitle.getBoundingClientRect();
+    if (dom.cameraView && dom.loginView) {
+      // 1. Prepare camera view in DOM at opacity 0
+      dom.cameraView.style.display = "flex";
+      dom.cameraView.classList.remove("hidden", "pointer-events-none");
+      dom.cameraView.classList.add("pointer-events-auto");
+      dom.cameraView.style.opacity = "0";
+      dom.cameraView.style.transition = "opacity 0.5s ease";
 
-      // Delta to slide UP and LEFT directly into top-left header
-      const dx = headerRect.left - titleRect.left;
-      const dy = headerRect.top - titleRect.top;
-      const scale = headerRect.height / titleRect.height;
+      // 2. Concurrently fade out the login screen over 0.5s
+      dom.loginView.style.transition = "opacity 0.5s ease";
+      dom.loginView.style.opacity = "0";
+      dom.loginView.style.pointerEvents = "none";
 
-      const EASING = "cubic-bezier(0.22, 1, 0.36, 1)";
-      const DURATION = 650; // ms
-
-      // Hide stationary header text during slide to avoid ghosting
-      headerTitle.style.opacity = "0";
-
-      // Concurrently bring camera view into view
-      if (dom.cameraView) {
-        dom.cameraView.classList.remove("opacity-0", "pointer-events-none", "hidden");
-        dom.cameraView.classList.add("opacity-100", "pointer-events-auto");
-        dom.cameraView.style.transition = `opacity ${DURATION}ms ${EASING}`;
-        dom.cameraView.style.opacity = "1";
-      }
-
-      // Concurrently fade out the rest of login view (form, emblem, subtitle)
-      if (loginEmblem) {
-        loginEmblem.style.transition = `opacity 280ms ${EASING}, transform 280ms ${EASING}`;
-        loginEmblem.style.opacity = "0";
-        loginEmblem.style.transform = "translate3d(0, -12px, 0) scale(0.92)";
-      }
-      if (loginSubtitle) {
-        loginSubtitle.style.transition = `opacity 240ms ${EASING}`;
-        loginSubtitle.style.opacity = "0";
-      }
-      if (loginForm) {
-        loginForm.style.transition = `opacity 280ms ${EASING}, transform 280ms ${EASING}`;
-        loginForm.style.opacity = "0";
-        loginForm.style.transform = "translate3d(0, 16px, 0) scale(0.96)";
-      }
-
-      // Smoothly animate main title UP and LEFT into the top-left header corner
-      loginTitle.style.transformOrigin = "0 0";
-      loginTitle.style.willChange = "transform";
-      loginTitle.style.transition = `transform ${DURATION}ms ${EASING}`;
-      loginTitle.style.transform = `translate3d(${dx}px, ${dy}px, 0) scale(${scale})`;
-
-      setTimeout(() => {
-        // Complete the handover into header area
-        headerTitle.style.opacity = "1";
-        headerTitle.style.transition = "opacity 0.2s ease-out";
-
-        if (dom.headerUserTag) {
-          dom.headerUserTag.classList.remove("hidden");
-          dom.headerUserTag.classList.add("flex");
-        }
-        if (dom.logoutBtn) {
-          dom.logoutBtn.classList.remove("hidden");
-        }
-
-        // Hide login view completely
-        if (dom.loginView) {
-          dom.loginView.classList.add("opacity-0", "pointer-events-none", "hidden");
-          dom.loginView.classList.remove("opacity-100", "pointer-events-auto");
-          dom.loginView.style.opacity = "0";
-        }
-
-        // Reset login elements for future logout
-        loginTitle.style.transform = "";
-        loginTitle.style.transition = "";
-        if (loginEmblem) {
-          loginEmblem.style.transform = "";
-          loginEmblem.style.opacity = "";
-        }
-        if (loginSubtitle) loginSubtitle.style.opacity = "";
-        if (loginForm) {
-          loginForm.style.transform = "";
-          loginForm.style.opacity = "";
-        }
-
-        isLoggingIn = false;
-        startCamera();
-      }, DURATION);
-
-    } else {
-      // Safe fallback
-      showView("camera-view");
-      if (dom.headerUserTag) {
-        dom.headerUserTag.classList.remove("hidden");
-        dom.headerUserTag.classList.add("flex");
-      }
-      if (dom.logoutBtn) dom.logoutBtn.classList.remove("hidden");
-      isLoggingIn = false;
+      // 3. Start camera stream so video begins streaming during crossfade
       startCamera();
+
+      // 4. Trigger camera view fade-in to opacity: 1 on next animation frames
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          dom.cameraView.style.opacity = "1";
+        });
+      });
+
+      // 5. Set login screen to display: none ONLY after the 500ms transition completes
+      setTimeout(() => {
+        dom.loginView.style.display = "none";
+        dom.loginView.classList.add("hidden");
+        isLoggingIn = false;
+      }, 500);
+    } else {
+      // Fallback
+      showView("camera-view");
+      startCamera();
+      isLoggingIn = false;
     }
   }
 
@@ -1805,6 +1758,20 @@
       if (dom.headerUserTag) dom.headerUserTag.classList.add("hidden");
       if (dom.logoutBtn) dom.logoutBtn.classList.add("hidden");
       if (dom.userNameInput) dom.userNameInput.value = "";
+
+      // Reset inline styles on views
+      if (dom.loginView) {
+        dom.loginView.style.display = "";
+        dom.loginView.style.opacity = "";
+        dom.loginView.style.transition = "";
+        dom.loginView.style.pointerEvents = "";
+      }
+      if (dom.cameraView) {
+        dom.cameraView.style.display = "";
+        dom.cameraView.style.opacity = "";
+        dom.cameraView.style.transition = "";
+        dom.cameraView.style.pointerEvents = "";
+      }
       showView("login-view");
     });
   }

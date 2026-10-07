@@ -206,14 +206,10 @@ input {
 
 #camera-viewport {
   position: relative !important;
-  /* Mathematically guaranteed centered 3:4 portrait container:
-     Never exceeds screen width (min 80vw, 320px)
-     Never exceeds available screen height (calc(min(54vh, 460px) * 3 / 4)) */
-  width: min(80vw, 320px, calc(54vh * 3 / 4)) !important;
-  height: calc(min(80vw, 320px, calc(54vh * 3 / 4)) * 4 / 3) !important;
-  max-width: 330px !important;
-  max-height: 56vh !important;
+  width: 100% !important;
+  max-width: 340px !important;
   aspect-ratio: 3 / 4 !important;
+  max-height: 68vh !important;
   margin: auto !important;
   border-radius: 1.25rem !important;
   overflow: hidden !important;
@@ -235,6 +231,11 @@ input {
   object-fit: cover !important;
   transform: translate3d(0, 0, 0);
   pointer-events: none;
+}
+
+/* Dynamic JS-controlled front camera mirror */
+.mirrored {
+  transform: scaleX(-1) !important;
 }
 
 #frames-scroll-track {
