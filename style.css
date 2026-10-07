@@ -1,7 +1,7 @@
 /* ==========================================================================
    GRADUATE 2026 - PHOTOBOOTH STYLESHEET (style.css)
    Pure Hardware-Accelerated CSS, Native Scroll-Snap Swiping (Zero JS Math),
-   Fixed 3:4 Aspect Viewport, and Zero-Lag Mobile Performance
+   Fixed 3:4 Aspect Viewport, Cinematic Splash, and Native PWA Micro-Interactions
    ========================================================================== */
 
 /* Universal Reset & Mobile Touch Optimizations */
@@ -16,7 +16,37 @@ input {
 }
 
 /* ==========================================================================
-   NATIVE CSS SCROLL SNAP (Zero-Lag Mobile Swiping)
+   1. CINEMATIC SPLASH SCREEN (HARDWARE-ACCELERATED)
+   ========================================================================== */
+#splash-screen {
+  will-change: opacity;
+  contain: layout paint;
+}
+
+.splash-content {
+  animation: splashFadeIn 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: transform, opacity;
+}
+
+@keyframes splashFadeIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.92) translate3d(0, 16px, 0);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translate3d(0, 0, 0);
+  }
+}
+
+.splash-fade-out {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  transition: opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ==========================================================================
+   2. NATIVE CSS SCROLL SNAP (Zero-Lag Mobile Swiping)
    ========================================================================== */
 .scroll-snap-x {
   display: flex;
@@ -64,7 +94,7 @@ input {
 }
 
 /* ==========================================================================
-   VIEW TRANSITIONS & MICRO-INTERACTIONS
+   3. VIEW TRANSITIONS & MICRO-INTERACTIONS
    ========================================================================== */
 .view-fade {
   transition: opacity 0.22s cubic-bezier(0.16, 1, 0.3, 1), transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
@@ -81,8 +111,12 @@ input {
   will-change: opacity;
 }
 
+.flash-active {
+  opacity: 1 !important;
+}
+
 .btn-bounce {
-  transition: transform 0.12s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 0.12s cubic-bezier(0.16, 1, 0.3, 1), filter 0.12s ease;
   will-change: transform;
 }
 
@@ -91,12 +125,35 @@ input {
 }
 
 /* Natural selfie mirroring */
-.mirrored {
+.camera-mirror {
   transform: scaleX(-1);
 }
 
 /* ==========================================================================
-   CAMERA VIEWPORT (FIXED 3:4 ASPECT RATIO & CLEAN VIDEO FEED)
+   4. SMART COUNTDOWN TIMER POPUP ANIMATION
+   ========================================================================== */
+@keyframes countdownPop {
+  0% {
+    opacity: 0;
+    transform: scale(1.6) translate3d(0, 0, 0);
+  }
+  35% {
+    opacity: 1;
+    transform: scale(0.94) translate3d(0, 0, 0);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translate3d(0, 0, 0);
+  }
+}
+
+.countdown-active-num {
+  animation: countdownPop 0.82s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: transform, opacity;
+}
+
+/* ==========================================================================
+   5. CAMERA VIEWPORT (FIXED 3:4 ASPECT RATIO & CLEAN VIDEO FEED)
    ========================================================================== */
 #camera-viewport {
   position: relative;
@@ -151,7 +208,7 @@ input {
 }
 
 /* ==========================================================================
-   FULLSCREEN ISOLATED LIGHTBOX OVERLAY
+   6. FULLSCREEN ISOLATED LIGHTBOX OVERLAY
    ========================================================================== */
 #view-lightbox {
   position: fixed;

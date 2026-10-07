@@ -5,7 +5,7 @@
  * ============================================================================
  */
 
-const CACHE_NAME = 'photobooth-cache-v2026.1';
+const CACHE_NAME = 'photobooth-cache-v2026.2';
 
 // Core assets to pre-cache on install
 const PRECACHE_ASSETS = [
