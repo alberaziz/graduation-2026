@@ -15,43 +15,15 @@
  */
 
 // ============================================================================
-// 1. FOOLPROOF CINEMATIC SPLASH SCREEN REMOVAL
-// Runs with zero dependencies at the very top of the script.
-// Handles DOMContentLoaded, window.onload, and document.readyState !== 'loading'.
-// Strictly waits 2000ms, triggers smooth CSS fade-out, and purges after 600ms.
+// 1. MOBILE-SAFE USER-GESTURE INITIALIZATION & SHARED-ELEMENT HERO MORPH
+// No automatic setTimeout dismissal. The splash screen MUST only dismiss when
+// the user explicitly TAPS or CLICKS anywhere on it.
+// On tap/click:
+//   - Unlocks mobile-restricted browser APIs (Audio Context, IndexedDB, SW)
+//   - Executes 60-120fps hardware-accelerated "Shared Element" Hero Morph:
+//     "Class of 2026" smoothly slides & scales into the top header slot (#header-brand-title)
+//   - Completely purges #splash-screen from the DOM after 800ms.
 // ============================================================================
-(function initFoolproofSplash() {
-  const triggerFadeAndRemove = () => {
-    setTimeout(() => {
-      const splash = document.getElementById("splash-screen");
-      if (!splash) return;
-
-      // Trigger smooth CSS fade-out
-      splash.classList.add("opacity-0", "pointer-events-none");
-      splash.style.opacity = "0";
-      splash.style.pointerEvents = "none";
-
-      // 600ms later, completely remove from DOM
-      setTimeout(() => {
-        try {
-          const el = document.getElementById("splash-screen");
-          if (el && el.parentNode) {
-            el.parentNode.removeChild(el);
-          }
-        } catch (e) {
-          console.warn("[Splash] Removal notice:", e);
-        }
-      }, 600);
-    }, 2000);
-  };
-
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", triggerFadeAndRemove, { once: true });
-    window.addEventListener("load", triggerFadeAndRemove, { once: true });
-  } else {
-    triggerFadeAndRemove();
-  }
-})();
 
 (() => {
   'use strict';
@@ -569,6 +541,14 @@
   // 8. DOM ELEMENT REFERENCES (SAFE RESOLUTION)
   // ==========================================================================
   const dom = {
+    splashScreen: document.getElementById("splash-screen"),
+    splashBackdrop: document.getElementById("splash-backdrop"),
+    splashGlow: document.getElementById("splash-glow"),
+    splashHeroTitle: document.getElementById("splash-hero-title"),
+    splashAuxTop: document.getElementById("splash-aux-top"),
+    splashAuxBottom: document.getElementById("splash-aux-bottom"),
+    headerBrandTitle: document.getElementById("header-brand-title"),
+
     loginView: document.getElementById("login-view"),
     cameraView: document.getElementById("camera-view"),
     galleryView: document.getElementById("gallery-view"),
@@ -1475,8 +1455,182 @@
   });
 
   // ==========================================================================
+  // 17. MOBILE-SAFE USER-GESTURE WARMUP & HERO SHARED ELEMENT TRANSITION
+  // ==========================================================================
+  let isWarmedUp = false;
+
+  function warmupUserGestureAPIs() {
+    if (isWarmedUp) return;
+    isWarmedUp = true;
+
+    // 1. Audio Object Warmup (Unlocks iOS/Android HTML5 Audio thread & autoplay policy)
+    try {
+      if (!shutterAudio && typeof Audio !== "undefined") {
+        shutterAudio = new Audio(SHUTTER_SOUND_DATA_URL);
+      }
+      if (shutterAudio) {
+        shutterAudio.volume = 0.9;
+        shutterAudio.load();
+        const originalVol = shutterAudio.volume;
+        shutterAudio.volume = 0;
+        const playPromise = shutterAudio.play();
+        if (playPromise !== undefined) {
+          playPromise
+            .then(() => {
+              shutterAudio.pause();
+              shutterAudio.currentTime = 0;
+              shutterAudio.volume = originalVol || 0.9;
+              console.log("[Audio] Shutter sound unlocked via user gesture.");
+            })
+            .catch(() => {
+              shutterAudio.volume = originalVol || 0.9;
+            });
+        }
+      }
+    } catch (audioErr) {
+      console.warn("[Audio] Gesture warmup notice:", audioErr);
+    }
+
+    // 2. Safe IndexedDB Initialization inside user gesture
+    try {
+      PhotoboothDB.init()
+        .then(() => {
+          console.log("[IndexedDB] Storage unlocked via user gesture.");
+          try {
+            processSyncQueue();
+          } catch (e) {}
+        })
+        .catch((dbErr) => {
+          console.warn("[IndexedDB] Gesture initialization notice:", dbErr);
+        });
+    } catch (e) {
+      console.warn("[IndexedDB] Gesture exception:", e);
+    }
+
+    // 3. Service Worker Registration inside user gesture
+    try {
+      if ('serviceWorker' in navigator && window.location.protocol.startsWith('http')) {
+        navigator.serviceWorker.register('./sw.js')
+          .then((reg) => console.log('[ServiceWorker] Scope registered:', reg.scope))
+          .catch((swErr) => console.warn('[ServiceWorker] Registration notice:', swErr));
+      }
+    } catch (swErr) {
+      console.warn('[ServiceWorker] Gesture registration exception:', swErr);
+    }
+  }
+
+  let splashDismissed = false;
+
+  function performHeroMorph() {
+    const splash = dom.splashScreen || document.getElementById("splash-screen");
+    const splashBackdrop = dom.splashBackdrop || document.getElementById("splash-backdrop");
+    const splashGlow = dom.splashGlow || document.getElementById("splash-glow");
+    const splashTitle = dom.splashHeroTitle || document.getElementById("splash-hero-title");
+    const splashAuxTop = dom.splashAuxTop || document.getElementById("splash-aux-top");
+    const splashAuxBottom = dom.splashAuxBottom || document.getElementById("splash-aux-bottom");
+    const headerTitle = dom.headerBrandTitle || document.getElementById("header-brand-title");
+
+    if (!splash) return;
+
+    if (!splashTitle || !headerTitle) {
+      splash.style.transition = "opacity 0.5s ease-out";
+      splash.style.opacity = "0";
+      setTimeout(() => {
+        try {
+          if (splash && splash.parentNode) splash.parentNode.removeChild(splash);
+        } catch (e) {}
+      }, 550);
+      return;
+    }
+
+    const splashRect = splashTitle.getBoundingClientRect();
+    const headerRect = headerTitle.getBoundingClientRect();
+
+    if (!headerRect || headerRect.width === 0 || headerRect.height === 0) {
+      splash.style.transition = "opacity 0.5s ease-out";
+      splash.style.opacity = "0";
+      setTimeout(() => {
+        try {
+          if (splash && splash.parentNode) splash.parentNode.removeChild(splash);
+        } catch (e) {}
+      }, 550);
+      return;
+    }
+
+    // Hide target title in header during transition to prevent ghosting
+    headerTitle.style.opacity = "0";
+
+    // Calculate translation and scale deltas for hardware-accelerated transform
+    const dx = headerRect.left - splashRect.left;
+    const dy = headerRect.top - splashRect.top;
+    const scale = headerRect.height / splashRect.height;
+
+    // 1. Smoothly fade out pure black background over 800ms
+    if (splashBackdrop) {
+      splashBackdrop.style.transition = "opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1)";
+      splashBackdrop.style.opacity = "0";
+    }
+    if (splashGlow) {
+      splashGlow.style.transition = "opacity 0.35s ease-out";
+      splashGlow.style.opacity = "0";
+    }
+
+    // 2. Rapidly fade and slide auxiliary items away
+    if (splashAuxTop) {
+      splashAuxTop.style.transition = "opacity 0.28s ease-out, transform 0.28s ease-out";
+      splashAuxTop.style.opacity = "0";
+      splashAuxTop.style.transform = "translate3d(0, -14px, 0) scale(0.95)";
+    }
+    if (splashAuxBottom) {
+      splashAuxBottom.style.transition = "opacity 0.28s ease-out, transform 0.28s ease-out";
+      splashAuxBottom.style.opacity = "0";
+      splashAuxBottom.style.transform = "translate3d(0, 14px, 0) scale(0.95)";
+    }
+
+    // 3. Morph Hero Title smoothly into header position & scale
+    splashTitle.style.transformOrigin = "0 0";
+    splashTitle.style.transition = "transform 0.8s cubic-bezier(0.16, 1, 0.3, 1)";
+    splashTitle.style.transform = `translate3d(${dx}px, ${dy}px, 0) scale(${scale})`;
+
+    // 4. At exactly 800ms: reveal header title and purge splash screen from DOM
+    setTimeout(() => {
+      headerTitle.style.opacity = "1";
+      headerTitle.style.transition = "opacity 0.2s ease-out";
+      try {
+        if (splash && splash.parentNode) {
+          splash.parentNode.removeChild(splash);
+        }
+      } catch (cleanErr) {
+        console.warn("[Splash] Clean up notice:", cleanErr);
+      }
+    }, 800);
+  }
+
+  function initTapToEnterSplashHero() {
+    const splash = dom.splashScreen || document.getElementById("splash-screen");
+    if (!splash) return;
+
+    const onDismiss = () => {
+      if (splashDismissed) return;
+      splashDismissed = true;
+
+      // Unlock mobile APIs inside this user interaction
+      warmupUserGestureAPIs();
+
+      // Execute Hero Shared Element Morph
+      performHeroMorph();
+    };
+
+    splash.addEventListener("pointerdown", onDismiss, { passive: true });
+    splash.addEventListener("click", onDismiss);
+  }
+
+  // ==========================================================================
   // 18. GLOBAL EVENT LISTENERS & INITIALIZATION
   // ==========================================================================
+  // Attach tap-to-enter splash listener
+  initTapToEnterSplashHero();
+
   // Initialize IndexedDB (Non-blocking with error catching)
   try {
     PhotoboothDB.init().catch(err => console.warn("[IndexedDB] Boot init notice:", err));

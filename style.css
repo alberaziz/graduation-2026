@@ -16,27 +16,43 @@ input {
 }
 
 /* ==========================================================================
-   1. CINEMATIC SPLASH SCREEN (HARDWARE-ACCELERATED)
+   1. CINEMATIC SPLASH SCREEN & HERO SHARED ELEMENT TRANSITION
    ========================================================================== */
 #splash-screen {
   position: fixed;
   inset: 0;
   z-index: 9999;
-  background-color: #000000;
-  transition: opacity 0.5s ease-out;
-  will-change: opacity;
+  background-color: transparent;
+  cursor: pointer;
+  touch-action: manipulation;
   contain: layout paint;
 }
 
-.splash-content {
-  animation: splashFadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+#splash-backdrop {
+  position: absolute;
+  inset: 0;
+  background-color: #000000;
+  will-change: opacity;
+}
+
+#splash-hero-title {
+  display: inline-block;
   will-change: transform, opacity;
+  transform-origin: 0 0;
+}
+
+.splash-aux {
+  will-change: transform, opacity;
+}
+
+.splash-initial-fade {
+  animation: splashFadeIn 0.75s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 @keyframes splashFadeIn {
   0% {
     opacity: 0;
-    transform: scale(0.92) translate3d(0, 16px, 0);
+    transform: scale(0.94) translate3d(0, 14px, 0);
   }
   100% {
     opacity: 1;
@@ -48,6 +64,10 @@ input {
 #splash-screen.opacity-0 {
   opacity: 0 !important;
   pointer-events: none !important;
+}
+
+#header-brand-title {
+  will-change: opacity;
 }
 
 /* ==========================================================================
