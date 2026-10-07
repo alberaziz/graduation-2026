@@ -138,9 +138,14 @@
           </div>
 
           <!-- Main Heading -->
-          <h1 class="text-xl sm:text-2xl font-bold tracking-tight text-white leading-snug">
-            Church Of The Virgin Mary and St. Mina
-          </h1>
+          <div id="login-title-wrap" class="flex flex-col items-center">
+            <h1 id="login-hero-title" class="text-2xl sm:text-3xl font-black tracking-[0.22em] text-gold-400 uppercase drop-shadow-md whitespace-nowrap">
+              Class of 2026
+            </h1>
+            <p id="login-subtitle" class="mt-2 text-xs sm:text-sm font-semibold tracking-wider text-neutral-300 uppercase max-w-xs leading-relaxed">
+              Church Of The Virgin Mary and St. Mina
+            </p>
+          </div>
 
           <!-- Form -->
           <form id="login-form" class="mt-8 w-full space-y-5">
@@ -160,6 +165,7 @@
 
             <button
               type="submit"
+              id="login-submit-btn"
               class="btn-bounce w-full rounded-xl bg-gradient-to-r from-gold-600 via-gold-500 to-gold-400 py-3.5 text-sm font-semibold text-black tracking-wide shadow-md transition-transform duration-150 active:scale-95 hover:brightness-105"
             >
               Enter Photobooth
@@ -213,11 +219,11 @@
         </div>
 
         <!-- Centered Fixed 3:4 Viewport (Zero-Lag Native CSS Scroll-Snap Track) -->
-        <div class="relative flex flex-1 items-center justify-center p-3 sm:p-4 overflow-hidden">
+        <div class="camera-stage relative flex flex-1 items-center justify-center p-2 sm:p-4 overflow-hidden">
           
           <div
             id="camera-viewport"
-            class="relative aspect-[3/4] w-full max-w-[340px] max-h-[62vh] rounded-2xl overflow-hidden bg-black shadow-[0_20px_50px_rgba(0,0,0,0.85)] border-2 border-gold-500/35"
+            class="relative rounded-2xl overflow-hidden bg-black shadow-[0_20px_50px_rgba(0,0,0,0.85)] border-2 border-gold-500/40"
           >
             <!-- Clean Video Feed (No CSS Filters) -->
             <video

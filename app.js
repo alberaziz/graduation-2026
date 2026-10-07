@@ -1543,6 +1543,12 @@
       return;
     }
 
+    // Cancel ongoing CSS @keyframes animations so inline transitions take 100% precedence
+    splashTitle.style.animation = "none";
+    if (splashAuxTop) splashAuxTop.style.animation = "none";
+    if (splashAuxBottom) splashAuxBottom.style.animation = "none";
+    void splashTitle.offsetWidth; // Force synchronous reflow
+
     const splashRect = splashTitle.getBoundingClientRect();
     const headerRect = headerTitle.getBoundingClientRect();
 
@@ -1560,39 +1566,48 @@
     // Hide target title in header during transition to prevent ghosting
     headerTitle.style.opacity = "0";
 
-    // Calculate translation and scale deltas for hardware-accelerated transform
+    // Hardware-accelerated translate and scale
     const dx = headerRect.left - splashRect.left;
     const dy = headerRect.top - splashRect.top;
     const scale = headerRect.height / splashRect.height;
 
-    // 1. Smoothly fade out pure black background over 800ms
-    if (splashBackdrop) {
-      splashBackdrop.style.transition = "opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1)";
-      splashBackdrop.style.opacity = "0";
-    }
-    if (splashGlow) {
-      splashGlow.style.transition = "opacity 0.35s ease-out";
-      splashGlow.style.opacity = "0";
-    }
+    // Single unified duration and cubic-bezier curve for perfect lockstep synchronization
+    const EASING = "cubic-bezier(0.22, 1, 0.36, 1)";
+    const DURATION = 700; // ms
 
-    // 2. Rapidly fade and slide auxiliary items away
-    if (splashAuxTop) {
-      splashAuxTop.style.transition = "opacity 0.28s ease-out, transform 0.28s ease-out";
-      splashAuxTop.style.opacity = "0";
-      splashAuxTop.style.transform = "translate3d(0, -14px, 0) scale(0.95)";
-    }
-    if (splashAuxBottom) {
-      splashAuxBottom.style.transition = "opacity 0.28s ease-out, transform 0.28s ease-out";
-      splashAuxBottom.style.opacity = "0";
-      splashAuxBottom.style.transform = "translate3d(0, 14px, 0) scale(0.95)";
-    }
-
-    // 3. Morph Hero Title smoothly into header position & scale
     splashTitle.style.transformOrigin = "0 0";
-    splashTitle.style.transition = "transform 0.8s cubic-bezier(0.16, 1, 0.3, 1)";
-    splashTitle.style.transform = `translate3d(${dx}px, ${dy}px, 0) scale(${scale})`;
+    splashTitle.style.willChange = "transform";
+    if (splashBackdrop) splashBackdrop.style.willChange = "opacity";
 
-    // 4. At exactly 800ms: reveal header title and purge splash screen from DOM
+    requestAnimationFrame(() => {
+      // 1. Black backdrop & glow smoothly fade out over exact duration
+      if (splashBackdrop) {
+        splashBackdrop.style.transition = `opacity ${DURATION}ms ${EASING}`;
+        splashBackdrop.style.opacity = "0";
+      }
+      if (splashGlow) {
+        splashGlow.style.transition = `opacity ${DURATION}ms ${EASING}`;
+        splashGlow.style.opacity = "0";
+      }
+
+      // 2. Auxiliary elements smoothly slide and fade away
+      if (splashAuxTop) {
+        splashAuxTop.style.transition = `opacity 350ms ${EASING}, transform 350ms ${EASING}`;
+        splashAuxTop.style.opacity = "0";
+        splashAuxTop.style.transform = "translate3d(0, -14px, 0) scale(0.96)";
+      }
+      if (splashAuxBottom) {
+        splashAuxBottom.style.transition = `opacity 350ms ${EASING}, transform 350ms ${EASING}`;
+        splashAuxBottom.style.opacity = "0";
+        splashAuxBottom.style.transform = "translate3d(0, 14px, 0) scale(0.96)";
+      }
+
+      // 3. Hero Title glides in lockstep with the backdrop fade
+      splashTitle.style.transition = `transform ${DURATION}ms ${EASING}`;
+      splashTitle.style.transform = `translate3d(${dx}px, ${dy}px, 0) scale(${scale})`;
+    });
+
+    // 4. Reveal header title and completely purge splash screen from DOM
     setTimeout(() => {
       headerTitle.style.opacity = "1";
       headerTitle.style.transition = "opacity 0.2s ease-out";
@@ -1603,7 +1618,7 @@
       } catch (cleanErr) {
         console.warn("[Splash] Clean up notice:", cleanErr);
       }
-    }, 800);
+    }, DURATION + 20);
   }
 
   function initTapToEnterSplashHero() {
@@ -1653,26 +1668,129 @@
   if (dom.galleryBackBtn) dom.galleryBackBtn.addEventListener("click", closeGalleryPanel);
   if (dom.createStripBtn) dom.createStripBtn.addEventListener("click", createPolaroidStrip);
 
-  // Login Form
-  if (dom.loginForm) {
-    dom.loginForm.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const name = dom.userNameInput ? dom.userNameInput.value.trim() : "";
-      if (!name) return;
+  // ==========================================================================
+  // LOGIN SCREEN TRANSITION (HERO TITLE SLIDES UP AND LEFT INTO HEADER)
+  // ==========================================================================
+  let isLoggingIn = false;
 
-      appState.userName = name;
-      if (dom.headerUserName) dom.headerUserName.textContent = name;
+  async function handleLoginSubmit(e) {
+    if (e) e.preventDefault();
+    if (isLoggingIn) return;
+
+    const name = dom.userNameInput ? dom.userNameInput.value.trim() : "";
+    if (!name) return;
+
+    isLoggingIn = true;
+    appState.userName = name;
+    if (dom.headerUserName) dom.headerUserName.textContent = name;
+
+    const loginTitle = document.getElementById("login-hero-title") || document.getElementById("login-title-wrap");
+    const headerTitle = dom.headerBrandTitle || document.getElementById("header-brand-title");
+    const loginEmblem = document.getElementById("login-emblem");
+    const loginSubtitle = document.getElementById("login-subtitle");
+    const loginForm = dom.loginForm;
+
+    // Load user photos in background
+    loadUserSession(name).catch(() => {});
+
+    if (loginTitle && headerTitle) {
+      const titleRect = loginTitle.getBoundingClientRect();
+      const headerRect = headerTitle.getBoundingClientRect();
+
+      // Delta to slide UP and LEFT directly into top-left header
+      const dx = headerRect.left - titleRect.left;
+      const dy = headerRect.top - titleRect.top;
+      const scale = headerRect.height / titleRect.height;
+
+      const EASING = "cubic-bezier(0.22, 1, 0.36, 1)";
+      const DURATION = 650; // ms
+
+      // Hide stationary header text during slide to avoid ghosting
+      headerTitle.style.opacity = "0";
+
+      // Concurrently bring camera view into view
+      if (dom.cameraView) {
+        dom.cameraView.classList.remove("opacity-0", "pointer-events-none", "hidden");
+        dom.cameraView.classList.add("opacity-100", "pointer-events-auto");
+        dom.cameraView.style.transition = `opacity ${DURATION}ms ${EASING}`;
+        dom.cameraView.style.opacity = "1";
+      }
+
+      // Concurrently fade out the rest of login view (form, emblem, subtitle)
+      if (loginEmblem) {
+        loginEmblem.style.transition = `opacity 280ms ${EASING}, transform 280ms ${EASING}`;
+        loginEmblem.style.opacity = "0";
+        loginEmblem.style.transform = "translate3d(0, -12px, 0) scale(0.92)";
+      }
+      if (loginSubtitle) {
+        loginSubtitle.style.transition = `opacity 240ms ${EASING}`;
+        loginSubtitle.style.opacity = "0";
+      }
+      if (loginForm) {
+        loginForm.style.transition = `opacity 280ms ${EASING}, transform 280ms ${EASING}`;
+        loginForm.style.opacity = "0";
+        loginForm.style.transform = "translate3d(0, 16px, 0) scale(0.96)";
+      }
+
+      // Smoothly animate main title UP and LEFT into the top-left header corner
+      loginTitle.style.transformOrigin = "0 0";
+      loginTitle.style.willChange = "transform";
+      loginTitle.style.transition = `transform ${DURATION}ms ${EASING}`;
+      loginTitle.style.transform = `translate3d(${dx}px, ${dy}px, 0) scale(${scale})`;
+
+      setTimeout(() => {
+        // Complete the handover into header area
+        headerTitle.style.opacity = "1";
+        headerTitle.style.transition = "opacity 0.2s ease-out";
+
+        if (dom.headerUserTag) {
+          dom.headerUserTag.classList.remove("hidden");
+          dom.headerUserTag.classList.add("flex");
+        }
+        if (dom.logoutBtn) {
+          dom.logoutBtn.classList.remove("hidden");
+        }
+
+        // Hide login view completely
+        if (dom.loginView) {
+          dom.loginView.classList.add("opacity-0", "pointer-events-none", "hidden");
+          dom.loginView.classList.remove("opacity-100", "pointer-events-auto");
+          dom.loginView.style.opacity = "0";
+        }
+
+        // Reset login elements for future logout
+        loginTitle.style.transform = "";
+        loginTitle.style.transition = "";
+        if (loginEmblem) {
+          loginEmblem.style.transform = "";
+          loginEmblem.style.opacity = "";
+        }
+        if (loginSubtitle) loginSubtitle.style.opacity = "";
+        if (loginForm) {
+          loginForm.style.transform = "";
+          loginForm.style.opacity = "";
+        }
+
+        isLoggingIn = false;
+        startCamera();
+      }, DURATION);
+
+    } else {
+      // Safe fallback
+      showView("camera-view");
       if (dom.headerUserTag) {
         dom.headerUserTag.classList.remove("hidden");
         dom.headerUserTag.classList.add("flex");
       }
       if (dom.logoutBtn) dom.logoutBtn.classList.remove("hidden");
-
-      await loadUserSession(name);
-
-      showView("camera-view");
+      isLoggingIn = false;
       startCamera();
-    });
+    }
+  }
+
+  // Login Form
+  if (dom.loginForm) {
+    dom.loginForm.addEventListener("submit", handleLoginSubmit);
   }
 
   // Exit / Switch Guest
