@@ -546,8 +546,8 @@
     splashGlow: document.getElementById("splash-glow"),
     splashHeroTitle: document.getElementById("splash-hero-title"),
     splashAuxTop: document.getElementById("splash-aux-top"),
-    splashAuxBottom: document.getElementById("splash-aux-bottom"),
-    headerBrandTitle: document.getElementById("header-brand-title"),
+    realHeaderText: document.getElementById("real-header-text") || document.getElementById("header-brand-title"),
+    headerBrandTitle: document.getElementById("real-header-text") || document.getElementById("header-brand-title"),
 
     loginView: document.getElementById("login-view"),
     cameraView: document.getElementById("camera-view"),
@@ -722,22 +722,19 @@
   }
 
   function showView(viewId) {
-    const update = () => {
-      const views = [dom.loginView, dom.cameraView];
-      views.forEach((v) => {
-        if (!v) return;
-        if (v.id === viewId) {
-          v.classList.remove("opacity-0", "pointer-events-none", "hidden");
-          v.classList.add("opacity-100", "pointer-events-auto");
-          v.style.display = "flex";
-        } else {
-          v.classList.add("opacity-0", "pointer-events-none", "hidden");
-          v.classList.remove("opacity-100", "pointer-events-auto");
-          v.style.display = "none";
-        }
-      });
-    };
-    executeViewTransition(update);
+    const views = [dom.loginView, dom.cameraView];
+    views.forEach((v) => {
+      if (!v) return;
+      if (v.id === viewId) {
+        v.classList.remove("opacity-0", "pointer-events-none", "hidden");
+        v.classList.add("opacity-100", "pointer-events-auto");
+        v.style.display = "flex";
+      } else {
+        v.classList.add("opacity-0", "pointer-events-none", "hidden");
+        v.classList.remove("opacity-100", "pointer-events-auto");
+        v.style.display = "none";
+      }
+    });
   }
 
   async function openGalleryPanel() {
@@ -1613,101 +1610,90 @@
     const splashTitle = dom.splashHeroTitle || document.getElementById("splash-hero-title");
     const splashAuxTop = dom.splashAuxTop || document.getElementById("splash-aux-top");
     const splashAuxBottom = dom.splashAuxBottom || document.getElementById("splash-aux-bottom");
-    const headerTitle = dom.headerBrandTitle || document.getElementById("header-brand-title");
+    const realHeaderText = document.getElementById("real-header-text") || dom.realHeaderText || document.getElementById("header-brand-title");
 
     if (!splash) return;
 
-    if (!splashTitle || !headerTitle) {
-      splash.style.transition = "opacity 0.5s ease-out";
-      splash.style.opacity = "0";
-      setTimeout(() => {
-        try {
-          if (splash && splash.parentNode) splash.parentNode.removeChild(splash);
-        } catch (e) {}
-      }, 550);
+    if (!splashTitle || !realHeaderText) {
+      if (splash) splash.remove();
+      if (realHeaderText) {
+        realHeaderText.classList.remove("opacity-0");
+        realHeaderText.classList.add("opacity-100");
+        realHeaderText.style.opacity = "1";
+      }
       return;
     }
 
-    // Cancel ongoing CSS @keyframes animations so inline transitions take 100% precedence
+    // Cancel ongoing CSS keyframe animations so inline transitions take 100% precedence
     splashTitle.style.animation = "none";
     if (splashAuxTop) splashAuxTop.style.animation = "none";
     if (splashAuxBottom) splashAuxBottom.style.animation = "none";
     void splashTitle.offsetWidth; // Force synchronous reflow
 
     const splashRect = splashTitle.getBoundingClientRect();
-    const headerRect = headerTitle.getBoundingClientRect();
+    const headerRect = realHeaderText.getBoundingClientRect();
 
-    if (!headerRect || headerRect.width === 0 || headerRect.height === 0) {
-      splash.style.transition = "opacity 0.5s ease-out";
-      splash.style.opacity = "0";
-      setTimeout(() => {
-        try {
-          if (splash && splash.parentNode) splash.parentNode.removeChild(splash);
-        } catch (e) {}
-      }, 550);
-      return;
+    let dx = 0;
+    let dy = -splashRect.top + 16;
+    let scale = 0.55;
+
+    if (headerRect && headerRect.width > 0 && headerRect.height > 0) {
+      dx = headerRect.left - splashRect.left;
+      dy = headerRect.top - splashRect.top;
+      scale = headerRect.height / splashRect.height;
     }
 
-    // Hide target title in header during initial movement
-    headerTitle.style.opacity = "0";
-
-    // Pure CSS hardware-accelerated translate and scale
-    const dx = headerRect.left - splashRect.left;
-    const dy = headerRect.top - splashRect.top;
-    const scale = headerRect.height / splashRect.height;
-
-    // Smooth cubic-bezier deceleration curve
     const EASING = "cubic-bezier(0.16, 1, 0.3, 1)";
-    const DURATION = 650; // ms
-
-    splashTitle.style.transformOrigin = "0 0";
-    splashTitle.style.willChange = "transform, opacity";
-    if (splashBackdrop) splashBackdrop.style.willChange = "opacity";
+    const DURATION_MS = 800; // 0.8s
 
     requestAnimationFrame(() => {
-      // 1. Black backdrop & glow smoothly fade out
+      // 1. Fade out the black background, glow, and auxiliary prompts
       if (splashBackdrop) {
-        splashBackdrop.style.transition = `opacity ${DURATION}ms ${EASING}`;
+        splashBackdrop.style.transition = `opacity ${DURATION_MS}ms ${EASING}`;
         splashBackdrop.style.opacity = "0";
       }
       if (splashGlow) {
-        splashGlow.style.transition = `opacity ${DURATION}ms ${EASING}`;
+        splashGlow.style.transition = `opacity ${DURATION_MS}ms ${EASING}`;
         splashGlow.style.opacity = "0";
       }
-
-      // 2. Auxiliary elements smoothly slide and fade away
       if (splashAuxTop) {
-        splashAuxTop.style.transition = `opacity 300ms ${EASING}, transform 300ms ${EASING}`;
+        splashAuxTop.style.transition = `opacity 250ms ${EASING}, transform 250ms ${EASING}`;
         splashAuxTop.style.opacity = "0";
-        splashAuxTop.style.transform = "translate3d(0, -14px, 0) scale(0.96)";
+        splashAuxTop.style.transform = "translate3d(0, -16px, 0) scale(0.95)";
       }
       if (splashAuxBottom) {
-        splashAuxBottom.style.transition = `opacity 300ms ${EASING}, transform 300ms ${EASING}`;
+        splashAuxBottom.style.transition = `opacity 250ms ${EASING}, transform 250ms ${EASING}`;
         splashAuxBottom.style.opacity = "0";
-        splashAuxBottom.style.transform = "translate3d(0, 14px, 0) scale(0.96)";
+        splashAuxBottom.style.transform = "translate3d(0, 16px, 0) scale(0.95)";
       }
 
-      // 3. Hero Title glides with pure CSS transform smoothly to destination
-      // Seamlessly cross-fade during final 120ms to eliminate ANY snap/glitch at the end
-      splashTitle.style.transition = `transform ${DURATION}ms ${EASING}, opacity 120ms ease-out ${DURATION - 120}ms`;
+      // 2. Use CSS transform with a 0.8s cubic-bezier transition to physically move the Splash text to the top of the screen
+      splashTitle.style.transformOrigin = "0 0";
+      splashTitle.style.willChange = "transform";
+      splashTitle.style.transition = `transform ${DURATION_MS}ms ${EASING}`;
       splashTitle.style.transform = `translate3d(${dx}px, ${dy}px, 0) scale(${scale})`;
-      splashTitle.style.opacity = "0";
-
-      headerTitle.style.transition = `opacity 150ms ease-in ${DURATION - 150}ms`;
-      headerTitle.style.opacity = "1";
     });
 
-    // 4. Clean up splash DOM node after transform completes
+    // 3. Set a setTimeout for 800ms
     setTimeout(() => {
-      headerTitle.style.opacity = "1";
+      // Completely remove the Splash screen from the DOM
       try {
         if (splash && splash.parentNode) {
-          splash.parentNode.removeChild(splash);
+          splash.remove();
+        } else if (splash) {
+          splash.remove();
         }
       } catch (cleanErr) {
-        console.warn("[Splash] Clean up notice:", cleanErr);
+        console.warn("[Splash] Removal notice:", cleanErr);
       }
-    }, DURATION + 30);
+
+      // IMMEDIATELY set the opacity of real-header-text to 1 so it seamlessly takes its place
+      if (realHeaderText) {
+        realHeaderText.classList.remove("opacity-0");
+        realHeaderText.classList.add("opacity-100");
+        realHeaderText.style.opacity = "1";
+      }
+    }, DURATION_MS);
   }
 
   function initTapToEnterSplashHero() {
@@ -1783,55 +1769,40 @@
     // Load user photos in background
     loadUserSession(name).catch(() => {});
 
-    // Start camera stream so video begins streaming immediately
+    // Start camera stream so video begins streaming immediately in the background
     startCamera();
 
-    const switchViews = () => {
-      if (dom.loginView) {
-        dom.loginView.style.display = "none";
-        dom.loginView.classList.add("hidden", "opacity-0", "pointer-events-none");
-        dom.loginView.classList.remove("opacity-100", "pointer-events-auto");
-      }
-      if (dom.cameraView) {
-        dom.cameraView.style.display = "flex";
-        dom.cameraView.classList.remove("hidden", "opacity-0", "pointer-events-none");
-        dom.cameraView.classList.add("opacity-100", "pointer-events-auto");
-        dom.cameraView.style.opacity = "1";
-      }
-    };
+    const loginWrapper = dom.loginView;
+    const cameraWrapper = dom.cameraView;
 
-    if (typeof document.startViewTransition === "function") {
-      const transition = executeViewTransition(switchViews);
-      transition.finished.finally(() => {
+    if (loginWrapper && cameraWrapper) {
+      // 1. Apply smooth opacity 0 over 0.5s to Login wrapper
+      loginWrapper.style.transition = "opacity 0.5s ease";
+      loginWrapper.style.opacity = "0";
+      loginWrapper.style.pointerEvents = "none";
+
+      // 2. Use setTimeout(..., 500)
+      setTimeout(() => {
+        // Set Login wrapper to display: none
+        loginWrapper.style.display = "none";
+        loginWrapper.classList.add("hidden");
+
+        // Set Camera wrapper to display: flex with initial opacity: 0
+        cameraWrapper.style.display = "flex";
+        cameraWrapper.classList.remove("hidden", "pointer-events-none");
+        cameraWrapper.classList.add("pointer-events-auto");
+        cameraWrapper.style.opacity = "0";
+        cameraWrapper.style.transition = "opacity 0.5s ease";
+
+        // 3. Force a DOM reflow, then set Camera wrapper opacity to 1 for smooth fade-in
+        void cameraWrapper.offsetWidth;
+        cameraWrapper.style.opacity = "1";
+
         isLoggingIn = false;
-      });
+      }, 500);
     } else {
-      // Smooth 0.5s CSS crossfade fallback for older browsers
-      if (dom.cameraView && dom.loginView) {
-        dom.cameraView.style.display = "flex";
-        dom.cameraView.classList.remove("hidden", "pointer-events-none");
-        dom.cameraView.classList.add("pointer-events-auto");
-        dom.cameraView.style.opacity = "0";
-        dom.cameraView.style.transition = "opacity 0.5s ease";
-
-        dom.loginView.style.transition = "opacity 0.5s ease";
-        dom.loginView.style.opacity = "0";
-        dom.loginView.style.pointerEvents = "none";
-
-        requestAnimationFrame(() => {
-          requestAnimationFrame(() => {
-            dom.cameraView.style.opacity = "1";
-          });
-        });
-
-        setTimeout(() => {
-          switchViews();
-          isLoggingIn = false;
-        }, 500);
-      } else {
-        switchViews();
-        isLoggingIn = false;
-      }
+      showView("camera-view");
+      isLoggingIn = false;
     }
   }
 
@@ -1862,24 +1833,20 @@
       if (dom.logoutBtn) dom.logoutBtn.classList.add("hidden");
       if (dom.userNameInput) dom.userNameInput.value = "";
 
-      const resetViews = () => {
-        // Reset inline styles on views
-        if (dom.loginView) {
-          dom.loginView.style.display = "";
-          dom.loginView.style.opacity = "";
-          dom.loginView.style.transition = "";
-          dom.loginView.style.pointerEvents = "";
-        }
-        if (dom.cameraView) {
-          dom.cameraView.style.display = "";
-          dom.cameraView.style.opacity = "";
-          dom.cameraView.style.transition = "";
-          dom.cameraView.style.pointerEvents = "";
-        }
-        showView("login-view");
-      };
-
-      executeViewTransition(resetViews);
+      // Reset inline styles on views
+      if (dom.cameraView) {
+        dom.cameraView.style.display = "none";
+        dom.cameraView.classList.add("hidden", "opacity-0", "pointer-events-none");
+        dom.cameraView.classList.remove("opacity-100", "pointer-events-auto");
+        dom.cameraView.style.opacity = "0";
+      }
+      if (dom.loginView) {
+        dom.loginView.style.display = "flex";
+        dom.loginView.classList.remove("hidden", "opacity-0", "pointer-events-none");
+        dom.loginView.classList.add("opacity-100", "pointer-events-auto");
+        dom.loginView.style.opacity = "1";
+        dom.loginView.style.pointerEvents = "auto";
+      }
     });
   }
 

@@ -66,8 +66,15 @@ input {
   pointer-events: none !important;
 }
 
+#real-header-text,
 #header-brand-title {
   will-change: opacity;
+}
+
+#real-header-text.opacity-0,
+#header-brand-title.opacity-0 {
+  opacity: 0 !important;
+  pointer-events: none !important;
 }
 
 /* ==========================================================================
@@ -154,13 +161,7 @@ input {
   animation-timing-function: cubic-bezier(0.32, 0.72, 0, 1);
 }
 
-#app-header {
-  view-transition-name: header-bar;
-}
 
-::view-transition-group(header-bar) {
-  animation-duration: 0.35s;
-}
 
 /* View transitions & micro-interactions */
 .view-fade {
